@@ -1,0 +1,211 @@
+import { useEffect, useState } from 'react'
+import { useLocation, useSearchParams } from 'react-router-dom'
+import { lastMatch, player } from '@/requests/matchResult'
+import './match-result-page.scss'
+
+export function MatchResultPage() {
+  const pollMs = 5000
+  const durationMs = 7000
+  const testPauseMs = 3000
+  const testShowMs = 3000
+  const [ visible, setVisible ] = useState(false)
+  const [ result, setResult ] = useState<'WIN' | 'LOSS'>('WIN')
+  const [ errorMessage, setErrorMessage ] = useState<string | null>(null)
+  const [ level, setLevel ] = useState<number | null>(null)
+  const [ elo, setElo ] = useState<number | null>(null)
+  const [ eloDelta, setEloDelta ] = useState<number | null>(null)
+  const location = useLocation()
+  const [ searchParams, setSearchParams ] = useSearchParams()
+  const rawNickname = searchParams.get('nickname')
+  const rawTest = searchParams.get('test')
+  const isTestMode = rawTest === 'true'
+  const nickname = rawNickname?.trim() ?? ''
+  const missingNicknameMessage = !isTestMode && !nickname
+    ? 'Похоже, что ты не указал свой FACEIT-ник. Добавь его в адресной строке после nickname='
+    : null
+  const transparent = true
+
+  useEffect(() => {
+    const nextParams = new URLSearchParams()
+    if (rawNickname !== null || !isTestMode) nextParams.set('nickname', rawNickname ?? '')
+    if (rawTest !== null) nextParams.set('test', rawTest === 'true' ? 'true' : 'false')
+
+    const hasNicknameWithoutEquals = /(?:\?|&)nickname(?:&|$)/.test(location.search)
+    const hasTestWithoutEquals = /(?:\?|&)test(?:&|$)/.test(location.search)
+    if (hasNicknameWithoutEquals || hasTestWithoutEquals || nextParams.toString() !== searchParams.toString()) {
+      setSearchParams(nextParams, { replace: true })
+      return
+    }
+
+    if (isTestMode) {
+      let showTimer: number | null = null
+      let hideTimer: number | null = null
+
+      const schedule = () => {
+        const nextResult: 'WIN' | 'LOSS' = Math.random() >= 0.5 ? 'WIN' : 'LOSS'
+        const delta = 20 + Math.floor(Math.random() * 11)
+        const signedDelta = nextResult === 'WIN' ? delta : -delta
+
+        setResult(nextResult)
+        setLevel(10)
+        setEloDelta(signedDelta)
+        setElo((prev) => Math.max(0, (prev ?? 2100) + signedDelta))
+        setErrorMessage(null)
+        setVisible(true)
+
+        hideTimer = window.setTimeout(() => {
+          setVisible(false)
+          showTimer = window.setTimeout(schedule, testPauseMs)
+        }, testShowMs)
+      }
+
+      showTimer = window.setTimeout(schedule, 0)
+      return () => {
+        if (showTimer) window.clearTimeout(showTimer)
+        if (hideTimer) window.clearTimeout(hideTimer)
+      }
+    }
+
+    if (!nickname) {
+      return
+    }
+
+    let lastMatchId: string | null = null
+    let lastKnownElo: number | null = null
+    let playerId: string | null = null
+    let hideTimer: number | null = null
+    let pollTimer: number | null = null
+    let cancelled = false
+
+    const showMatchResult = (
+      nextResult: 'WIN' | 'LOSS',
+      nextLevel: number | null,
+      nextElo: number | null,
+      nextEloDelta: number | null,
+    ) => {
+      setResult(nextResult)
+      setLevel(nextLevel)
+      setElo(nextElo)
+      setEloDelta(nextEloDelta)
+      setVisible(true)
+      if (hideTimer) window.clearTimeout(hideTimer)
+      hideTimer = window.setTimeout(() => setVisible(false), durationMs)
+    }
+
+    const pollLastMatch = async () => {
+      try {
+        if (!playerId) {
+          setErrorMessage('Не удалось определить playerId для запроса последнего матча.')
+          return
+        }
+        const matchData = await lastMatch(playerId)
+        setErrorMessage(null)
+        if (!matchData?.matchId) {
+          return
+        }
+        if (matchData.status?.toUpperCase() !== 'FINISHED') {
+          return
+        }
+        if (matchData.result === 'UNKNOWN' || !matchData.result) {
+          return
+        }
+
+        if (!lastMatchId) {
+          lastMatchId = matchData.matchId
+          return
+        }
+        if (matchData.matchId === lastMatchId) return
+
+        const playerPayload = await player(nickname)
+        if (cancelled) return
+
+        const nextElo = typeof playerPayload.currentElo === 'number' ? playerPayload.currentElo : null
+        const nextLevel =
+          typeof playerPayload.currentSkillLevel === 'number' ? playerPayload.currentSkillLevel : null
+        const previousElo = lastKnownElo
+        let computedDelta: number | null = null
+        if (typeof nextElo === 'number' && typeof previousElo === 'number') {
+          computedDelta = nextElo - previousElo
+        }
+
+        lastMatchId = matchData.matchId
+        lastKnownElo = nextElo
+        showMatchResult(matchData.result === 'LOSS' ? 'LOSS' : 'WIN', nextLevel, nextElo, computedDelta)
+      } catch (error) {
+        console.error('[lastMatch request failed]', error)
+        setErrorMessage(
+          'Связь с сервером временно потерялась. Проверьте интернет и FACEIT-ник (регистр букв важен), затем обновите страницу.',
+        )
+        setVisible(false)
+      }
+    }
+
+    const bootstrap = async () => {
+      try {
+        const playerPayload = await player(nickname)
+        if (cancelled) return
+        playerId = typeof playerPayload.playerId === 'string' ? playerPayload.playerId : null
+        if (!playerId) {
+          setErrorMessage('Не удалось получить playerId игрока.')
+          return
+        }
+        lastKnownElo =
+          typeof playerPayload.currentElo === 'number' ? playerPayload.currentElo : null
+        setLevel(typeof playerPayload.currentSkillLevel === 'number' ? playerPayload.currentSkillLevel : null)
+        setElo(lastKnownElo)
+
+        const matchData = await lastMatch(playerId)
+        if (cancelled) return
+        if (matchData.matchId) {
+          lastMatchId = matchData.matchId
+        }
+        setErrorMessage(null)
+
+        pollTimer = window.setInterval(() => void pollLastMatch(), pollMs)
+      } catch (error) {
+        console.error('[bootstrap lastMatch flow failed]', error)
+        setErrorMessage(
+          'Связь с сервером временно потерялась. Проверьте интернет и FACEIT-ник (регистр букв важен), затем обновите страницу.',
+        )
+      }
+    }
+
+    void bootstrap()
+
+    return () => {
+      cancelled = true
+      if (hideTimer) window.clearTimeout(hideTimer)
+      if (pollTimer) window.clearInterval(pollTimer)
+    }
+  }, [ isTestMode, location.search, nickname, rawNickname, rawTest, searchParams, setSearchParams, testPauseMs, testShowMs ])
+
+  const isMatchResultVisible = visible && !missingNicknameMessage
+  let eloDeltaText = '--'
+  if (typeof eloDelta === 'number') {
+    eloDeltaText = eloDelta >= 0 ? `+${eloDelta}` : `${eloDelta}`
+  }
+
+  return (
+    <div className={`match-result ${transparent ? 'match-result--transparent' : 'match-result--solid'}`}>
+      {missingNicknameMessage || errorMessage ? (
+        <div className="match-result__error-screen">
+          <div className="match-result__error-title">Упс, не нашли такого игрока</div>
+          <div className="match-result__error-message">{missingNicknameMessage || errorMessage}</div>
+        </div>
+      ) : null}
+      <div
+        className={`match-result__card ${isMatchResultVisible ? 'match-result__card--show' : 'match-result__card--hidden'} ${result === 'LOSS' ? 'match-result__card--loss' : 'match-result__card--win'}`}
+      >
+        <div className="match-result__badge">FACEIT</div>
+        <div className="match-result__result">{result === 'LOSS' ? 'DEFEAT' : 'VICTORY'}</div>
+        <div className="match-result__meta">
+          <span>LVL {level ?? '--'}</span>
+          <span>ELO {elo ?? '--'}</span>
+          <span className={(eloDelta ?? 0) >= 0 ? 'match-result__meta-delta--positive' : 'match-result__meta-delta--negative'}>
+            {eloDeltaText}
+          </span>
+        </div>
+      </div>
+    </div>
+  )
+}

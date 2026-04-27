@@ -1,0 +1,8 @@
+node_modules
+dist
+build
+coverage
+*.lock
+
+# HTML: форматирование и перевод строки в конце — через ESLint (@html-eslint), не Prettier.
+**/*.html

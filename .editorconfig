@@ -1,0 +1,12 @@
+# https://editorconfig.org — согласовать переводы строк с Prettier (LF)
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{ts,tsx,js,mjs,cjs,json,yml,yaml,md,html,css,scss}]
+indent_style = space
+indent_size = 2

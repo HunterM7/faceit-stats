@@ -1,0 +1,20 @@
+{
+  "name": "faceit-stats",
+  "version": "0.2.0",
+  "private": true,
+  "description": "FACEIT stream match result and stats widgets",
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "clean:workspace-modules": "rm -rf client/node_modules server/node_modules",
+    "postinstall": "npm run clean:workspace-modules",
+    "build": "npm run build -w client && npm run build -w server && npm run clean:workspace-modules",
+    "start": "npm run build && npm run start -w server",
+    "dev": "concurrently \"npm run dev -w client\" \"npm run start:dev -w server\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

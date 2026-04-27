@@ -1,0 +1,111 @@
+.match-result {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &--solid {
+    background: #11141b;
+  }
+
+  &--transparent {
+    background: rgba(9, 12, 18, 0.28);
+  }
+
+  &__card {
+    min-width: 420px;
+    text-align: center;
+    color: #fff;
+    border-radius: 18px;
+    padding: 22px 28px;
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    background: rgba(10, 10, 20, 0.8);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.45);
+    transform: translateY(20px) scale(0.95);
+    opacity: 0;
+    transition: all 260ms ease-out;
+
+    &--show {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+
+    &--hidden {
+      opacity: 0;
+    }
+
+    &--win {
+      border-color: rgba(45, 219, 130, 0.8);
+      box-shadow: 0 0 35px rgba(45, 219, 130, 0.35);
+    }
+
+    &--loss {
+      border-color: rgba(255, 84, 102, 0.8);
+      box-shadow: 0 0 35px rgba(255, 84, 102, 0.35);
+    }
+  }
+
+  &__badge {
+    font-size: 14px;
+    opacity: 0.9;
+    letter-spacing: 1px;
+  }
+
+  &__result {
+    margin-top: 10px;
+    font-size: 44px;
+    font-weight: 900;
+    letter-spacing: 2px;
+  }
+
+  &__meta {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    font-size: 17px;
+    font-weight: 700;
+  }
+
+  &__meta-delta {
+    &--positive {
+      color: #2ddb82;
+    }
+
+    &--negative {
+      color: #ff5466;
+    }
+  }
+
+  &__error-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+    box-sizing: border-box;
+    background: rgba(9, 12, 18, 0.28);
+    color: #fff;
+  }
+
+  &__error-title {
+    font-size: 42px;
+    line-height: 1.05;
+    font-weight: 900;
+    letter-spacing: 0.8px;
+  }
+
+  &__error-message {
+    margin-top: 12px;
+    max-width: 760px;
+    font-size: 24px;
+    line-height: 1.25;
+    color: rgba(255, 255, 255, 0.92);
+  }
+}

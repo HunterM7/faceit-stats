@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#111827"/>
+      <stop offset="1" stop-color="#0B1220"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="18" y1="16" x2="46" y2="48" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF5F2E"/>
+      <stop offset="1" stop-color="#7E14FF"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="56" height="56" rx="14" fill="url(#bg)"/>
+  <path d="M19 14C18.2 14 17.72 14.9 18.18 15.56L26.56 27.38C27.08 28.12 27.08 29.12 26.56 29.86L18.18 41.68C17.72 42.34 18.2 43.24 19 43.24H27.18C27.56 43.24 27.9 43.06 28.1 42.76L35.02 32.94C35.48 32.3 36.4 32.3 36.86 32.94L43.78 42.76C43.98 43.06 44.32 43.24 44.7 43.24H52.88C53.68 43.24 54.16 42.34 53.7 41.68L45.32 29.86C44.8 29.12 44.8 28.12 45.32 27.38L53.7 15.56C54.16 14.9 53.68 14 52.88 14H44.7C44.32 14 43.98 14.18 43.78 14.48L36.86 24.3C36.4 24.94 35.48 24.94 35.02 24.3L28.1 14.48C27.9 14.18 27.56 14 27.18 14H19Z" fill="url(#accent)"/>
+  <circle cx="48" cy="18" r="4" fill="#47BFFF"/>
+</svg>
