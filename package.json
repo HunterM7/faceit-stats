@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "clean:workspace-modules": "rm -rf client/node_modules server/node_modules",
-    "postinstall": "npm run clean:workspace-modules",
+    "postinstall": "node -e \"if (!process.env.VERCEL) require('child_process').execSync('npm run clean:workspace-modules', {stdio:'inherit'})\"",
     "build": "npm run build -w client && npm run build -w server && npm run clean:workspace-modules",
     "start": "npm run build && npm run start -w server",
     "dev": "concurrently \"npm run dev -w client\" \"npm run start:dev -w server\""
