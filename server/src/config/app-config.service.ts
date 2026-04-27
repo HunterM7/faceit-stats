@@ -10,7 +10,9 @@ export class AppConfigService {
   }
 
   get corsOrigin(): string {
-    return this.config.get<string>('app.corsOrigin', '');
+    const raw = this.config.get<string>('app.corsOrigin', '').trim();
+    // Origin из браузера без завершающего `/`; строка должна совпасть побайтово.
+    return raw.replace(/\/+$/, '');
   }
 
   get gameId(): string {
