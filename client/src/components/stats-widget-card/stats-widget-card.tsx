@@ -92,7 +92,7 @@ export function StatsWidgetCard(props: StatsWidgetCardProps) {
         </div>
 
         <div className='stats-widget-card__kd-ratio'>
-          {common.kdRatioValue}
+          {formatNumberWithFixedDecimals(common.kdRatioValue, 2)}
           <div className='stats-widget-card__label'>K/D</div>
         </div>
 
