@@ -1,4 +1,4 @@
-.widget-config-page {
+.stats-widget-page {
   min-height: 100svh;
   color: #e6e9ef;
   background:
@@ -60,7 +60,7 @@
   &__grid {
     margin-top: 14px;
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
     gap: 12px;
 
     label {
@@ -70,8 +70,7 @@
       font-size: 14px;
     }
 
-    input,
-    select {
+    input {
       border-radius: 10px;
       border: 1px solid rgba(255, 255, 255, 0.25);
       background: rgba(0, 0, 0, 0.25);
@@ -162,8 +161,8 @@
   }
 
   @media (max-width: 900px) {
-    &__grid {
-      grid-template-columns: 1fr;
+    &__card {
+      padding: 16px;
     }
 
     &__link-row {

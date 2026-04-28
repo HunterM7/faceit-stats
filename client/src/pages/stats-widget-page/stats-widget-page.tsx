@@ -1,14 +1,11 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AppHeader } from '@components/app-header/app-header'
-import { buildUrl, type BoolSetting } from '@utils/widget-url'
+import { buildUrl } from '@utils/widget-url'
 import './stats-widget-page.scss'
 
 export function StatsWidgetPage() {
   const [ nickname, setNickname ] = useState('')
-  const [ hideRank, setHideRank ] = useState<BoolSetting>('false')
-  const [ hideChallenger, setHideChallenger ] = useState<BoolSetting>('false')
-  const [ transparent, setTransparent ] = useState<BoolSetting>('true')
   const [ copied, setCopied ] = useState(false)
   const canBuild = nickname.trim().length > 0
 
@@ -16,12 +13,9 @@ export function StatsWidgetPage() {
     () => (canBuild
       ? buildUrl('/stats', {
         nickname: nickname.trim(),
-        hideRank,
-        hideChallenger,
-        transparent,
       })
       : ''),
-    [ canBuild, nickname, hideRank, hideChallenger, transparent ],
+    [ canBuild, nickname ],
   )
 
   const copy = async () => {
@@ -36,11 +30,11 @@ export function StatsWidgetPage() {
   }
 
   return (
-    <main className="widget-config-page">
+    <main className="stats-widget-page">
       <AppHeader />
-      <section className="widget-config-page__card">
-        <div className="widget-config-page__top">
-          <p className="widget-config-page__badge">WIDGET PAGE</p>
+      <section className="stats-widget-page__card">
+        <div className="stats-widget-page__top">
+          <p className="stats-widget-page__badge">WIDGET PAGE</p>
           <h1>Stats Widget</h1>
           <p>
             Виджет с ELO, уровнем, winrate и актуальной статистикой игрока FACEIT. Здесь можно настроить параметры и сразу
@@ -48,7 +42,7 @@ export function StatsWidgetPage() {
           </p>
         </div>
 
-        <div className="widget-config-page__hint-list">
+        <div className="stats-widget-page__hint-list">
           <span>
             1) Укажи ник FACEIT
           </span>
@@ -60,7 +54,7 @@ export function StatsWidgetPage() {
           </span>
         </div>
 
-        <div className="widget-config-page__grid">
+        <div className="stats-widget-page__grid">
           <label>
             Ник FACEIT
             <input
@@ -70,33 +64,9 @@ export function StatsWidgetPage() {
               placeholder="например: s1mple"
             />
           </label>
-
-          <label>
-            hideRank
-            <select value={hideRank} onChange={(e) => setHideRank(e.target.value as BoolSetting)}>
-              <option value="false">false</option>
-              <option value="true">true</option>
-            </select>
-          </label>
-
-          <label>
-            hideChallenger
-            <select value={hideChallenger} onChange={(e) => setHideChallenger(e.target.value as BoolSetting)}>
-              <option value="false">false</option>
-              <option value="true">true</option>
-            </select>
-          </label>
-
-          <label>
-            transparent
-            <select value={transparent} onChange={(e) => setTransparent(e.target.value as BoolSetting)}>
-              <option value="true">true</option>
-              <option value="false">false</option>
-            </select>
-          </label>
         </div>
 
-        <div className="widget-config-page__link-row">
+        <div className="stats-widget-page__link-row">
           <input
             type="text"
             readOnly
@@ -110,15 +80,15 @@ export function StatsWidgetPage() {
             href={widgetUrl || undefined}
             target="_blank"
             rel="noreferrer"
-            className={`widget-config-page__open ${canBuild ? '' : 'widget-config-page__open--disabled'}`}
+            className={`stats-widget-page__open ${canBuild ? '' : 'stats-widget-page__open--disabled'}`}
           >
             Открыть виджет
           </a>
         </div>
 
-        <div className="widget-config-page__footer">
-          <Link to="/" className="widget-config-page__link">На главную</Link>
-          <Link to="/widgets/match-result" className="widget-config-page__link">К странице Match Result</Link>
+        <div className="stats-widget-page__footer">
+          <Link to="/" className="stats-widget-page__link">На главную</Link>
+          <Link to="/widgets/match-result" className="stats-widget-page__link">К странице Match Result</Link>
         </div>
       </section>
     </main>

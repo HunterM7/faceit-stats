@@ -116,6 +116,7 @@ export default tseslint.config([
       'no-tabs': ['error'],
       'prefer-const': ['error', { destructuring: 'all', ignoreReadBeforeAssign: false }],
       quotes: ['error', 'single'],
+      'jsx-quotes': ['error', 'prefer-single'],
 
       'max-depth': ['error', { max: 5 }],
       'max-params': ['error', { max: 5 }],

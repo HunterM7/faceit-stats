@@ -30,7 +30,7 @@ export type StatsPayload = {
   winRate?: number | null
   averageKills?: number | null
   averageAdr?: number | null
-  kdRatio?: number | null
+  kdRatio: number
   krRatio?: number | null
   last30Wins?: number
   last30Losses?: number

@@ -1,13 +1,15 @@
-import { useEffect, useState, type ReactNode } from 'react'
-import { SkillLevelIcon } from '@/components/skill-level-icon/skill-level-icon'
+import { useEffect, useState } from 'react'
+import { useLocation, useSearchParams } from 'react-router-dom'
+import { StatsWidgetCard } from '@components/stats-widget-card/stats-widget-card'
 import { requestStats, type StatsPayload } from '@requests/stats'
 import './stats-page.scss'
+import { formatNumberWithFixedDecimals } from '@/utils/number-format';
 
 type StatsState = {
   nickname: string
   country: string | null
-  elo: number | null
-  level: number | null
+  elo: number
+  level: number
   rankLabel: string
   winRate: number | null
   averageKills: number | null
@@ -21,13 +23,6 @@ type StatsState = {
   updated: string
   status: 'online' | 'offline'
   latestResult: 'WIN' | 'LOSS' | 'UNKNOWN'
-  errorMessage: string | null
-}
-
-type StatsMetricProps = {
-  value: ReactNode
-  label: string
-  valueClassName?: string
 }
 
 function formatUpdated(iso?: string | null): string {
@@ -42,61 +37,28 @@ function countryCodeToFlagEmoji(code?: string | null): string {
   return String.fromCodePoint(...normalized.split('').map((char) => 127397 + char.charCodeAt(0)))
 }
 
-function StatsMetric({ value, label, valueClassName }: StatsMetricProps) {
-  return (
-    <div className="stats-widget__metric">
-      <div className={valueClassName ? `stats-widget__value ${valueClassName}` : 'stats-widget__value'}>{value}</div>
-      <div className="stats-widget__label">{label}</div>
-    </div>
-  )
-}
-
 export function StatsPage() {
-  const PANEL_SWITCH_MS = 5000
-  const PANEL_FADE_MS = 700
+  const location = useLocation()
+  const [ searchParams, setSearchParams ] = useSearchParams()
+  const rawNickname = searchParams.get('nickname')
+  const nicknameParam = rawNickname?.trim()
 
-  const params = new URLSearchParams(window.location.search)
-  const nicknameParam = params.get('nickname')?.trim()
-  const hideRank = params.get('hideRank') === 'true'
-  const hideChallenger = params.get('hideChallenger') === 'true'
-  const transparent = params.get('transparent') !== 'false'
-
-  const [ state, setState ] = useState<StatsState>({
-    nickname: '...',
-    country: null,
-    elo: null,
-    level: null,
-    rankLabel: '#----',
-    winRate: null,
-    averageKills: null,
-    averageAdr: null,
-    kdRatio: null,
-    krRatio: null,
-    last30Wins: 0,
-    last30Losses: 0,
-    todayWins: 0,
-    todayLosses: 0,
-    updated: '--:--:--',
-    status: 'offline',
-    latestResult: 'UNKNOWN',
-    errorMessage: null,
-  })
-  const [ panel, setPanel ] = useState<'last30' | 'today'>('last30')
-  const [ isPanelVisible, setIsPanelVisible ] = useState(true)
+  const [ state, setState ] = useState<StatsState | undefined>(undefined)
 
   useEffect(() => {
     let mounted = true
 
     const refresh = async () => {
+      const nextParams = new URLSearchParams()
+      nextParams.set('nickname', rawNickname ?? '')
+
+      const hasNicknameWithoutEquals = /(?:\?|&)nickname(?:&|$)/.test(location.search)
+      if (hasNicknameWithoutEquals || nextParams.toString() !== searchParams.toString()) {
+        setSearchParams(nextParams, { replace: true })
+        return
+      }
+
       if (!nicknameParam) {
-        if (!mounted) return
-        setState((prev) => ({
-          ...prev,
-          status: 'offline',
-          updated: 'offline',
-          latestResult: 'UNKNOWN',
-          errorMessage: 'Не передан nickname в URL. Добавь параметр ?nickname=FACEIT_NICK',
-        }))
         return
       }
 
@@ -118,7 +80,7 @@ export function StatsPage() {
           winRate: typeof stats.winRate === 'number' ? stats.winRate : null,
           averageKills: typeof stats.averageKills === 'number' ? stats.averageKills : null,
           averageAdr: typeof stats.averageAdr === 'number' ? stats.averageAdr : null,
-          kdRatio: typeof stats.kdRatio === 'number' ? stats.kdRatio : null,
+          kdRatio: stats.kdRatio,
           krRatio: typeof stats.krRatio === 'number' ? stats.krRatio : null,
           last30Wins: stats.last30Wins ?? 0,
           last30Losses: stats.last30Losses ?? 0,
@@ -127,41 +89,23 @@ export function StatsPage() {
           updated: formatUpdated(stats.updatedAt),
           status: 'online',
           latestResult: stats.latestMatchResult || 'UNKNOWN',
-          errorMessage: null,
         })
-      } catch (error) {
+      } catch {
         if (!mounted) return
-        setState((prev) => ({
-          ...prev,
-          status: 'offline',
-          updated: 'offline',
-          latestResult: 'UNKNOWN',
-          errorMessage: error instanceof Error ? error.message : 'Не удалось загрузить статистику',
-        }))
+        // Keep the last successful state on transient fetch errors.
       }
     }
 
     refresh()
-    const timer = window.setInterval(refresh, 60000)
-    let fadeTimer: number | null = null
-    const panelTimer = window.setInterval(() => {
-      setIsPanelVisible(false)
-      fadeTimer = window.setTimeout(() => {
-        setPanel((prev) => (prev === 'last30' ? 'today' : 'last30'))
-        setIsPanelVisible(true)
-      }, PANEL_FADE_MS)
-    }, PANEL_SWITCH_MS)
+    const timer = window.setInterval(refresh, 5000)
     return () => {
       mounted = false
       window.clearInterval(timer)
-      window.clearInterval(panelTimer)
-      if (fadeTimer) window.clearTimeout(fadeTimer)
     }
-  }, [ nicknameParam ])
+  }, [ location.search, nicknameParam, rawNickname, searchParams, setSearchParams ])
 
-  const getPanelStateClass = (target: 'last30' | 'today') => {
-    if (panel !== target) return 'stats-widget__panel--hidden'
-    return isPanelVisible ? 'stats-widget__panel--active' : 'stats-widget__panel--hiding'
+  if (state === undefined) {
+    return null
   }
 
   const levelValue = state.level ?? 0
@@ -171,69 +115,40 @@ export function StatsPage() {
   const total30 = wins30 + losses30
   const winRate30 = total30 > 0 ? Math.round((wins30 / total30) * 100) : null
 
-  const formatOne = (value: number | null): string => (typeof value === 'number' ? value.toFixed(1) : '--')
-  const formatZero = (value: number | null): string => (typeof value === 'number' ? Math.round(value).toString() : '--')
   const countryFlag = countryCodeToFlagEmoji(state.country)
   const winRateValue = winRate30 === null ? '--' : `${winRate30}%`
-  const avgKillsAdr = `${formatOne(state.averageKills)} / ${formatZero(state.averageAdr)}`
-  const kdKr = `${formatOne(state.kdRatio)} / ${formatOne(state.krRatio)}`
+  const avgKillsAdr = `${formatNumberWithFixedDecimals(state.averageKills, 0)} / ${formatNumberWithFixedDecimals(state.averageAdr, 0)}`
+  const kdKr = `${formatNumberWithFixedDecimals(state.averageKills, 2)} / ${formatNumberWithFixedDecimals(state.krRatio, 2)}`
+
+  const common = {
+    levelValue,
+    eloValue,
+    kdRatioValue: state.kdRatio,
+    countryFlag,
+    rankLabel: state.rankLabel,
+  }
+
+  const daily = {
+    todayWins: state.todayWins,
+    todayLosses: state.todayLosses,
+    avgKillsAdr,
+    kdRatioValue: state.kdRatio,
+  }
+
+  const monthly = {
+    winRateValue,
+    avgKillsAdr,
+    kdKr,
+  }
 
   return (
-    <div className={`stats-widget ${transparent ? 'stats-widget--transparent' : 'stats-widget--solid'}`}>
-      <div className="stats-widget__card">
-        <div className="stats-widget__top">
-          {state.errorMessage ? <div className="stats-widget__top-label">{state.errorMessage}</div> : null}
-          {!hideRank && (
-            <div className="stats-widget__level-badge">
-              {levelValue ? (
-                <SkillLevelIcon level={levelValue} className="stats-widget__level-icon" />
-              ) : (
-                <span>{levelValue || '-'}</span>
-              )}
-            </div>
-          )}
-          <div className="stats-widget__top-item">
-            <div className="stats-widget__top-value">{eloValue || '--'}</div>
-            <div className="stats-widget__top-label">ELO</div>
-          </div>
-          <div className="stats-widget__top-item">
-            <div className="stats-widget__top-value">{formatOne(state.kdRatio)}</div>
-            <div className="stats-widget__top-label">K/D RATIO</div>
-          </div>
-          {!hideChallenger && (
-            <div className="stats-widget__top-item stats-widget__top-item--rank">
-              <div className="stats-widget__top-value">
-                {countryFlag ? <span className="stats-widget__country-flag">{countryFlag}</span> : null}
-                <span>{state.rankLabel}</span>
-              </div>
-              <div className="stats-widget__top-label">RANK</div>
-            </div>
-          )}
-        </div>
-
-        <div className="stats-widget__divider" />
-
-        <div className="stats-widget__panels">
-          <div className={`stats-widget__panel stats-widget__panel--last30 ${getPanelStateClass('last30')}`}>
-            <div className="stats-widget__subtitle">LAST 30 MATCHES</div>
-            <div className="stats-widget__grid">
-              <StatsMetric value={winRateValue} label="Win rate" />
-              <StatsMetric value={avgKillsAdr} label="Avg. Kills / ADR" />
-              <StatsMetric value={kdKr} label="K/D / K/R" />
-            </div>
-          </div>
-
-          <div className={`stats-widget__panel stats-widget__panel--today ${getPanelStateClass('today')}`}>
-            <div className="stats-widget__subtitle">STATS TODAY</div>
-            <div className="stats-widget__grid stats-widget__grid--today">
-              <StatsMetric value={state.todayWins} label="Wins" valueClassName="stats-widget__value--win" />
-              <StatsMetric value={state.todayLosses} label="Losses" valueClassName="stats-widget__value--loss" />
-              <StatsMetric value={avgKillsAdr} label="Avg. Kills / ADR" />
-              <StatsMetric value={formatOne(state.kdRatio)} label="K/D" />
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className='stats-page'>
+      <StatsWidgetCard
+        common={common}
+        daily={daily}
+        monthly={monthly}
+        className='stats-page__widget'
+      />
     </div>
   )
 }

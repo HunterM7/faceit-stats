@@ -1,0 +1,121 @@
+.stats-widget-card {
+  min-width: 320px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(22, 24, 31, 0.96) 0%, rgba(12, 14, 20, 0.96) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #fff;
+  padding: 8px 10px;
+
+  &__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__level-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  &__level-icon {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+  }
+
+  &__elo {
+    font-size: 18px;
+    font-weight: 700;
+    position: relative;
+  }
+
+  &__label {
+    position: absolute;
+    transform: translateY(100%);
+    bottom: 4px;
+    right: 0;
+    font-size: 6px;
+    font-weight: 700;
+    letter-spacing: 20%;
+    white-space: nowrap;
+    color: rgba(232, 236, 245, 0.72);
+  }
+
+  &__kd-ratio {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    position: relative;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  &__rank {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    position: relative;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  &__divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.12);
+    margin: 9px 0 8px;
+  }
+
+  &__panels {
+    display: grid;
+  }
+
+  &__panel {
+    grid-area: 1 / 1;
+    opacity: 0;
+    visibility: hidden;
+    min-height: 74px;
+
+    &--active {
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.25s ease;
+    }
+
+    &--hiding {
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.7s ease, visibility 0s linear 0.7s;
+    }
+
+    &--hidden {
+      opacity: 0;
+      visibility: hidden;
+      transition: none;
+    }
+  }
+
+  &__subtitle {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.65px;
+    color: rgba(230, 235, 245, 0.62);
+    text-transform: uppercase;
+    margin-bottom: 7px;
+    text-align: center;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+
+    &--today {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+  }
+
+}

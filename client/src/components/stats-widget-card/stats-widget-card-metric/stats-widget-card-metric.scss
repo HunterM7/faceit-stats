@@ -1,0 +1,33 @@
+.stats-widget-card-metric {
+  min-width: 0;
+  overflow: hidden;
+
+  &__value {
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1.08;
+    white-space: nowrap;
+    overflow: visible;
+
+    &--win {
+      color: #00e676 !important;
+    }
+
+    &--loss {
+      color: #ff2052 !important;
+    }
+  }
+
+  &__label {
+    margin-top: 1px;
+    font-size: 9px;
+    color: rgba(230, 235, 245, 0.84);
+    font-weight: 700;
+    letter-spacing: 0.1px;
+  }
+}
+
+.stats-widget-card__grid--today .stats-widget-card-metric:nth-child(3) .stats-widget-card-metric__value,
+.stats-widget-card__grid .stats-widget-card-metric:nth-child(2) .stats-widget-card-metric__value {
+  font-size: 16px;
+}

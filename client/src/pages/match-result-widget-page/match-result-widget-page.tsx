@@ -36,11 +36,11 @@ export function MatchResultWidgetPage() {
   }
 
   return (
-    <main className="widget-config-page">
+    <main className="match-result-widget-page">
       <AppHeader />
-      <section className="widget-config-page__card">
-        <div className="widget-config-page__top">
-          <p className="widget-config-page__badge">WIDGET PAGE</p>
+      <section className="match-result-widget-page__card">
+        <div className="match-result-widget-page__top">
+          <p className="match-result-widget-page__badge">WIDGET PAGE</p>
           <h1>Match Result Widget</h1>
           <p>
             Алерт для стрима: показывает VICTORY/DEFEAT при новом завершенном матче. Можно включить тестовый режим и
@@ -48,7 +48,7 @@ export function MatchResultWidgetPage() {
           </p>
         </div>
 
-        <div className="widget-config-page__hint-list">
+        <div className="match-result-widget-page__hint-list">
           <span>
             Обязательный параметр: nickname
           </span>
@@ -60,7 +60,7 @@ export function MatchResultWidgetPage() {
           </span>
         </div>
 
-        <div className="widget-config-page__grid">
+        <div className="match-result-widget-page__grid">
           <label>
             Ник FACEIT
             <input
@@ -104,7 +104,7 @@ export function MatchResultWidgetPage() {
           </label>
         </div>
 
-        <div className="widget-config-page__link-row">
+        <div className="match-result-widget-page__link-row">
           <input
             type="text"
             readOnly
@@ -118,15 +118,15 @@ export function MatchResultWidgetPage() {
             href={widgetUrl || undefined}
             target="_blank"
             rel="noreferrer"
-            className={`widget-config-page__open ${canBuild ? '' : 'widget-config-page__open--disabled'}`}
+            className={`match-result-widget-page__open ${canBuild ? '' : 'match-result-widget-page__open--disabled'}`}
           >
             Открыть виджет
           </a>
         </div>
 
-        <div className="widget-config-page__footer">
-          <Link to="/" className="widget-config-page__link">На главную</Link>
-          <Link to="/widgets/stats" className="widget-config-page__link">К странице Stats Widget</Link>
+        <div className="match-result-widget-page__footer">
+          <Link to="/" className="match-result-widget-page__link">На главную</Link>
+          <Link to="/widgets/stats" className="match-result-widget-page__link">К странице Stats Widget</Link>
         </div>
       </section>
     </main>

@@ -20,7 +20,7 @@
 
 Пример целевого URL:
 
-`https://НАШ_САЙТ/stats?hideRank=true&hideChallenger=false&transparent=false&nickname=НИК_ПОЛЬЗОВАТЕЛЯ`
+`https://НАШ_САЙТ/stats?nickname=НИК_ПОЛЬЗОВАТЕЛЯ`
 
 ## Установка
 
@@ -119,7 +119,7 @@ npm install
 Для текущего продукта выбрана stateless-модель:
 
 - не храним пользовательские профили/настройки в базе;
-- все нужные параметры передаются в URL (`nickname`, `hideRank`, `transparent`, и т.д.);
+- все нужные параметры передаются в URL (для stats виджета это `nickname`);
 - при необходимости UI может сохранять последнее введенное значение только в `localStorage`.
 
 ### 2) Почему сейчас polling, а не webhook
