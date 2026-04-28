@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { classNames } from '@/utils/classNames'
 import { formatNumberWithFixedDecimals } from '@/utils/number-format'
 import { SkillLevelIcon } from '@/components/skill-level-icon/skill-level-icon'
+import { CountryFlagIcon } from '@components/country-flag-icon/country-flag-icon'
 import { StatsWidgetCardMetric } from './stats-widget-card-metric/stats-widget-card-metric'
 import './stats-widget-card.scss'
 
@@ -12,8 +13,8 @@ interface CommonStatistic {
   eloValue: number
   /** Текущее значение K/D для верхнего блока. */
   kdRatioValue: number
-  /** Emoji-флаг страны игрока (может быть пустым). */
-  countryFlag: string
+  /** Код страны игрока (ISO alpha-2), например `ru` или `ua`. */
+  countryCode: string
   /** Текстовый label ранга игрока (например, `#1234`). */
   rankLabel: string
 }
@@ -96,7 +97,7 @@ export function StatsWidgetCard(props: StatsWidgetCardProps) {
         </div>
 
         <div className='stats-widget-card__rank'>
-          <span>{common.countryFlag.toLocaleUpperCase()}</span>
+          <CountryFlagIcon countryCode={common.countryCode} className='stats-widget-card__country-flag-icon' />
           <span>{common.rankLabel}</span>
           <div className='stats-widget-card__label'>RANK</div>
         </div>

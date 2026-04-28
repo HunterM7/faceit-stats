@@ -30,13 +30,6 @@ function formatUpdated(iso?: string | null): string {
   return new Date(iso).toLocaleTimeString()
 }
 
-function countryCodeToFlagEmoji(code?: string | null): string {
-  if (!code) return ''
-  const normalized = code.trim().toUpperCase()
-  if (!/^[A-Z]{2}$/.test(normalized)) return ''
-  return String.fromCodePoint(...normalized.split('').map((char) => 127397 + char.charCodeAt(0)))
-}
-
 export function StatsPage() {
   const location = useLocation()
   const [ searchParams, setSearchParams ] = useSearchParams()
@@ -113,7 +106,7 @@ export function StatsPage() {
   const total30 = wins30 + losses30
   const winRate30 = total30 > 0 ? Math.round((wins30 / total30) * 100) : null
 
-  const countryFlag = countryCodeToFlagEmoji(state.country)
+  const countryCode = (state.country || '').toLowerCase()
   const winRateValue = winRate30 === null ? '--' : `${winRate30}%`
   const avgKillsAdr = `${formatNumberWithFixedDecimals(state.averageKills, 0)} / ${formatNumberWithFixedDecimals(state.averageAdr, 0)}`
   const kdKr = `${formatNumberWithFixedDecimals(state.kdRatio, 2)} / ${formatNumberWithFixedDecimals(state.krRatio, 2)}`
@@ -122,7 +115,7 @@ export function StatsPage() {
     levelValue,
     eloValue,
     kdRatioValue: state.kdRatio,
-    countryFlag,
+    countryCode,
     rankLabel: state.rankLabel,
   }
 
