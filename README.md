@@ -60,10 +60,11 @@ npm install
 
 ## URLs (локально)
 
-- Health: `http://localhost:3333/health`
 - Landing page: `http://localhost:5173/`
 - MatchResult page (React): `http://localhost:5173/matchResult`
 - Stats widget (React): `http://localhost:5173/stats`
+- Stats Widget builder: `http://localhost:5173/widgets/stats`
+- Match Result Widget builder: `http://localhost:5173/widgets/match-result`
 
 ## Доступные виджеты
 
@@ -80,7 +81,7 @@ npm install
 Добавь два Browser Source:
 
 - `http://localhost:5173/matchResult` — анимация победа/поражение
-- `http://localhost:3333/stats` — виджет статистики
+- `http://localhost:5173/stats` — виджет статистики
 
 Для Vercel-деплоя используются те же клиентские маршруты, но на основном домене:
 
@@ -162,7 +163,7 @@ Webhook стоит включать, только если появится тр
 
 ## Быстрый smoke-check
 
-- `GET /health`
 - `GET /api/playerStatistics?nickname=ТВОЙ_FACEIT_NICK`
 - `GET /api/player?nickname=ТВОЙ_FACEIT_NICK`
 - `GET /api/lastMatch?playerId=FACEIT_PLAYER_ID`
+- `GET /api/duoMatches?nickname=ТВОЙ_FACEIT_NICK&teammateNickname=NICK_ТИММЕЙТА`
