@@ -93,7 +93,7 @@ export function StatsWidgetCard(props: StatsWidgetCardProps) {
 
         <div className='stats-widget-card__kd-ratio'>
           {common.kdRatioValue}
-          <div className='stats-widget-card__label'>K/D RATIO</div>
+          <div className='stats-widget-card__label'>K/D</div>
         </div>
 
         <div className='stats-widget-card__rank'>
