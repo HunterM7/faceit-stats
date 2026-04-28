@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react'
 import { useLocation, useSearchParams } from 'react-router-dom'
 import { StatsWidgetCard } from '@components/stats-widget-card/stats-widget-card'
 import { requestStats, type StatsPayload } from '@requests/stats'
+import { formatNumberWithFixedDecimals } from '@/utils/number-format'
 import './stats-page.scss'
-import { formatNumberWithFixedDecimals } from '@/utils/number-format';
 
 type StatsState = {
   nickname: string
@@ -11,11 +11,11 @@ type StatsState = {
   elo: number
   level: number
   rankLabel: string
-  winRate: number | null
-  averageKills: number | null
-  averageAdr: number | null
-  kdRatio: number | null
-  krRatio: number | null
+  winRate: number
+  averageKills: number
+  averageAdr: number
+  kdRatio: number
+  krRatio: number
   last30Wins: number
   last30Losses: number
   todayWins: number
@@ -63,32 +63,30 @@ export function StatsPage() {
       }
 
       try {
-        const payload = (await requestStats(nicknameParam)) as StatsPayload
-
-        const stats = payload
+        const stats: StatsPayload = await requestStats(nicknameParam)
 
         if (!mounted || !stats) {
           return
         }
 
         setState({
-          nickname: stats.nickname || 'Unknown',
-          country: stats.country || null,
-          elo: typeof stats.faceitElo === 'number' ? stats.faceitElo : null,
-          level: typeof stats.skillLevel === 'number' ? stats.skillLevel : null,
+          nickname: stats.nickname,
+          country: stats.country,
+          elo: stats.faceitElo,
+          level: stats.skillLevel,
           rankLabel: stats.faceitElo ? `#${Math.max(1, Math.round(5000 - stats.faceitElo)).toString()}` : '#----',
-          winRate: typeof stats.winRate === 'number' ? stats.winRate : null,
-          averageKills: typeof stats.averageKills === 'number' ? stats.averageKills : null,
-          averageAdr: typeof stats.averageAdr === 'number' ? stats.averageAdr : null,
+          winRate: stats.winRate,
+          averageKills: stats.averageKills,
+          averageAdr: stats.averageAdr,
           kdRatio: stats.kdRatio,
-          krRatio: typeof stats.krRatio === 'number' ? stats.krRatio : null,
-          last30Wins: stats.last30Wins ?? 0,
-          last30Losses: stats.last30Losses ?? 0,
-          todayWins: stats.todayWins ?? 0,
-          todayLosses: stats.todayLosses ?? 0,
+          krRatio: stats.krRatio,
+          last30Wins: stats.last30Wins,
+          last30Losses: stats.last30Losses,
+          todayWins: stats.todayWins,
+          todayLosses: stats.todayLosses,
           updated: formatUpdated(stats.updatedAt),
           status: 'online',
-          latestResult: stats.latestMatchResult || 'UNKNOWN',
+          latestResult: stats.latestMatchResult,
         })
       } catch {
         if (!mounted) return
@@ -108,8 +106,8 @@ export function StatsPage() {
     return null
   }
 
-  const levelValue = state.level ?? 0
-  const eloValue = state.elo ?? 0
+  const levelValue = state.level
+  const eloValue = state.elo
   const wins30 = state.last30Wins
   const losses30 = state.last30Losses
   const total30 = wins30 + losses30
@@ -118,7 +116,7 @@ export function StatsPage() {
   const countryFlag = countryCodeToFlagEmoji(state.country)
   const winRateValue = winRate30 === null ? '--' : `${winRate30}%`
   const avgKillsAdr = `${formatNumberWithFixedDecimals(state.averageKills, 0)} / ${formatNumberWithFixedDecimals(state.averageAdr, 0)}`
-  const kdKr = `${formatNumberWithFixedDecimals(state.averageKills, 2)} / ${formatNumberWithFixedDecimals(state.krRatio, 2)}`
+  const kdKr = `${formatNumberWithFixedDecimals(state.kdRatio, 2)} / ${formatNumberWithFixedDecimals(state.krRatio, 2)}`
 
   const common = {
     levelValue,

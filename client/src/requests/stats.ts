@@ -18,24 +18,24 @@ async function parseErrorMessage(response: Response): Promise<string> {
 }
 
 export type StatsPayload = {
-  nickname?: string
-  country?: string | null
-  faceitElo?: number | null
-  skillLevel?: number | null
+  nickname: string
+  country: string | null
+  faceitElo: number
+  skillLevel: number
   gameId?: string
   updatedAt?: string | null
   latestMatchId?: string | null
   latestMatchStatus?: string | null
-  latestMatchResult?: 'WIN' | 'LOSS' | 'UNKNOWN'
-  winRate?: number | null
-  averageKills?: number | null
-  averageAdr?: number | null
+  latestMatchResult: 'WIN' | 'LOSS' | 'UNKNOWN'
+  winRate: number
+  averageKills: number
+  averageAdr: number
   kdRatio: number
-  krRatio?: number | null
-  last30Wins?: number
-  last30Losses?: number
-  todayWins?: number
-  todayLosses?: number
+  krRatio: number
+  last30Wins: number
+  last30Losses: number
+  todayWins: number
+  todayLosses: number
   raw?: {
     player?: unknown
     gameStats?: unknown
