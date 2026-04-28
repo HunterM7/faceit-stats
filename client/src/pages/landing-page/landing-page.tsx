@@ -129,14 +129,24 @@ export function LandingPage() {
         <div className="landing__links">
           <div className="landing__link-row">
             <span>Ссылка на stats:</span>
-            <code>{urls.stats || 'Укажи nickname, чтобы сгенерировать ссылку'}</code>
+            <input
+              type="text"
+              readOnly
+              value={urls.stats || 'Укажи nickname, чтобы сгенерировать ссылку'}
+              aria-label="Ссылка на stats"
+            />
             <button type="button" onClick={() => void copy('stats')} disabled={!canBuild}>
               {copied === 'stats' ? 'Скопировано' : 'Копировать'}
             </button>
           </div>
           <div className="landing__link-row">
             <span>Ссылка на matchResult:</span>
-            <code>{urls.matchResult || 'Укажи nickname, чтобы сгенерировать ссылку'}</code>
+            <input
+              type="text"
+              readOnly
+              value={urls.matchResult || 'Укажи nickname, чтобы сгенерировать ссылку'}
+              aria-label="Ссылка на matchResult"
+            />
             <button type="button" onClick={() => void copy('matchResult')} disabled={!canBuild}>
               {copied === 'matchResult' ? 'Скопировано' : 'Копировать'}
             </button>

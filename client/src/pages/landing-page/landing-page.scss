@@ -132,13 +132,15 @@
     gap: 10px;
     align-items: center;
 
-    code {
-      overflow-x: auto;
-      white-space: nowrap;
+    input {
       border-radius: 8px;
       padding: 8px 10px;
       background: rgba(0, 0, 0, 0.32);
       border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #f1f3f7;
+      font: inherit;
+      width: 100%;
+      box-sizing: border-box;
     }
 
     button {
