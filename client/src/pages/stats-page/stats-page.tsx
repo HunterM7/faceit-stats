@@ -7,27 +7,27 @@ import { formatNumberWithFixedDecimals } from '@/utils/number-format'
 import './stats-page.scss'
 
 type StatsState = {
-  country: string | null
+  country: string | null;
   common: {
-    level: number
-    elo: number
-    kdRatio: number
-    rankLabel: string
-  }
+    level: number;
+    elo: number;
+    kdRatio: number;
+    rankLabel: string;
+  };
   daily: {
-    wins: number
-    losses: number
-    averageKills: number
-    averageAdr: number
-    kdRatio: number
-  }
+    wins: number;
+    losses: number;
+    averageKills: number;
+    averageAdr: number;
+    kdRatio: number;
+  };
   monthly: {
-    winRate: number
-    averageKills: number
-    averageAdr: number
-    kdRatio: number
-    krRatio: number
-  }
+    winRate: number;
+    averageKills: number;
+    averageAdr: number;
+    kdRatio: number;
+    krRatio: number;
+  };
 }
 
 export function StatsPage() {

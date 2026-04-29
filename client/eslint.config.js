@@ -7,6 +7,7 @@ import promisePlugin from 'eslint-plugin-promise';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
+import stylistic from '@stylistic/eslint-plugin';
 import tseslint from 'typescript-eslint';
 import { globalIgnores } from 'eslint/config';
 import path from 'node:path';
@@ -54,6 +55,7 @@ export default tseslint.config([
     plugins: {
       react: reactPlugin,
       promise: promisePlugin,
+      '@stylistic': stylistic,
     },
     settings: {
       react: {
@@ -137,6 +139,20 @@ export default tseslint.config([
 
       '@typescript-eslint/no-var-requires': ['error'],
       '@typescript-eslint/no-explicit-any': ['error'],
+      '@stylistic/member-delimiter-style': [
+        'error',
+        {
+          multiline: {
+            delimiter: 'semi',
+            requireLast: true,
+          },
+          singleline: {
+            delimiter: 'semi',
+            requireLast: false,
+          },
+          multilineDetection: 'brackets',
+        },
+      ],
 
       'react/jsx-max-depth': ['error', { max: 5 }],
     },

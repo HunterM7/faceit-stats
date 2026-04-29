@@ -4,9 +4,9 @@ import './stats-widget-card-value.scss'
 
 type StatsWidgetCardValueProps = {
   /** Подпись под значением. */
-  label: string
+  label: string;
   /** Дополнительный класс для стилизации компонента. */
-  className?: string | undefined
+  className?: string | undefined;
 }
 
 /** Компонент для отображения значения в статистической карточке. */

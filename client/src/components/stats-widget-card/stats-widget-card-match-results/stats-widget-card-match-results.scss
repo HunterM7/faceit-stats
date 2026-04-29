@@ -1,0 +1,61 @@
+.stats-widget-card-match-results {
+  position: relative;
+  min-width: 0;
+  border-radius: 10px;
+  padding: 0px 8px;
+  overflow: hidden;
+  width: 50px;
+  display: flex;
+  align-items: center;
+  position: relative;
+
+  &::before {
+    position: absolute;
+    bottom: -4px;
+    font-size: 36px;
+    font-weight: 900;
+    line-height: 1;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  &--win {
+    background: linear-gradient(135deg, rgba(0, 230, 118, 0.3) 0%, rgba(0, 230, 118, 0.08) 100%);
+    border: 1px solid rgba(0, 230, 118, 0.35);
+
+    &::before {
+      content: 'W';
+      right: -8px;
+      color: rgba(0, 230, 118, 0.15);
+    }
+  }
+
+  &--lose {
+    background: linear-gradient(135deg, rgba(255, 32, 82, 0.3) 0%, rgba(255, 32, 82, 0.08) 100%);
+    border: 1px solid rgba(255, 32, 82, 0.35);
+
+    &::before {
+      content: 'L';
+      right: 4px;
+      color: rgba(255, 32, 82, 0.15);
+    }
+  }
+
+  &__value {
+    position: relative;
+    z-index: 1;
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1.08;
+    white-space: nowrap;
+    overflow: visible;
+
+    &--win {
+      color: #00e676;
+    }
+
+    &--lose {
+      color: #ff2052;
+    }
+  }
+}

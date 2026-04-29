@@ -18,42 +18,42 @@ async function parseErrorMessage(response: Response): Promise<string> {
 }
 
 export type StatsPayload = {
-  nickname: string
-  country: string | null
-  playerId?: string | null
+  nickname: string;
+  country: string | null;
+  playerId?: string | null;
   common: {
-    faceitElo: number
-    skillLevel: number
-    kdRatio: number
-    rankLabel: string
-  }
+    faceitElo: number;
+    skillLevel: number;
+    kdRatio: number;
+    rankLabel: string;
+  };
   daily: {
-    wins: number
-    losses: number
-    averageKills: number
-    averageAdr: number
-    kdRatio: number
-  }
+    wins: number;
+    losses: number;
+    averageKills: number;
+    averageAdr: number;
+    kdRatio: number;
+  };
   last30: {
-    wins: number
-    losses: number
-    winRate: number
-    averageKills: number
-    averageAdr: number
-    kdRatio: number
-    krRatio: number
-  }
-  gameId?: string
-  updatedAt?: string | null
-  latestMatchId?: string | null
-  latestMatchStatus?: string | null
-  latestMatchResult: 'WIN' | 'LOSS' | 'UNKNOWN'
+    wins: number;
+    losses: number;
+    winRate: number;
+    averageKills: number;
+    averageAdr: number;
+    kdRatio: number;
+    krRatio: number;
+  };
+  gameId?: string;
+  updatedAt?: string | null;
+  latestMatchId?: string | null;
+  latestMatchStatus?: string | null;
+  latestMatchResult: 'WIN' | 'LOSS' | 'UNKNOWN';
   raw?: {
-    player?: unknown
-    gameStats?: unknown
-    history?: unknown
-    internalStats?: unknown
-  }
+    player?: unknown;
+    gameStats?: unknown;
+    history?: unknown;
+    internalStats?: unknown;
+  };
 }
 
 export async function requestStats(nickname?: string): Promise<StatsPayload> {

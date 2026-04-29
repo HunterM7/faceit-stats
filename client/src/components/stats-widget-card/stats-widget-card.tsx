@@ -1,58 +1,63 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
 import { classNames } from '@/utils/classNames'
 import { formatNumberWithFixedDecimals } from '@/utils/number-format'
 import { SkillLevelIcon } from '@/components/skill-level-icon/skill-level-icon'
 import { CountryFlagIcon } from '@components/country-flag-icon/country-flag-icon'
 import { StatsWidgetCardMetric } from './stats-widget-card-metric/stats-widget-card-metric'
+import { MatchResult, StatsWidgetCardMatchResults } from './stats-widget-card-match-results/stats-widget-card-match-results'
 import { StatsWidgetCardValue } from './stats-widget-card-value/stats-widget-card-value'
 import './stats-widget-card.scss'
 
 interface CommonStatistic {
   /** Текущий уровень FACEIT (skill level). */
-  levelValue: number
+  levelValue: number;
   /** Текущее значение ELO игрока. */
-  eloValue: number
+  eloValue: number;
   /** Текущее значение K/D для верхнего блока. */
-  kdRatioValue: number
+  kdRatioValue: number;
   /** Код страны игрока (ISO alpha-2), например `ru` или `ua`. */
-  countryCode: string
+  countryCode: string;
   /** Текстовый label ранга игрока (например, `#1234`). */
-  rankLabel: string
+  rankLabel: string;
 }
 
 interface DailyStatistic {
   /** Количество побед за сегодня. */
-  todayWins: number
+  todayWins: number;
   /** Количество поражений за сегодня. */
-  todayLosses: number
+  todayLosses: number;
   /** Средние kills/ADR за сегодня (подготовленная строка). */
-  avgKillsAdr: string
+  avgKillsAdr: string;
   /** Значение K/D за сегодня (подготовленная строка). */
-  kdRatioValue: number
+  kdRatioValue: number;
 }
 
 interface MonthlyStatistic {
   /** Win rate за последние 30 матчей (подготовленная строка). */
-  winRateValue: string
+  winRateValue: string;
   /** Средние kills/ADR за последние 30 матчей (подготовленная строка). */
-  avgKillsAdr: string
+  avgKillsAdr: string;
   /** Сводное значение K/D / K/R за последние 30 матчей (подготовленная строка). */
-  kdKr: string
+  kdKr: string;
 }
 
 type StatsWidgetCardProps = {
   /** Общая статистика игрока. */
-  common: CommonStatistic
+  common: CommonStatistic;
   /** Статистика игрока за текущий игровой день. */
-  daily: DailyStatistic
+  daily: DailyStatistic;
   /** Статистика игрока за последние 30 матчей. */
-  monthly: MonthlyStatistic
+  monthly: MonthlyStatistic;
   /** Дополнительный класс для стилизации компонента. */
-  className?: string | undefined
+  className?: string | undefined;
 }
 
 export function StatsWidgetCard(props: StatsWidgetCardProps) {
   const { common, daily, monthly, className } = props
+
+  // Для показа определенной панели
+  // const panel: 'last30' | 'today' = 'today'
+  // const isPanelVisible = true
 
   const PANEL_SWITCH_MS = 5000
   const PANEL_FADE_MS = 700
@@ -115,11 +120,13 @@ export function StatsWidgetCard(props: StatsWidgetCardProps) {
 
         <div className={`stats-widget-card__panel stats-widget-card__panel--today ${getPanelStateClass('today')}`}>
           <div className='stats-widget-card__subtitle'>STATS TODAY</div>
-          <div className='stats-widget-card__grid stats-widget-card__grid--today'>
-            <StatsWidgetCardMetric value={daily.todayWins} label='Wins' valueClassName='stats-widget-card-metric__value--win' />
-            <StatsWidgetCardMetric value={daily.todayLosses} label='Losses' valueClassName='stats-widget-card-metric__value--loss' />
-            <StatsWidgetCardMetric value={daily.avgKillsAdr} label='Avg. Kills / ADR' />
-            <StatsWidgetCardMetric value={formatNumberWithFixedDecimals(daily.kdRatioValue, 2)} label='K/D' />
+          <div className='stats-widget-card__grid'>
+            <div className='stats-widget-card__match-results'>
+              <StatsWidgetCardMatchResults value={daily.todayWins} result={MatchResult.Win} />
+              <StatsWidgetCardMatchResults value={daily.todayLosses} result={MatchResult.Lose} />
+            </div>
+            <StatsWidgetCardMetric value={daily.avgKillsAdr} label='Avg. Kills / ADR' className='stats-widget-card__metric'/>
+            <StatsWidgetCardMetric value={formatNumberWithFixedDecimals(daily.kdRatioValue, 2)} label='K/D' className='stats-widget-card__metric'/>
           </div>
         </div>
       </div>

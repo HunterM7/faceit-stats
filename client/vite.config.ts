@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import checker from 'vite-plugin-checker'
+import viteChecker from 'vite-plugin-checker'
 import path from 'path'
 
 // https://vite.dev/config/
@@ -9,7 +9,7 @@ export default defineConfig(({ command }) => ({
   plugins: [
     react(),
     ...(command === 'serve' ? [
-      checker({
+      viteChecker({
         eslint: {
           lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
         },

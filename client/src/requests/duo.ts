@@ -18,22 +18,22 @@ async function parseErrorMessage(response: Response): Promise<string> {
 }
 
 export type DuoMatchItem = {
-  matchId: string
-  finishedAt: string | null
-  status: string | null
-  result: 'WIN' | 'LOSS' | 'UNKNOWN'
-  teamScore: number | null
-  enemyScore: number | null
-  faceitUrl: string | null
+  matchId: string;
+  finishedAt: string | null;
+  status: string | null;
+  result: 'WIN' | 'LOSS' | 'UNKNOWN';
+  teamScore: number | null;
+  enemyScore: number | null;
+  faceitUrl: string | null;
 }
 
 export type DuoMatchesPayload = {
-  nickname: string
-  teammateNickname: string
-  gameId: string
-  totalChecked: number
-  totalTogether: number
-  matches: DuoMatchItem[]
+  nickname: string;
+  teammateNickname: string;
+  gameId: string;
+  totalChecked: number;
+  totalTogether: number;
+  matches: DuoMatchItem[];
 }
 
 export async function requestDuoMatches(nickname: string, teammateNickname: string): Promise<DuoMatchesPayload> {
