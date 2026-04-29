@@ -1,0 +1,17 @@
+.stats-widget-card-value {
+  font-size: 18px;
+  font-weight: 700;
+  position: relative;
+
+  &__label {
+    position: absolute;
+    transform: translateY(100%);
+    bottom: 4px;
+    right: 0;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 20%;
+    white-space: nowrap;
+    color: #aaafb6;
+  }
+}

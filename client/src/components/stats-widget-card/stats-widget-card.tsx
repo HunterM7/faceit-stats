@@ -4,6 +4,7 @@ import { formatNumberWithFixedDecimals } from '@/utils/number-format'
 import { SkillLevelIcon } from '@/components/skill-level-icon/skill-level-icon'
 import { CountryFlagIcon } from '@components/country-flag-icon/country-flag-icon'
 import { StatsWidgetCardMetric } from './stats-widget-card-metric/stats-widget-card-metric'
+import { StatsWidgetCardValue } from './stats-widget-card-value/stats-widget-card-value'
 import './stats-widget-card.scss'
 
 interface CommonStatistic {
@@ -85,22 +86,19 @@ export function StatsWidgetCard(props: StatsWidgetCardProps) {
       <div className='stats-widget-card__top'>
         <div className='stats-widget-card__level-badge'>
           <SkillLevelIcon level={common.levelValue} className='stats-widget-card__level-icon'/>
-          <span className='stats-widget-card__elo'>
+          <StatsWidgetCardValue label='ELO'>
             {common.eloValue}
-            <div className='stats-widget-card__label'>ELO</div>
-          </span>
+          </StatsWidgetCardValue>
         </div>
 
-        <div className='stats-widget-card__kd-ratio'>
+        <StatsWidgetCardValue label='K/D'>
           {formatNumberWithFixedDecimals(common.kdRatioValue, 2)}
-          <div className='stats-widget-card__label'>K/D</div>
-        </div>
+        </StatsWidgetCardValue>
 
-        <div className='stats-widget-card__rank'>
-          <CountryFlagIcon countryCode={common.countryCode} className='stats-widget-card__country-flag-icon' />
+        <StatsWidgetCardValue label='RANK' className='stats-widget-card__rank'>
+          <CountryFlagIcon countryCode={common.countryCode} className='stats-widget-card__country-flag-icon'/>
           <span>{common.rankLabel}</span>
-          <div className='stats-widget-card__label'>RANK</div>
-        </div>
+        </StatsWidgetCardValue>
       </div>
 
       <div className='stats-widget-card__divider' />
