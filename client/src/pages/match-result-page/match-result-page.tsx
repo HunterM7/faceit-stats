@@ -23,7 +23,6 @@ export function MatchResultPage() {
   const missingNicknameMessage = !isTestMode && !nickname
     ? 'Похоже, что ты не указал свой FACEIT-ник. Добавь его в адресной строке после nickname='
     : null
-  const transparent = true
 
   useEffect(() => {
     const nextParams = new URLSearchParams()
@@ -186,7 +185,7 @@ export function MatchResultPage() {
   }
 
   return (
-    <div className={`match-result-page ${transparent ? 'match-result-page--transparent' : 'match-result-page--solid'}`}>
+    <div className='match-result-page'>
       {missingNicknameMessage || errorMessage ? (
         <div className='match-result-page__error-screen'>
           <div className='match-result-page__error-title'>Упс, не нашли такого игрока</div>

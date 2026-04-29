@@ -6,14 +6,6 @@
   justify-content: center;
   align-items: center;
 
-  &--solid {
-    background: #11141b;
-  }
-
-  &--transparent {
-    background: rgba(9, 12, 18, 0.28);
-  }
-
   &__card {
     min-width: 420px;
     text-align: center;
