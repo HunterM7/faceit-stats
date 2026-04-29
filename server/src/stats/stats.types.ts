@@ -38,22 +38,41 @@ export interface MatchHistoryResponse {
   items?: MatchHistoryItem[];
 }
 
+export interface InternalMatchStatsItem {
+  stats?: Record<string, string>;
+}
+
+export interface InternalMatchStatsResponse {
+  items?: InternalMatchStatsItem[];
+}
+
 export interface StatsResponse {
   nickname: string;
   country: string | null;
   playerId: string;
   gameId: string;
-  faceitElo: number;
-  skillLevel: number;
-  winRate: number;
-  averageKills: number;
-  averageAdr: number;
-  kdRatio: number;
-  krRatio: number;
-  last30Wins: number;
-  last30Losses: number;
-  todayWins: number;
-  todayLosses: number;
+  common: {
+    faceitElo: number;
+    skillLevel: number;
+    kdRatio: number;
+    rankLabel: string;
+  };
+  daily: {
+    wins: number;
+    losses: number;
+    averageKills: number;
+    averageAdr: number;
+    kdRatio: number;
+  };
+  last30: {
+    wins: number;
+    losses: number;
+    winRate: number;
+    averageKills: number;
+    averageAdr: number;
+    kdRatio: number;
+    krRatio: number;
+  };
   latestMatchId: string | null;
   latestMatchStatus: string | null;
   latestMatchResult: MatchResult;
@@ -62,6 +81,7 @@ export interface StatsResponse {
     player: PlayerResponse;
     gameStats: Record<string, unknown>;
     history: MatchHistoryResponse;
+    internalStats: InternalMatchStatsResponse;
   };
 }
 

@@ -1,33 +1,33 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useLocation, useSearchParams } from 'react-router-dom'
 import { StatsWidgetCard } from '@components/stats-widget-card/stats-widget-card'
 import { requestStats, type StatsPayload } from '@requests/stats'
+import { lastMatch, player } from '@requests/matchResult'
 import { formatNumberWithFixedDecimals } from '@/utils/number-format'
 import './stats-page.scss'
 
 type StatsState = {
-  nickname: string
   country: string | null
-  elo: number
-  level: number
-  rankLabel: string
-  winRate: number
-  averageKills: number
-  averageAdr: number
-  kdRatio: number
-  krRatio: number
-  last30Wins: number
-  last30Losses: number
-  todayWins: number
-  todayLosses: number
-  updated: string
-  status: 'online' | 'offline'
-  latestResult: 'WIN' | 'LOSS' | 'UNKNOWN'
-}
-
-function formatUpdated(iso?: string | null): string {
-  if (!iso) return '--:--:--'
-  return new Date(iso).toLocaleTimeString()
+  common: {
+    level: number
+    elo: number
+    kdRatio: number
+    rankLabel: string
+  }
+  daily: {
+    wins: number
+    losses: number
+    averageKills: number
+    averageAdr: number
+    kdRatio: number
+  }
+  monthly: {
+    winRate: number
+    averageKills: number
+    averageAdr: number
+    kdRatio: number
+    krRatio: number
+  }
 }
 
 export function StatsPage() {
@@ -37,6 +37,33 @@ export function StatsPage() {
   const nicknameParam = rawNickname?.trim()
 
   const [ state, setState ] = useState<StatsState | undefined>(undefined)
+  const playerIdRef = useRef<string | null>(null)
+  const latestMatchIdRef = useRef<string | null>(null)
+  const isPollingRef = useRef(false)
+
+  const mapStatsToState = (stats: StatsPayload): StatsState => ({
+    country: stats.country,
+    common: {
+      level: stats.common.skillLevel,
+      elo: stats.common.faceitElo,
+      kdRatio: stats.common.kdRatio,
+      rankLabel: stats.common.rankLabel,
+    },
+    daily: {
+      wins: stats.daily.wins,
+      losses: stats.daily.losses,
+      averageKills: stats.daily.averageKills,
+      averageAdr: stats.daily.averageAdr,
+      kdRatio: stats.daily.kdRatio,
+    },
+    monthly: {
+      winRate: stats.last30.winRate,
+      averageKills: stats.last30.averageKills,
+      averageAdr: stats.last30.averageAdr,
+      kdRatio: stats.last30.kdRatio,
+      krRatio: stats.last30.krRatio,
+    },
+  })
 
   useEffect(() => {
     let mounted = true
@@ -62,33 +89,62 @@ export function StatsPage() {
           return
         }
 
-        setState({
-          nickname: stats.nickname,
-          country: stats.country,
-          elo: stats.faceitElo,
-          level: stats.skillLevel,
-          rankLabel: stats.faceitElo ? `#${Math.max(1, Math.round(5000 - stats.faceitElo)).toString()}` : '#----',
-          winRate: stats.winRate,
-          averageKills: stats.averageKills,
-          averageAdr: stats.averageAdr,
-          kdRatio: stats.kdRatio,
-          krRatio: stats.krRatio,
-          last30Wins: stats.last30Wins,
-          last30Losses: stats.last30Losses,
-          todayWins: stats.todayWins,
-          todayLosses: stats.todayLosses,
-          updated: formatUpdated(stats.updatedAt),
-          status: 'online',
-          latestResult: stats.latestMatchResult,
-        })
+        playerIdRef.current = stats.playerId ?? null
+        latestMatchIdRef.current = stats.latestMatchId ?? null
+        setState(mapStatsToState(stats))
       } catch {
         if (!mounted) return
         // Keep the last successful state on transient fetch errors.
       }
     }
 
+    const pollMatchUpdates = async () => {
+      if (isPollingRef.current || !nicknameParam) {
+        return
+      }
+      isPollingRef.current = true
+
+      try {
+        if (!playerIdRef.current) {
+          const snapshot = await player(nicknameParam)
+          playerIdRef.current = snapshot.playerId ?? null
+        }
+
+        const playerId = playerIdRef.current
+        if (!playerId) {
+          return
+        }
+
+        const matchData = await lastMatch(playerId)
+        const currentMatchId = matchData.matchId ?? null
+
+        if (!latestMatchIdRef.current) {
+          latestMatchIdRef.current = currentMatchId
+          return
+        }
+
+        if (!currentMatchId || currentMatchId === latestMatchIdRef.current) {
+          return
+        }
+
+        latestMatchIdRef.current = currentMatchId
+        const nextStats = await requestStats(nicknameParam)
+        if (!mounted || !nextStats) {
+          return
+        }
+
+        playerIdRef.current = nextStats.playerId ?? playerIdRef.current
+        latestMatchIdRef.current = nextStats.latestMatchId ?? currentMatchId
+        setState(mapStatsToState(nextStats))
+      } catch {
+        // Keep the last successful state on transient polling errors.
+      } finally {
+        isPollingRef.current = false
+      }
+    }
+
     refresh()
-    const timer = window.setInterval(refresh, 5000)
+    const timer = window.setInterval(pollMatchUpdates, 10000)
     return () => {
       mounted = false
       window.clearInterval(timer)
@@ -99,37 +155,35 @@ export function StatsPage() {
     return null
   }
 
-  const levelValue = state.level
-  const eloValue = state.elo
-  const wins30 = state.last30Wins
-  const losses30 = state.last30Losses
-  const total30 = wins30 + losses30
-  const winRate30 = total30 > 0 ? Math.round((wins30 / total30) * 100) : null
+  const levelValue = state.common.level
+  const eloValue = state.common.elo
 
   const countryCode = (state.country || '').toLowerCase()
-  const winRateValue = winRate30 === null ? '--' : `${winRate30}%`
-  const avgKillsAdr = `${formatNumberWithFixedDecimals(state.averageKills, 0)} / ${formatNumberWithFixedDecimals(state.averageAdr, 0)}`
-  const kdKr = `${formatNumberWithFixedDecimals(state.kdRatio, 2)} / ${formatNumberWithFixedDecimals(state.krRatio, 2)}`
+  const dailyAvgKillsAdr =
+    `${formatNumberWithFixedDecimals(state.daily.averageKills, 0)} / ${formatNumberWithFixedDecimals(state.daily.averageAdr, 0)}`
+  const monthlyAvgKillsAdr =
+    `${formatNumberWithFixedDecimals(state.monthly.averageKills, 0)} / ${formatNumberWithFixedDecimals(state.monthly.averageAdr, 0)}`
+  const monthlyKdKr = `${formatNumberWithFixedDecimals(state.monthly.kdRatio, 2)} / ${formatNumberWithFixedDecimals(state.monthly.krRatio, 2)}`
 
   const common = {
     levelValue,
     eloValue,
-    kdRatioValue: state.kdRatio,
+    kdRatioValue: state.common.kdRatio,
     countryCode,
-    rankLabel: state.rankLabel,
+    rankLabel: state.common.rankLabel,
   }
 
   const daily = {
-    todayWins: state.todayWins,
-    todayLosses: state.todayLosses,
-    avgKillsAdr,
-    kdRatioValue: state.kdRatio,
+    todayWins: state.daily.wins,
+    todayLosses: state.daily.losses,
+    avgKillsAdr: dailyAvgKillsAdr,
+    kdRatioValue: state.daily.kdRatio,
   }
 
   const monthly = {
-    winRateValue,
-    avgKillsAdr,
-    kdKr,
+    winRateValue: `${state.monthly.winRate}%`,
+    avgKillsAdr: monthlyAvgKillsAdr,
+    kdKr: monthlyKdKr,
   }
 
   return (

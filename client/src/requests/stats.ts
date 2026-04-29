@@ -20,26 +20,39 @@ async function parseErrorMessage(response: Response): Promise<string> {
 export type StatsPayload = {
   nickname: string
   country: string | null
-  faceitElo: number
-  skillLevel: number
+  playerId?: string | null
+  common: {
+    faceitElo: number
+    skillLevel: number
+    kdRatio: number
+    rankLabel: string
+  }
+  daily: {
+    wins: number
+    losses: number
+    averageKills: number
+    averageAdr: number
+    kdRatio: number
+  }
+  last30: {
+    wins: number
+    losses: number
+    winRate: number
+    averageKills: number
+    averageAdr: number
+    kdRatio: number
+    krRatio: number
+  }
   gameId?: string
   updatedAt?: string | null
   latestMatchId?: string | null
   latestMatchStatus?: string | null
   latestMatchResult: 'WIN' | 'LOSS' | 'UNKNOWN'
-  winRate: number
-  averageKills: number
-  averageAdr: number
-  kdRatio: number
-  krRatio: number
-  last30Wins: number
-  last30Losses: number
-  todayWins: number
-  todayLosses: number
   raw?: {
     player?: unknown
     gameStats?: unknown
     history?: unknown
+    internalStats?: unknown
   }
 }
 

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { AppConfigService } from '../config/app-config.service';
 import { FaceitService } from '../faceit/faceit.service';
 import {
+  type InternalMatchStatsItem,
   type DuoMatchesResponse,
   type LastMatchResponse,
   type MatchHistoryItem,
@@ -9,6 +10,15 @@ import {
   type PlayerSnapshotResponse,
   type StatsResponse,
 } from './stats.types';
+
+type ParsedInternalMatch = {
+  isWin: boolean;
+  kills: number;
+  deaths: number;
+  rounds: number;
+  damage: number;
+  finishedAtMs: number | null;
+};
 
 @Injectable()
 export class StatsService {
@@ -37,34 +47,56 @@ export class StatsService {
       throw new Error('Игрок FACEIT не найден по никнейму');
     }
 
-    const [ history, gameStatsRaw ] = await Promise.all([
+    const [ history, gameStatsRaw, internalStats ] = await Promise.all([
       this.faceit.getPlayerHistory(playerId, this.config.gameId, 30),
       this.faceit.getPlayerGameStats(playerId, this.config.gameId),
+      this.faceit.getPlayerInternalMatchesStats(playerId, this.config.gameId, 30),
     ]);
     const items = history?.items || [];
     const latest = items[0] || null;
     const gameStats = player?.games?.[this.config.gameId] || {};
     const lifetime = this.getLifetimeStats(gameStatsRaw);
-    const last30 = this.calculateWindowStats(items, playerId);
-    const today = this.calculateTodayStats(items, playerId);
+    const internalItems = (internalStats?.items || [])
+      .map((item) => this.parseInternalMatch(item))
+      .filter((item): item is ParsedInternalMatch => item !== null);
+    const last30 = this.aggregateInternalMatches(internalItems);
+    const todayStartMs = this.getDailyStartMs(7);
+    const today = this.aggregateInternalMatches(
+      internalItems.filter((item) => item.finishedAtMs !== null && item.finishedAtMs > todayStartMs),
+    );
     const fallback = this.buildLifetimeFallback(lifetime);
+    const faceitElo = typeof gameStats.faceit_elo === 'number' ? gameStats.faceit_elo : 0;
+    const skillLevel = typeof gameStats.skill_level === 'number' ? gameStats.skill_level : 0;
+    const commonKdRatio = this.pickNumber(lifetime, [ 'Average K/D Ratio', 'K/D Ratio' ]) ?? 0;
+    const rankLabel = faceitElo ? `#${Math.max(1, Math.round(5000 - faceitElo)).toString()}` : '#----';
 
     return {
       nickname: player.nickname || nickname,
       country: player.country?.toUpperCase() || null,
       playerId,
       gameId: this.config.gameId,
-      faceitElo: typeof gameStats.faceit_elo === 'number' ? gameStats.faceit_elo : 0,
-      skillLevel: typeof gameStats.skill_level === 'number' ? gameStats.skill_level : 0,
-      winRate: this.pickNumber(lifetime, [ 'Win Rate %', 'Win Rate' ]) ?? 0,
-      averageKills: this.pickNumber(lifetime, [ 'Average Kills', 'Avg Kills' ]) ?? fallback.averageKills ?? 0,
-      averageAdr: this.pickNumber(lifetime, [ 'ADR', 'Average ADR' ]) ?? 0,
-      kdRatio: this.pickNumber(lifetime, [ 'Average K/D Ratio', 'K/D Ratio' ]) ?? 0,
-      krRatio: this.pickNumber(lifetime, [ 'K/R Ratio', 'Average K/R Ratio' ]) ?? fallback.krRatio ?? 0,
-      last30Wins: last30.wins,
-      last30Losses: last30.losses,
-      todayWins: today.wins,
-      todayLosses: today.losses,
+      common: {
+        faceitElo,
+        skillLevel,
+        kdRatio: commonKdRatio,
+        rankLabel,
+      },
+      daily: {
+        wins: today.wins,
+        losses: today.losses,
+        averageKills: today.avgKills,
+        averageAdr: today.adr,
+        kdRatio: today.avgKD,
+      },
+      last30: {
+        wins: last30.wins,
+        losses: last30.losses,
+        winRate: last30.winRate,
+        averageKills: last30.avgKills,
+        averageAdr: last30.adr,
+        kdRatio: last30.avgKD,
+        krRatio: last30.avgKR || fallback.krRatio || 0,
+      },
       latestMatchId: latest?.match_id || null,
       latestMatchStatus: latest?.status || null,
       latestMatchResult: this.resolveResultForPlayer(latest, playerId),
@@ -73,6 +105,7 @@ export class StatsService {
         player,
         gameStats: gameStatsRaw,
         history,
+        internalStats,
       },
     };
   }
@@ -194,37 +227,94 @@ export class StatsService {
     return { averageKills, krRatio };
   }
 
-  private calculateWindowStats(items: MatchHistoryItem[], playerId: string): { wins: number; losses: number } {
-    let wins = 0;
-    let losses = 0;
-    for (const item of items) {
-      const result = this.resolveResultForPlayer(item, playerId);
-      if (result === 'WIN') wins += 1;
-      if (result === 'LOSS') losses += 1;
+  private parseInternalMatch(item: InternalMatchStatsItem): ParsedInternalMatch | null {
+    const stats = item?.stats || {};
+    const kills = this.toFiniteNumber(stats.Kills);
+    const deaths = this.toFiniteNumber(stats.Deaths);
+    const rounds = this.toFiniteNumber(stats.Rounds);
+    const damage = this.toFiniteNumber(stats.Damage);
+    const result = stats.Result;
+    const finishedAtMs = this.toFiniteNumber(stats['Match Finished At']);
+
+    if (kills === null || deaths === null || rounds === null || damage === null) {
+      return null;
     }
-    return { wins, losses };
+
+    return {
+      isWin: result === '1',
+      kills,
+      deaths,
+      rounds,
+      damage,
+      finishedAtMs,
+    };
   }
 
-  private calculateTodayStats(items: MatchHistoryItem[], playerId: string): { wins: number; losses: number } {
-    const now = new Date();
-    const year = now.getUTCFullYear();
-    const month = now.getUTCMonth();
-    const day = now.getUTCDate();
-    let wins = 0;
-    let losses = 0;
-
-    for (const item of items) {
-      if (!item.finished_at) continue;
-      const playedAt = new Date(item.finished_at * 1000);
-      if (playedAt.getUTCFullYear() !== year || playedAt.getUTCMonth() !== month || playedAt.getUTCDate() !== day) {
-        continue;
-      }
-      const result = this.resolveResultForPlayer(item, playerId);
-      if (result === 'WIN') wins += 1;
-      if (result === 'LOSS') losses += 1;
+  private aggregateInternalMatches(items: ParsedInternalMatch[]): {
+    wins: number;
+    losses: number;
+    winRate: number;
+    avgKills: number;
+    avgKD: number;
+    avgKR: number;
+    adr: number;
+  } {
+    if (items.length === 0) {
+      return {
+        wins: 0,
+        losses: 0,
+        winRate: 0,
+        avgKills: 0,
+        avgKD: 0,
+        avgKR: 0,
+        adr: 0,
+      };
     }
 
-    return { wins, losses };
+    const summary = items.reduce((acc, item) => {
+      if (item.isWin) {
+        acc.wins += 1;
+      } else {
+        acc.losses += 1;
+      }
+      acc.kills += item.kills;
+      acc.deaths += item.deaths;
+      acc.rounds += item.rounds;
+      acc.damage += item.damage;
+      return acc;
+    }, {
+      wins: 0,
+      losses: 0,
+      kills: 0,
+      deaths: 0,
+      rounds: 0,
+      damage: 0,
+    });
+
+    const totalMatches = items.length;
+    return {
+      wins: summary.wins,
+      losses: summary.losses,
+      winRate: Math.floor((summary.wins / totalMatches) * 100),
+      avgKills: Math.round(summary.kills / totalMatches),
+      avgKD: this.roundFixed(summary.kills / summary.deaths),
+      avgKR: this.roundFixed(summary.kills / summary.rounds),
+      adr: this.roundFixed(summary.damage / summary.rounds),
+    };
+  }
+
+  private getDailyStartMs(startHour: number): number {
+    const now = new Date();
+    if (now.getHours() < startHour) {
+      now.setDate(now.getDate() - 1);
+    }
+    now.setHours(startHour, 0, 0, 0);
+    return now.getTime();
+  }
+
+  private roundFixed(value: number): number {
+    if (!Number.isFinite(value)) return 0;
+    return Math.round((value + Number.EPSILON) * 100) / 100;
   }
 
   private resolveResultForPlayer(match: MatchHistoryItem | null, playerId: string): MatchResult {

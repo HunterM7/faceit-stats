@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import axios, { type AxiosInstance } from 'axios';
 import { AppConfigService } from '../config/app-config.service';
-import { type MatchHistoryResponse, type PlayerResponse } from '../stats/stats.types';
+import {
+  type InternalMatchStatsResponse,
+  type MatchHistoryResponse,
+  type PlayerResponse,
+} from '../stats/stats.types';
 
 const FACEIT_BASE_URL = 'https://open.faceit.com/data/v4';
 
@@ -44,6 +48,16 @@ export class FaceitService {
 
   async getPlayerGameStats(playerId: string, game = 'cs2'): Promise<Record<string, unknown>> {
     const response = await this.http.get<Record<string, unknown>>(`/players/${playerId}/stats/${game}`);
+    return response.data;
+  }
+
+  async getPlayerInternalMatchesStats(playerId: string, game = 'cs2', limit = 30, offset = 0): Promise<InternalMatchStatsResponse> {
+    const response = await this.http.get<InternalMatchStatsResponse>(`/players/${playerId}/games/${game}/stats`, {
+      params: {
+        limit,
+        offset,
+      },
+    });
     return response.data;
   }
 }
