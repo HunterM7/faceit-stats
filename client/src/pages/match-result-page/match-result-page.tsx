@@ -188,17 +188,17 @@ export function MatchResultPage() {
   return (
     <div className={`match-result-page ${transparent ? 'match-result-page--transparent' : 'match-result-page--solid'}`}>
       {missingNicknameMessage || errorMessage ? (
-        <div className="match-result-page__error-screen">
-          <div className="match-result-page__error-title">Упс, не нашли такого игрока</div>
-          <div className="match-result-page__error-message">{missingNicknameMessage || errorMessage}</div>
+        <div className='match-result-page__error-screen'>
+          <div className='match-result-page__error-title'>Упс, не нашли такого игрока</div>
+          <div className='match-result-page__error-message'>{missingNicknameMessage || errorMessage}</div>
         </div>
       ) : null}
       <div
         className={`match-result-page__card ${isMatchResultVisible ? 'match-result-page__card--show' : 'match-result-page__card--hidden'} ${result === 'LOSS' ? 'match-result-page__card--loss' : 'match-result-page__card--win'}`}
       >
-        <div className="match-result-page__badge">FACEIT</div>
-        <div className="match-result-page__result">{result === 'LOSS' ? 'DEFEAT' : 'VICTORY'}</div>
-        <div className="match-result-page__meta">
+        <div className='match-result-page__badge'>FACEIT</div>
+        <div className='match-result-page__result'>{result === 'LOSS' ? 'DEFEAT' : 'VICTORY'}</div>
+        <div className='match-result-page__meta'>
           <span>LVL {level ?? '--'}</span>
           <span>ELO {elo ?? '--'}</span>
           <span className={(eloDelta ?? 0) >= 0 ? 'match-result-page__meta-delta--positive' : 'match-result-page__meta-delta--negative'}>

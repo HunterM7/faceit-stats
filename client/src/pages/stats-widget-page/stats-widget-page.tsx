@@ -30,11 +30,11 @@ export function StatsWidgetPage() {
   }
 
   return (
-    <main className="stats-widget-page">
+    <main className='stats-widget-page'>
       <AppHeader />
-      <section className="stats-widget-page__card">
-        <div className="stats-widget-page__top">
-          <p className="stats-widget-page__badge">WIDGET PAGE</p>
+      <section className='stats-widget-page__card'>
+        <div className='stats-widget-page__top'>
+          <p className='stats-widget-page__badge'>WIDGET PAGE</p>
           <h1>Stats Widget</h1>
           <p>
             Виджет с ELO, уровнем, winrate и актуальной статистикой игрока FACEIT. Здесь можно настроить параметры и сразу
@@ -42,7 +42,7 @@ export function StatsWidgetPage() {
           </p>
         </div>
 
-        <div className="stats-widget-page__hint-list">
+        <div className='stats-widget-page__hint-list'>
           <span>
             1) Укажи ник FACEIT
           </span>
@@ -54,41 +54,41 @@ export function StatsWidgetPage() {
           </span>
         </div>
 
-        <div className="stats-widget-page__grid">
+        <div className='stats-widget-page__grid'>
           <label>
             Ник FACEIT
             <input
-              type="text"
+              type='text'
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
-              placeholder="например: s1mple"
+              placeholder='например: s1mple'
             />
           </label>
         </div>
 
-        <div className="stats-widget-page__link-row">
+        <div className='stats-widget-page__link-row'>
           <input
-            type="text"
+            type='text'
             readOnly
             value={widgetUrl || 'Укажи nickname, чтобы сгенерировать ссылку'}
-            aria-label="Ссылка на stats widget"
+            aria-label='Ссылка на stats widget'
           />
-          <button type="button" onClick={() => void copy()} disabled={!canBuild}>
+          <button type='button' onClick={() => void copy()} disabled={!canBuild}>
             {copied ? 'Скопировано' : 'Копировать URL'}
           </button>
           <a
             href={widgetUrl || undefined}
-            target="_blank"
-            rel="noreferrer"
+            target='_blank'
+            rel='noreferrer'
             className={`stats-widget-page__open ${canBuild ? '' : 'stats-widget-page__open--disabled'}`}
           >
             Открыть виджет
           </a>
         </div>
 
-        <div className="stats-widget-page__footer">
-          <Link to="/" className="stats-widget-page__link">На главную</Link>
-          <Link to="/widgets/match-result" className="stats-widget-page__link">К странице Match Result</Link>
+        <div className='stats-widget-page__footer'>
+          <Link to='/' className='stats-widget-page__link'>На главную</Link>
+          <Link to='/widgets/match-result' className='stats-widget-page__link'>К странице Match Result</Link>
         </div>
       </section>
     </main>

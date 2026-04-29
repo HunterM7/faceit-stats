@@ -14,13 +14,13 @@ export function AppHeader() {
 
   return (
     <header className={`app-header ${isScrolled ? 'app-header--scrolled' : ''}`}>
-      <div className="app-header__inner">
-        <NavLink to="/" end className="app-header__brand">
+      <div className='app-header__inner'>
+        <NavLink to='/' end className='app-header__brand'>
           FACEIT WIDGETS
         </NavLink>
-        <nav className="app-header__nav">
-          <NavLink to="/widgets/stats" className="app-header__nav-link">Stats Widget</NavLink>
-          <NavLink to="/widgets/match-result" className="app-header__nav-link">Match Result</NavLink>
+        <nav className='app-header__nav'>
+          <NavLink to='/widgets/stats' className='app-header__nav-link'>Stats Widget</NavLink>
+          <NavLink to='/widgets/match-result' className='app-header__nav-link'>Match Result</NavLink>
         </nav>
       </div>
     </header>

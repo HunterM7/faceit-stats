@@ -36,11 +36,11 @@ export function MatchResultWidgetPage() {
   }
 
   return (
-    <main className="match-result-widget-page">
+    <main className='match-result-widget-page'>
       <AppHeader />
-      <section className="match-result-widget-page__card">
-        <div className="match-result-widget-page__top">
-          <p className="match-result-widget-page__badge">WIDGET PAGE</p>
+      <section className='match-result-widget-page__card'>
+        <div className='match-result-widget-page__top'>
+          <p className='match-result-widget-page__badge'>WIDGET PAGE</p>
           <h1>Match Result Widget</h1>
           <p>
             Алерт для стрима: показывает VICTORY/DEFEAT при новом завершенном матче. Можно включить тестовый режим и
@@ -48,7 +48,7 @@ export function MatchResultWidgetPage() {
           </p>
         </div>
 
-        <div className="match-result-widget-page__hint-list">
+        <div className='match-result-widget-page__hint-list'>
           <span>
             Обязательный параметр: nickname
           </span>
@@ -60,73 +60,73 @@ export function MatchResultWidgetPage() {
           </span>
         </div>
 
-        <div className="match-result-widget-page__grid">
+        <div className='match-result-widget-page__grid'>
           <label>
             Ник FACEIT
             <input
-              type="text"
+              type='text'
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
-              placeholder="например: s1mple"
+              placeholder='например: s1mple'
             />
           </label>
 
           <label>
             test
             <select value={testMode} onChange={(e) => setTestMode(e.target.value as BoolSetting)}>
-              <option value="false">false</option>
-              <option value="true">true</option>
+              <option value='false'>false</option>
+              <option value='true'>true</option>
             </select>
           </label>
 
           <label>
             hideRank
             <select value={hideRank} onChange={(e) => setHideRank(e.target.value as BoolSetting)}>
-              <option value="false">false</option>
-              <option value="true">true</option>
+              <option value='false'>false</option>
+              <option value='true'>true</option>
             </select>
           </label>
 
           <label>
             hideChallenger
             <select value={hideChallenger} onChange={(e) => setHideChallenger(e.target.value as BoolSetting)}>
-              <option value="false">false</option>
-              <option value="true">true</option>
+              <option value='false'>false</option>
+              <option value='true'>true</option>
             </select>
           </label>
 
           <label>
             transparent
             <select value={transparent} onChange={(e) => setTransparent(e.target.value as BoolSetting)}>
-              <option value="true">true</option>
-              <option value="false">false</option>
+              <option value='true'>true</option>
+              <option value='false'>false</option>
             </select>
           </label>
         </div>
 
-        <div className="match-result-widget-page__link-row">
+        <div className='match-result-widget-page__link-row'>
           <input
-            type="text"
+            type='text'
             readOnly
             value={widgetUrl || 'Укажи nickname, чтобы сгенерировать ссылку'}
-            aria-label="Ссылка на match result widget"
+            aria-label='Ссылка на match result widget'
           />
-          <button type="button" onClick={() => void copy()} disabled={!canBuild}>
+          <button type='button' onClick={() => void copy()} disabled={!canBuild}>
             {copied ? 'Скопировано' : 'Копировать URL'}
           </button>
           <a
             href={widgetUrl || undefined}
-            target="_blank"
-            rel="noreferrer"
+            target='_blank'
+            rel='noreferrer'
             className={`match-result-widget-page__open ${canBuild ? '' : 'match-result-widget-page__open--disabled'}`}
           >
             Открыть виджет
           </a>
         </div>
 
-        <div className="match-result-widget-page__footer">
-          <Link to="/" className="match-result-widget-page__link">На главную</Link>
-          <Link to="/widgets/stats" className="match-result-widget-page__link">К странице Stats Widget</Link>
+        <div className='match-result-widget-page__footer'>
+          <Link to='/' className='match-result-widget-page__link'>На главную</Link>
+          <Link to='/widgets/stats' className='match-result-widget-page__link'>К странице Stats Widget</Link>
         </div>
       </section>
     </main>

@@ -1,11 +1,21 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import checker from 'vite-plugin-checker'
 import path from 'path'
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   cacheDir: path.resolve(__dirname, '../.cache/vite-client'),
-  plugins: [ react() ],
+  plugins: [
+    react(),
+    ...(command === 'serve' ? [
+      checker({
+        eslint: {
+          lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
+        },
+      }),
+    ] : []),
+  ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
@@ -21,4 +31,4 @@ export default defineConfig({
     port: 5173,
     strictPort: true,
   },
-})
+}))
