@@ -1,0 +1,40 @@
+[data-sonner-toast].app-toast {
+  border-radius: 12px;
+  border: 1px solid rgba(156, 176, 233, 0.34) !important;
+  background:
+    linear-gradient(180deg, rgba(24, 31, 47, 0.94), rgba(15, 20, 33, 0.94)),
+    radial-gradient(circle at 100% 0, rgba(110, 142, 255, 0.18), transparent 48%) !important;
+  color: #eef3ff !important;
+  box-shadow:
+    0 10px 22px rgba(4, 8, 18, 0.38),
+    0 0 18px rgba(108, 139, 255, 0.18) !important;
+  backdrop-filter: blur(8px);
+  min-width: 280px;
+  padding-left: 12px;
+}
+
+.app-toast__title {
+  color: #f4f7ff !important;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.app-toast__description {
+  display: none;
+}
+
+.app-toast--success {
+  border-color: rgba(126, 215, 180, 0.4);
+}
+
+.app-toast--error {
+  border-color: rgba(255, 150, 150, 0.46);
+}
+
+.app-toast--warning {
+  border-color: rgba(255, 208, 129, 0.46);
+}
+
+.app-toast--info {
+  border-color: rgba(145, 171, 255, 0.44);
+}

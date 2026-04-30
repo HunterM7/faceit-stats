@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AppConfigModule } from './config/app-config.module';
 import { configuration } from './config/configuration';
 import { FaceitModule } from './faceit/faceit.module';
+import { AdminAnalyticsModule } from './modules/admin-analytics/admin-analytics.module';
 import { DuoMatchesModule } from './modules/duo-matches/duo-matches.module';
 import { LastMatchModule } from './modules/last-match/last-match.module';
 import { PlayerModule } from './modules/player/player.module';
@@ -18,6 +19,7 @@ import { StatsModule } from './stats/stats.module';
     }),
     AppConfigModule,
     FaceitModule,
+    AdminAnalyticsModule,
     StatsModule,
     PlayerStatisticsModule,
     LastMatchModule,

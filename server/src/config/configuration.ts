@@ -11,4 +11,8 @@ export const configuration = () => ({
     apiKey: process.env.FACEIT_API_KEY || '',
     gameId: 'cs2',
   },
+  admin: {
+    login: process.env.ADMIN_LOGIN || '',
+    password: process.env.ADMIN_PASSWORD || '',
+  },
 });

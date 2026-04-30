@@ -27,6 +27,14 @@ export class AppConfigService {
     return this.config.get<string>('app.webDistPath', '');
   }
 
+  get adminLogin(): string {
+    return this.config.get<string>('admin.login', '').trim();
+  }
+
+  get adminPassword(): string {
+    return this.config.get<string>('admin.password', '').trim();
+  }
+
   validateRequired(): void {
     if (!this.faceitApiKey) {
       throw new Error('В .env отсутствует FACEIT_API_KEY');

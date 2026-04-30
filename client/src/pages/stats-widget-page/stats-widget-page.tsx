@@ -1,12 +1,13 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AppHeader } from '@components/app-header/app-header'
+import { useToast } from '@components/toast-provider/use-toast'
 import { buildUrl } from '@utils/widget-url'
 import './stats-widget-page.scss'
 
 export function StatsWidgetPage() {
+  const { showToast } = useToast()
   const [ nickname, setNickname ] = useState('')
-  const [ copied, setCopied ] = useState(false)
   const canBuild = nickname.trim().length > 0
 
   const widgetUrl = useMemo(
@@ -22,10 +23,17 @@ export function StatsWidgetPage() {
     if (!widgetUrl) return
     try {
       await navigator.clipboard.writeText(widgetUrl)
-      setCopied(true)
-      window.setTimeout(() => setCopied(false), 1200)
+      showToast({
+        title: 'Скопировано',
+        variant: 'success',
+        durationMs: 2200,
+      })
     } catch {
-      setCopied(false)
+      showToast({
+        title: 'Не удалось скопировать',
+        message: 'Разреши доступ к буферу обмена или скопируй ссылку вручную.',
+        variant: 'error',
+      })
     }
   }
 
@@ -70,11 +78,12 @@ export function StatsWidgetPage() {
           <input
             type='text'
             readOnly
-            value={widgetUrl || 'Укажи nickname, чтобы сгенерировать ссылку'}
+            value={widgetUrl}
+            placeholder='Укажи nickname, чтобы сгенерировать ссылку'
             aria-label='Ссылка на stats widget'
           />
           <button type='button' onClick={() => void copy()} disabled={!canBuild}>
-            {copied ? 'Скопировано' : 'Копировать URL'}
+            Копировать URL
           </button>
           <a
             href={widgetUrl || undefined}

@@ -1,16 +1,17 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AppHeader } from '@components/app-header/app-header'
+import { useToast } from '@components/toast-provider/use-toast'
 import { buildUrl, type BoolSetting } from '@utils/widget-url'
 import './match-result-widget-page.scss'
 
 export function MatchResultWidgetPage() {
+  const { showToast } = useToast()
   const [ nickname, setNickname ] = useState('')
   const [ hideRank, setHideRank ] = useState<BoolSetting>('false')
   const [ hideChallenger, setHideChallenger ] = useState<BoolSetting>('false')
   const [ transparent, setTransparent ] = useState<BoolSetting>('true')
   const [ testMode, setTestMode ] = useState<BoolSetting>('false')
-  const [ copied, setCopied ] = useState(false)
   const canBuild = nickname.trim().length > 0
 
   const widgetUrl = useMemo(() => {
@@ -28,10 +29,17 @@ export function MatchResultWidgetPage() {
     if (!widgetUrl) return
     try {
       await navigator.clipboard.writeText(widgetUrl)
-      setCopied(true)
-      window.setTimeout(() => setCopied(false), 1200)
+      showToast({
+        title: 'Скопировано',
+        variant: 'success',
+        durationMs: 2200,
+      })
     } catch {
-      setCopied(false)
+      showToast({
+        title: 'Не удалось скопировать',
+        message: 'Разреши доступ к буферу обмена или скопируй ссылку вручную.',
+        variant: 'error',
+      })
     }
   }
 
@@ -108,11 +116,12 @@ export function MatchResultWidgetPage() {
           <input
             type='text'
             readOnly
-            value={widgetUrl || 'Укажи nickname, чтобы сгенерировать ссылку'}
+            value={widgetUrl}
+            placeholder='Укажи nickname, чтобы сгенерировать ссылку'
             aria-label='Ссылка на match result widget'
           />
           <button type='button' onClick={() => void copy()} disabled={!canBuild}>
-            {copied ? 'Скопировано' : 'Копировать URL'}
+            Копировать URL
           </button>
           <a
             href={widgetUrl || undefined}
