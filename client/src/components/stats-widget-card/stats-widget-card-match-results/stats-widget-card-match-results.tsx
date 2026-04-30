@@ -16,6 +16,7 @@ export function StatsWidgetCardMatchResults(props: StatsWidgetCardMatchResultsPr
   return (
     <div className={`stats-widget-card-match-results stats-widget-card-match-results--${result}`}>
       <div className={`stats-widget-card-match-results__value stats-widget-card-match-results__value--${result}`}>{value}</div>
+      <div className='stats-widget-card-match-results__fake-value'>00</div>
     </div>
   )
 }
