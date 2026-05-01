@@ -74,10 +74,12 @@ export function MatchResultWidgetPage() {
           <label>
             Ник FACEIT
             <input
+              name='nickname'
               type='text'
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
               placeholder='например: s1mple'
+              autoComplete='nickname'
             />
           </label>
 

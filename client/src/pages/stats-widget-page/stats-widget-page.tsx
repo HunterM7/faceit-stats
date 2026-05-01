@@ -64,10 +64,12 @@ export function StatsWidgetPage() {
             <p className='stats-widget-page__input-label'>Ник FACEIT</p>
             <input
               className='stats-widget-page__text-input'
+              name='nickname'
               type='text'
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
               placeholder='например: s1mple'
+              autoComplete='nickname'
             />
           </article>
 
