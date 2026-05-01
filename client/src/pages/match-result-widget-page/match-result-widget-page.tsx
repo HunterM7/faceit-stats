@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AppHeader } from '@components/app-header/app-header'
+import { Button, ButtonVariant } from '../../ui/button/button'
+import { LinkButton } from '../../ui/link-button/link-button'
 import { useToast } from '@components/toast-provider/use-toast'
 import { buildUrl, type BoolSetting } from '@utils/widget-url'
 import './match-result-widget-page.scss'
@@ -45,7 +47,7 @@ export function MatchResultWidgetPage() {
 
   return (
     <main className='match-result-widget-page'>
-      <AppHeader />
+      <AppHeader/>
       <section className='match-result-widget-page__card'>
         <div className='match-result-widget-page__top'>
           <p className='match-result-widget-page__badge'>WIDGET PAGE</p>
@@ -120,17 +122,12 @@ export function MatchResultWidgetPage() {
             placeholder='Укажи nickname, чтобы сгенерировать ссылку'
             aria-label='Ссылка на match result widget'
           />
-          <button type='button' onClick={() => void copy()} disabled={!canBuild}>
+          <Button variant={ButtonVariant.Primary} onClick={() => void copy()} disabled={!canBuild}>
             Копировать URL
-          </button>
-          <a
-            href={widgetUrl || undefined}
-            target='_blank'
-            rel='noreferrer'
-            className={`match-result-widget-page__open ${canBuild ? '' : 'match-result-widget-page__open--disabled'}`}
-          >
+          </Button>
+          <LinkButton href={widgetUrl} target='_blank' disabled={!canBuild}>
             Открыть виджет
-          </a>
+          </LinkButton>
         </div>
 
         <div className='match-result-widget-page__footer'>

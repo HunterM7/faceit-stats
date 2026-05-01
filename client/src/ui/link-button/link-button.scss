@@ -1,0 +1,22 @@
+.link-button {
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 8px 12px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.02);
+  color: #dbe2ef;
+
+  transition-property: border-color, box-shadow, background-color, color;
+  transition-duration: 0.16s;
+  transition-timing-function: ease;
+
+  &--disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+}

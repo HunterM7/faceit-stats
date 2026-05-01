@@ -129,26 +129,6 @@
     }
   }
 
-  &__open {
-    border-radius: 8px;
-    padding: 9px 12px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: #dbe2ef;
-    text-decoration: none;
-    font-weight: 700;
-    transition: border-color 0.16s ease, box-shadow 0.16s ease;
-
-    &:hover {
-      border-color: rgba(172, 194, 255, 0.56);
-      box-shadow: 0 0 16px rgba(116, 141, 255, 0.2);
-    }
-
-    &--disabled {
-      pointer-events: none;
-      opacity: 0.5;
-    }
-  }
-
   &__footer {
     margin-top: 16px;
     display: flex;

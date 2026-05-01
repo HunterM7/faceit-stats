@@ -18,14 +18,53 @@
     align-items: center;
   }
 
+  &__header {
+    width: min(1240px, 100%);
+    margin: 0 auto 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    position: sticky;
+    top: 10px;
+    z-index: 20;
+    padding: 6px 0;
+    backdrop-filter: blur(6px);
+  }
+
+  &__header-home-link {
+    color: #d7e5ff;
+    text-decoration: none;
+    font-weight: 600;
+    border: 1px solid rgba(155, 196, 255, 0.34);
+    border-radius: 9px;
+    padding: 8px 12px;
+    background: rgba(12, 20, 36, 0.64);
+    transition: border-color 0.16s ease, background-color 0.16s ease;
+
+    &:hover {
+      border-color: rgba(172, 208, 255, 0.55);
+      background: rgba(20, 31, 52, 0.88);
+    }
+  }
+
+  &__header-spacer {
+    width: 88px;
+    height: 1px;
+  }
+
   &__card {
-    border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    background: rgba(255, 255, 255, 0.04);
     padding: 32px;
-    box-shadow:
-      0 12px 32px rgba(3, 7, 20, 0.4),
-      inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  }
+
+  &__card--dashboard {
+    width: min(1120px, 100%);
+    margin: 0 auto;
+  }
+
+  &__card--status {
+    width: min(1120px, 100%);
+    margin: 0 auto;
   }
 
   &__top {
@@ -88,15 +127,6 @@
       }
     }
 
-    button {
-      border: none;
-      border-radius: 8px;
-      padding: 10px 12px;
-      font-weight: 700;
-      background: #ff5f2e;
-      color: #fff;
-      cursor: pointer;
-    }
   }
 
   &__badge {
@@ -136,14 +166,6 @@
   }
 
   &__period-button {
-    border: 1px solid rgba(255, 255, 255, 0.24);
-    border-radius: 9px;
-    padding: 8px 12px;
-    background: rgba(255, 255, 255, 0.06);
-    color: #d8e0f2;
-    cursor: pointer;
-    font: inherit;
-    font-weight: 600;
     transition: border-color 0.16s ease, background-color 0.16s ease, box-shadow 0.16s ease;
 
     &:hover {
@@ -159,14 +181,6 @@
   }
 
   &__logout-button {
-    border: 1px solid rgba(255, 161, 161, 0.45);
-    border-radius: 9px;
-    padding: 8px 12px;
-    background: rgba(120, 38, 38, 0.34);
-    color: #ffd8d8;
-    cursor: pointer;
-    font: inherit;
-    font-weight: 600;
     transition: border-color 0.16s ease, background-color 0.16s ease;
 
     &:hover {

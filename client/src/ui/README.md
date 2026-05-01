@@ -9,19 +9,7 @@
 - Стили базового состояния лежат рядом с компонентом.
 - Специфичные стили страницы задаются через `className` снаружи.
 
-## Компоненты
+## Документация компонентов
 
-- `button/button.tsx` — базовая кнопка `Button` с вариантами:
-  - `primary`
-  - `secondary`
-  - `danger`
-
-## Пример
-
-```tsx
-import { Button, ButtonVariant } from '@/ui/button/button'
-
-<Button variant={ButtonVariant.Primary} onClick={handleClick}>
-  Сохранить
-</Button>
-```
+- Каждый компонент в `ui` должен иметь собственный `README.md` в своей директории.
+- В корневом `ui/README.md` не дублируем API компонентов и usage-примеры.

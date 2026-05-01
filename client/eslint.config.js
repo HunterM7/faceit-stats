@@ -79,6 +79,13 @@ export default tseslint.config([
       'react/jsx-indent': ['error', 2, { checkAttributes: true, indentLogicalExpressions: true }],
       // Отступы в пропсах компонентов.
       'react/jsx-indent-props': ['error', 2],
+      // Управляет пробелами в JSX-тегах, в т.ч. перед "/>".
+      'react/jsx-tag-spacing': ['error', {
+        beforeSelfClosing: 'never',
+        closingSlash: 'never',
+        beforeClosing: 'never',
+        afterOpening: 'never',
+      }],
       // Запятая после последнего элемента в многострочных объектах и массивах
       'comma-dangle': ['error', 'always-multiline'],
       // Запрещает наличие нескольких пробелов подряд в коде.
@@ -97,6 +104,8 @@ export default tseslint.config([
       'no-whitespace-before-property': ['error'],
       // Пробел после if / for / while / switch / catch и т.д. перед ( или следующим токеном.
       'keyword-spacing': ['error', { before: true, after: true }],
+      // Требует пробелы вокруг инфиксных операторов, включая присваивание (=).
+      'space-infix-ops': ['error'],
       // Не больше 3 пустых строк подряд; в начале/конце файла — без лишних пропусков.
       'no-multiple-empty-lines': ['error', { max: 3, maxEOF: 1, maxBOF: 0 }],
 

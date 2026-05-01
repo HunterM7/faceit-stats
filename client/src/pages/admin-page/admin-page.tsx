@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { AppHeader } from '@components/app-header/app-header'
+import { Button, ButtonVariant } from '../../ui/button/button'
 import { useToast } from '@components/toast-provider/use-toast'
 import {
   AdminUnauthorizedError,
@@ -21,7 +21,6 @@ export function AdminPage() {
   const { showToast } = useToast()
   const [ period, setPeriod ] = useState<AdminPeriod>('day')
   const [ overview, setOverview ] = useState<AdminOverviewPayload | null>(null)
-  const [ isLoading, setIsLoading ] = useState(false)
   const [ authToken, setAuthToken ] = useState<string>(() => window.sessionStorage.getItem('admin-auth-token') || '')
   const [ isAuthorized, setIsAuthorized ] = useState(false)
   const [ login, setLogin ] = useState('')
@@ -34,7 +33,6 @@ export function AdminPage() {
 
     let cancelled = false
     const load = async () => {
-      setIsLoading(true)
       try {
         const next = await requestAdminOverview(period, authToken)
         if (cancelled) return
@@ -58,10 +56,6 @@ export function AdminPage() {
           message: (error as Error).message || 'Попробуй обновить страницу позже.',
           variant: 'error',
         })
-      } finally {
-        if (!cancelled) {
-          setIsLoading(false)
-        }
       }
     }
     void load()
@@ -125,9 +119,12 @@ export function AdminPage() {
   if (!authToken) {
     return (
       <main className='admin-page'>
-        <AppHeader />
+        <header className='admin-page__header'>
+          <Link to='/' className='admin-page__header-home-link'>На главную</Link>
+          <span className='admin-page__header-spacer'/>
+        </header>
         <div className='admin-page__container'>
-          <section className='admin-page__card'>
+          <section className='admin-page__card admin-page__card--auth'>
             <div className='admin-page__auth'>
               <h2>Вход в админку</h2>
               <p>Доступ только по логину и паролю администратора.</p>
@@ -145,7 +142,7 @@ export function AdminPage() {
                 placeholder='Пароль'
                 autoComplete='current-password'
               />
-              <button type='button' onClick={submitAuth}>Войти</button>
+              <Button variant={ButtonVariant.Primary} onClick={submitAuth}>Войти</Button>
             </div>
           </section>
         </div>
@@ -156,8 +153,11 @@ export function AdminPage() {
   if (!isAuthorized) {
     return (
       <main className='admin-page'>
-        <AppHeader />
-        <section className='admin-page__card'>
+        <header className='admin-page__header'>
+          <Link to='/' className='admin-page__header-home-link'>На главную</Link>
+          <Button variant={ButtonVariant.Danger} className='admin-page__logout-button' onClick={logout}>Выйти</Button>
+        </header>
+        <section className='admin-page__card admin-page__card--status'>
           <p className='admin-page__empty'>Проверяем доступ...</p>
         </section>
       </main>
@@ -166,9 +166,12 @@ export function AdminPage() {
 
   return (
     <main className='admin-page'>
-      <AppHeader />
+      <header className='admin-page__header'>
+        <Link to='/' className='admin-page__header-home-link'>На главную</Link>
+        <Button variant={ButtonVariant.Danger} className='admin-page__logout-button' onClick={logout}>Выйти</Button>
+      </header>
 
-      <section className='admin-page__card'>
+      <section className='admin-page__card admin-page__card--dashboard'>
         <div className='admin-page__top'>
           <div>
             <p className='admin-page__badge'>ADMIN DASHBOARD</p>
@@ -182,20 +185,17 @@ export function AdminPage() {
           </div>
           <div className='admin-page__periods' role='group' aria-label='Выбор периода'>
             {ADMIN_PERIOD_OPTIONS.map((option) => (
-              <button
+              <Button
                 key={option.id}
-                type='button'
+                variant={ButtonVariant.Secondary}
                 className={`admin-page__period-button ${period === option.id ? 'admin-page__period-button--active' : ''}`}
                 onClick={() => setPeriod(option.id)}
               >
                 {option.label}
-              </button>
+              </Button>
             ))}
-            <button type='button' className='admin-page__logout-button' onClick={logout}>Выйти</button>
           </div>
         </div>
-
-        {isLoading ? <p className='admin-page__empty'>Загрузка...</p> : null}
 
         <div className='admin-page__kpi-grid'>
           <article className='admin-page__kpi-item'>
@@ -228,7 +228,7 @@ export function AdminPage() {
                     <div key={item.label} className='admin-page__bar-col'>
                       <div className='admin-page__bar-value'>{item.count}</div>
                       <div className='admin-page__bar-wrap'>
-                        <div className='admin-page__bar' style={{ height: `${height}%` }} />
+                        <div className='admin-page__bar' style={{ height: `${height}%` }}/>
                       </div>
                       <div className='admin-page__bar-label'>{item.label}</div>
                     </div>
