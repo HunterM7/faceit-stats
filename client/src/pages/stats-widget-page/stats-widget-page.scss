@@ -117,19 +117,7 @@
 
   &__text-input {
     width: 100%;
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    background: rgba(0, 0, 0, 0.25);
-    color: #f1f3f7;
-    font: inherit;
-    padding: 10px 12px;
-    transition: border-color 0.16s ease, box-shadow 0.16s ease;
-
-    &:focus {
-      outline: none;
-      border-color: rgba(137, 168, 255, 0.7);
-      box-shadow: 0 0 0 2px rgba(96, 129, 255, 0.22);
-    }
+    box-sizing: border-box;
   }
 
   &__comment-title {

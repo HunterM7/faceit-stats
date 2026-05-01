@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AppHeader } from '@components/app-header/app-header'
 import { Button, ButtonVariant } from '../../ui/button/button'
+import { Input } from '../../ui/input/input'
 import { LinkButton } from '../../ui/link-button/link-button'
 import { useToast } from '@components/toast-provider/use-toast'
 import { buildUrl, type BoolSetting } from '@utils/widget-url'
@@ -73,11 +74,14 @@ export function MatchResultWidgetPage() {
         <div className='match-result-widget-page__grid'>
           <label>
             Ник FACEIT
-            <input
+            <Input
+              className='match-result-widget-page__nickname-input'
+              isClearable
+              onClear={() => setNickname('')}
               name='nickname'
               type='text'
               value={nickname}
-              onChange={(e) => setNickname(e.target.value)}
+              onChange={(value) => setNickname(value)}
               placeholder='например: s1mple'
               autoComplete='nickname'
             />

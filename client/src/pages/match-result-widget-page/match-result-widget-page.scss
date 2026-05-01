@@ -70,7 +70,6 @@
       font-size: 14px;
     }
 
-    input,
     select {
       border-radius: 10px;
       border: 1px solid rgba(255, 255, 255, 0.25);
@@ -86,6 +85,12 @@
         box-shadow: 0 0 0 2px rgba(96, 129, 255, 0.22);
       }
     }
+
+  }
+
+  &__nickname-input {
+    width: 100%;
+    box-sizing: border-box;
   }
 
   &__link-row {

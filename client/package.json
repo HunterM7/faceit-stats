@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "eslint .",
+    "lint": "eslint . && npm run lint:styles",
+    "lint:styles": "stylelint \"src/**/*.scss\"",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -33,6 +34,8 @@
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.5.0",
     "sass": "^1.99.0",
+    "postcss-scss": "^4.0.9",
+    "stylelint": "^16.25.0",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.58.2",
     "vite": "^8.0.10",

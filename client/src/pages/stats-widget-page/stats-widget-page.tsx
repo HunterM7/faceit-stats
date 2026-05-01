@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AppHeader } from '@components/app-header/app-header'
 import { Button, ButtonVariant } from '../../ui/button/button'
+import { Input } from '../../ui/input/input'
 import { LinkButton } from '../../ui/link-button/link-button'
 import { useToast } from '@components/toast-provider/use-toast'
 import { buildUrl } from '@utils/widget-url'
@@ -62,12 +63,14 @@ export function StatsWidgetPage() {
           <article className='stats-widget-page__panel stats-widget-page__metric'>
             <p className='stats-widget-page__metric-label'>Параметры виджета</p>
             <p className='stats-widget-page__input-label'>Ник FACEIT</p>
-            <input
+            <Input
               className='stats-widget-page__text-input'
+              isClearable
+              onClear={() => setNickname('')}
               name='nickname'
               type='text'
               value={nickname}
-              onChange={(e) => setNickname(e.target.value)}
+              onChange={(value) => setNickname(value)}
               placeholder='например: s1mple'
               autoComplete='nickname'
             />

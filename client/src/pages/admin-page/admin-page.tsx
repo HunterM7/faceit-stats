@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Button, ButtonVariant } from '@/ui/button/button'
+import { Input } from '@/ui/input/input'
 import { BarChart, type BarChartGroup } from '@/components/bar-chart/bar-chart'
 import { useToast } from '@components/toast-provider/use-toast'
 import {
@@ -150,17 +151,19 @@ export function AdminPage() {
             <div className='admin-page__auth'>
               <h2>Вход в админку</h2>
               <p>Доступ только по логину и паролю администратора.</p>
-              <input
+              <Input
+                className='admin-page__auth-input'
                 type='text'
                 value={login}
-                onChange={(event) => setLogin(event.target.value)}
+                onChange={(value) => setLogin(value)}
                 placeholder='Логин'
                 autoComplete='username'
               />
-              <input
+              <Input
+                className='admin-page__auth-input'
                 type='password'
                 value={password}
-                onChange={(event) => setPassword(event.target.value)}
+                onChange={(value) => setPassword(value)}
                 placeholder='Пароль'
                 autoComplete='current-password'
               />

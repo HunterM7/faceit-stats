@@ -127,40 +127,11 @@
       color: rgba(230, 233, 239, 0.86);
     }
 
-    input {
-      border-radius: 10px;
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      background: rgba(0, 0, 0, 0.25);
-      color: #f1f3f7;
-      font: inherit;
-      font-size: 16px;
-      line-height: 1.3;
-      padding: 10px 12px;
-      transition: border-color 0.16s ease, box-shadow 0.16s ease;
+  }
 
-      &:focus {
-        outline: none;
-        border-color: rgba(137, 168, 255, 0.7);
-        box-shadow: 0 0 0 2px rgba(96, 129, 255, 0.22);
-      }
-
-      &:-webkit-autofill,
-      &:-webkit-autofill:hover,
-      &:-webkit-autofill:focus {
-        font: inherit;
-        font-size: inherit;
-        line-height: 1.3;
-        letter-spacing: inherit;
-        -webkit-text-fill-color: #f1f3f7;
-        -webkit-text-size-adjust: 100%;
-        caret-color: #f1f3f7;
-        border: 1px solid rgba(255, 255, 255, 0.25);
-        -webkit-box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.25) inset;
-        box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.25) inset;
-        transition: background-color 99999s ease-out 0s;
-      }
-    }
-
+  &__auth-input {
+    width: 100%;
+    box-sizing: border-box;
   }
 
   &__badge {

@@ -1,0 +1,63 @@
+.input {
+  position: relative;
+
+  &__field {
+    width: 100%;
+    font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    font-size: 16px;
+    line-height: 1.3;
+    color: #f1f3f7;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 10px;
+    padding: 10px 12px;
+
+    &--clearable {
+      padding-right: 34px;
+    }
+
+    transition-property: border-color, box-shadow;
+    transition-duration: 0.16s;
+    transition-timing-function: ease;
+
+    &:focus {
+      outline: none;
+      border-color: rgba(137, 168, 255, 0.7);
+      box-shadow: 0 0 0 2px rgba(96, 129, 255, 0.22);
+    }
+
+    &:-webkit-autofill,
+    &:-webkit-autofill:hover,
+    &:-webkit-autofill:focus {
+      font: inherit;
+      font-size: inherit;
+      line-height: 1.3;
+      letter-spacing: inherit;
+      -webkit-text-fill-color: #f1f3f7;
+      -webkit-text-size-adjust: 100%;
+      caret-color: #f1f3f7;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      -webkit-box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.25) inset;
+      box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.25) inset;
+      transition: background-color 99999s ease-out 0s;
+    }
+  }
+
+  &__clear {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+    border: none;
+    background: transparent;
+    color: rgba(241, 243, 247, 0.6);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 2px 4px;
+
+    &:hover {
+      color: rgba(241, 243, 247, 0.95);
+    }
+  }
+}
