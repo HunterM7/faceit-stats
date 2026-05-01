@@ -51,13 +51,13 @@ type StatsWidgetCardProps = {
   monthly: MonthlyStatistic;
   /** Дополнительный класс для стилизации компонента. */
   className?: string | undefined;
-  /** Прозрачность фона карточки в процентах (1-100). */
+  /** Прозрачность фона карточки в процентах (0-100). */
   backgroundOpacityPercent?: number | undefined;
 }
 
 export function StatsWidgetCard(props: StatsWidgetCardProps) {
   const { common, daily, monthly, className, backgroundOpacityPercent = 96 } = props
-  const normalizedOpacity = Math.min(100, Math.max(1, backgroundOpacityPercent)) / 100
+  const normalizedOpacity = Math.min(100, Math.max(0, backgroundOpacityPercent)) / 100
   const cardStyle = {
     '--stats-widget-card-bg-opacity': normalizedOpacity,
   } as CSSProperties

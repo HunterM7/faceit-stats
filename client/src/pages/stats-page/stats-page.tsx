@@ -42,7 +42,7 @@ export function StatsPage() {
     if (!rawBg) return undefined
     if (!/^\d+$/.test(rawBg)) return undefined
     const parsed = Number(rawBg)
-    if (parsed < 1 || parsed > 100) return undefined
+    if (parsed < 0 || parsed > 100) return undefined
     return parsed
   })()
 

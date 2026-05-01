@@ -18,7 +18,7 @@ function parseBgOpacityPercent(raw: string): number {
     return DEFAULT_WIDGET_BG_PERCENT
   }
   const parsed = Number(trimmed)
-  if (parsed < 1 || parsed > 100) {
+  if (parsed < 0 || parsed > 100) {
     return DEFAULT_WIDGET_BG_PERCENT
   }
   return parsed
@@ -57,13 +57,13 @@ function StatsWidgetPageBgOpacityField(props: StatsWidgetPageBgOpacityFieldProps
       <input
         type='range'
         name='bg'
-        min={1}
+        min={0}
         max={100}
         step={1}
         value={value}
         onChange={(event) => onChange(Number(event.target.value))}
         className='stats-widget-page__bg-range'
-        aria-label='Прозрачность фона виджета, проценты от 1 до 100'
+        aria-label='Прозрачность фона виджета, проценты от 0 до 100'
       />
     </div>
   )
@@ -90,7 +90,7 @@ export function StatsWidgetPage() {
   }
 
   const handleBgOpacityPercentChange = (next: number) => {
-    const clamped = Math.min(100, Math.max(1, Math.round(next)))
+    const clamped = Math.min(100, Math.max(0, Math.round(next)))
     setBackgroundOpacityPercent(clamped)
     if (clamped === DEFAULT_WIDGET_BG_PERCENT) {
       backgroundOpacityStorage.delete()
