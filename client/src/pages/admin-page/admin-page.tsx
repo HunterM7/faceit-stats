@@ -270,11 +270,6 @@ export function AdminPage() {
             <strong>{data.uniqueUsers}</strong>
             <small>По уникальным FACEIT-никам</small>
           </article>
-          <article className='admin-page__kpi-item'>
-            <span>Уникальных FACEIT-ников</span>
-            <strong>{data.topNicknames.length}</strong>
-            <small>Топ за период</small>
-          </article>
         </div>
 
         <div className='admin-page__content-grid'>
