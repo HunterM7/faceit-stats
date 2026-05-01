@@ -96,7 +96,7 @@ export function StatsWidgetCard(props: StatsWidgetCardProps) {
           </StatsWidgetCardValue>
         </div>
 
-        <StatsWidgetCardValue label='K/D'>
+        <StatsWidgetCardValue label='K/D' className='stats-widget-card__kd'>
           {formatNumberWithFixedDecimals(common.kdRatioValue, 2)}
         </StatsWidgetCardValue>
 
