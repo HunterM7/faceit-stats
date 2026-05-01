@@ -27,6 +27,7 @@ export class AdminAnalyticsInterceptor implements NestInterceptor {
         next: () => {
           void this.analyticsService.trackRequest({
             route,
+            source: this.extractSource(request.query ?? {}),
             statusCode: response.statusCode ?? 200,
             durationMs: Date.now() - start,
             nicknames: this.extractNicknames(request.query ?? {}),
@@ -35,6 +36,7 @@ export class AdminAnalyticsInterceptor implements NestInterceptor {
         error: () => {
           void this.analyticsService.trackRequest({
             route,
+            source: this.extractSource(request.query ?? {}),
             statusCode: response.statusCode ?? 500,
             durationMs: Date.now() - start,
             nicknames: this.extractNicknames(request.query ?? {}),
@@ -55,5 +57,13 @@ export class AdminAnalyticsInterceptor implements NestInterceptor {
       result.push(teammateNickname);
     }
     return result;
+  }
+
+  private extractSource(query: Record<string, string | undefined>): 'stats_widget' | 'overlay_widget' | null {
+    const source = query.source?.trim();
+    if (source === 'stats_widget' || source === 'overlay_widget') {
+      return source;
+    }
+    return null;
   }
 }

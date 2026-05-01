@@ -1,4 +1,5 @@
 import { buildApiUrl } from '@config/api';
+import { type WidgetSource } from './stats';
 
 export type LastMatchPayload = {
   matchId?: string | null;
@@ -47,9 +48,15 @@ export type PlayerPayload = {
   updatedAt?: string;
 };
 
-export async function lastMatch(playerId: string): Promise<LastMatchPayload> {
+export async function lastMatch(playerId: string, source?: WidgetSource): Promise<LastMatchPayload> {
   const endpoint = buildApiUrl('/api/lastMatch');
-  const response = await fetch(`${endpoint}?playerId=${encodeURIComponent(playerId.trim())}`, {
+  const params = new URLSearchParams({
+    playerId: playerId.trim(),
+  });
+  if (source) {
+    params.set('source', source);
+  }
+  const response = await fetch(`${endpoint}?${params.toString()}`, {
     cache: 'no-store',
   });
   if (!response.ok) {
@@ -58,9 +65,15 @@ export async function lastMatch(playerId: string): Promise<LastMatchPayload> {
   return (await response.json()) as LastMatchPayload;
 }
 
-export async function player(nickname: string): Promise<PlayerPayload> {
+export async function player(nickname: string, source?: WidgetSource): Promise<PlayerPayload> {
   const endpoint = buildApiUrl('/api/player');
-  const response = await fetch(`${endpoint}?nickname=${encodeURIComponent(nickname.trim())}`, {
+  const params = new URLSearchParams({
+    nickname: nickname.trim(),
+  });
+  if (source) {
+    params.set('source', source);
+  }
+  const response = await fetch(`${endpoint}?${params.toString()}`, {
     cache: 'no-store',
   });
   if (!response.ok) {

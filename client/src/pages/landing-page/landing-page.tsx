@@ -7,7 +7,7 @@ import './landing-page.scss'
 export function LandingPage() {
   return (
     <main className='landing-page'>
-      <AppHeader />
+      <AppHeader/>
 
       <section className='landing-page__hero'>
         <p className='landing-page__badge'>ДЛЯ OBS / BROWSER SOURCE</p>

@@ -1,14 +1,17 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Collection, MongoClient } from 'mongodb';
+import { StatsService } from '../../stats/stats.service';
 import {
   type AdminEvent,
   type AdminNicknameStat,
   type AdminOverviewResponse,
   type AdminPeriod,
+  type AdminScope,
 } from './admin-analytics.types';
 
 type TrackRequestPayload = {
   route: string;
+  source: AdminScope | null;
   statusCode: number;
   durationMs: number;
   nicknames: string[];
@@ -23,7 +26,7 @@ export class AdminAnalyticsService {
   private collection: Collection<AdminEventDocument> | null = null;
   private isRuntimeDisabled = false;
 
-  constructor() {
+  constructor(private readonly statsService: StatsService) {
     this.mongoUri = (process.env.MONGODB_URI || '').trim();
     this.mongoDbName = (process.env.MONGODB_DB_NAME || 'faceit_stats').trim();
     if (!this.mongoUri) {
@@ -48,6 +51,7 @@ export class AdminAnalyticsService {
       await collection.insertOne({
         createdAt: now,
         route: payload.route,
+        source: payload.source,
         statusCode: payload.statusCode,
         durationMs: payload.durationMs,
         nicknames: normalizedNicknames,
@@ -58,10 +62,11 @@ export class AdminAnalyticsService {
     }
   }
 
-  async getOverview(period: AdminPeriod): Promise<AdminOverviewResponse> {
+  async getOverview(period: AdminPeriod, scope: AdminScope): Promise<AdminOverviewResponse> {
     if (this.isRuntimeDisabled) {
       return {
         period,
+        scope,
         totalEvents: 0,
         uniqueUsers: 0,
         topNicknames: [],
@@ -76,6 +81,7 @@ export class AdminAnalyticsService {
       if (!collection) {
         return {
           period,
+          scope,
           totalEvents: 0,
           uniqueUsers: 0,
           topNicknames: [],
@@ -88,15 +94,16 @@ export class AdminAnalyticsService {
       const now = new Date();
       const periodStartDate = this.getPeriodStartDate(period, now);
       const [ totalEvents, uniqueUsers, topNicknames, chart, latestEvents ] = await Promise.all([
-        this.getTotalEvents(collection, periodStartDate),
-        this.getUniqueUsers(collection, periodStartDate),
-        this.getTopNicknames(collection, periodStartDate),
-        this.getChart(collection, period, now),
-        this.getLatestEvents(collection, periodStartDate),
+        this.getTotalEvents(collection, periodStartDate, scope),
+        this.getUniqueUsers(collection, periodStartDate, scope),
+        this.getTopNicknames(collection, periodStartDate, scope),
+        this.getChart(collection, period, now, scope),
+        this.getLatestEvents(collection, periodStartDate, scope),
       ]);
 
       return {
         period,
+        scope,
         totalEvents,
         uniqueUsers,
         topNicknames,
@@ -109,6 +116,7 @@ export class AdminAnalyticsService {
       this.logger.error(`Mongo аналитика отключена после ошибки чтения: ${(error as Error).message}`);
       return {
         period,
+        scope,
         totalEvents: 0,
         uniqueUsers: 0,
         topNicknames: [],
@@ -119,13 +127,21 @@ export class AdminAnalyticsService {
     }
   }
 
-  private async getTotalEvents(collection: Collection<AdminEventDocument>, periodStartDate: Date | null): Promise<number> {
-    const query = this.getPeriodQuery(periodStartDate);
+  private async getTotalEvents(
+    collection: Collection<AdminEventDocument>,
+    periodStartDate: Date | null,
+    scope: AdminScope,
+  ): Promise<number> {
+    const query = this.getOverviewQuery(periodStartDate, scope);
     return await collection.countDocuments(query);
   }
 
-  private async getUniqueUsers(collection: Collection<AdminEventDocument>, periodStartDate: Date | null): Promise<number> {
-    const query = this.getPeriodQuery(periodStartDate);
+  private async getUniqueUsers(
+    collection: Collection<AdminEventDocument>,
+    periodStartDate: Date | null,
+    scope: AdminScope,
+  ): Promise<number> {
+    const query = this.getOverviewQuery(periodStartDate, scope);
     const result = await collection.aggregate<{ count: number }>([
       { $match: query },
       { $unwind: '$nicknames' },
@@ -138,9 +154,10 @@ export class AdminAnalyticsService {
   private async getTopNicknames(
     collection: Collection<AdminEventDocument>,
     periodStartDate: Date | null,
+    scope: AdminScope,
   ): Promise<AdminNicknameStat[]> {
-    const query = this.getPeriodQuery(periodStartDate);
-    return await collection.aggregate<AdminNicknameStat>([
+    const query = this.getOverviewQuery(periodStartDate, scope);
+    const rawTop = await collection.aggregate<{ nickname: string; count: number }>([
       { $match: query },
       { $unwind: '$nicknames' },
       { $group: { _id: '$nicknames', count: { $sum: 1 } } },
@@ -148,24 +165,58 @@ export class AdminAnalyticsService {
       { $sort: { count: -1 as const } },
       { $limit: 12 },
     ]).toArray();
+    return await Promise.all(rawTop.map(async (item) => ({
+      nickname: item.nickname,
+      count: item.count,
+      elo: await this.resolveNicknameElo(item.nickname),
+    })));
   }
 
   private async getChart(
     collection: Collection<AdminEventDocument>,
     period: AdminPeriod,
     now: Date,
-  ): Promise<Array<{ label: string; count: number }>> {
-    let points = 30;
+    scope: AdminScope,
+  ): Promise<Array<{ label: string; count: number; dateKey: string }>> {
     if (period === 'day') {
-      points = 1;
-    } else if (period === 'week') {
+      const hourKeys = this.getLastHoursKeys(24, now);
+      const startDate = new Date(hourKeys[0]);
+      const chartQuery = this.getOverviewQuery(startDate, scope);
+      const aggregated = await collection.aggregate<{ _id: string; count: number }>([
+        { $match: chartQuery },
+        {
+          $group: {
+            _id: {
+              $dateToString: {
+                date: '$createdAt',
+                format: '%Y-%m-%dT%H:00:00.000Z',
+                timezone: 'UTC',
+              },
+            },
+            count: { $sum: 1 },
+          },
+        },
+        { $sort: { _id: 1 as const } },
+      ]).toArray();
+
+      const map = new Map(aggregated.map((item) => [ item._id, item.count ]));
+      return hourKeys.map((key) => ({
+        label: this.toHourChartLabel(key),
+        dateKey: key.slice(0, 10),
+        count: map.get(key) ?? 0,
+      }));
+    }
+
+    let points = 30;
+    if (period === 'week') {
       points = 7;
     }
     const dayKeys = this.getLastDaysKeys(points, now);
     const startDate = new Date(`${dayKeys[0]}T00:00:00.000Z`);
 
+    const chartQuery = this.getOverviewQuery(startDate, scope);
     const aggregated = await collection.aggregate<{ _id: string; count: number }>([
-      { $match: { createdAt: { $gte: startDate } } },
+      { $match: chartQuery },
       {
         $group: {
           _id: {
@@ -184,12 +235,17 @@ export class AdminAnalyticsService {
     const map = new Map(aggregated.map((item) => [ item._id, item.count ]));
     return dayKeys.map((key) => ({
       label: this.toChartLabel(key),
+      dateKey: key,
       count: map.get(key) ?? 0,
     }));
   }
 
-  private async getLatestEvents(collection: Collection<AdminEventDocument>, periodStartDate: Date | null): Promise<AdminEvent[]> {
-    const query = this.getPeriodQuery(periodStartDate);
+  private async getLatestEvents(
+    collection: Collection<AdminEventDocument>,
+    periodStartDate: Date | null,
+    scope: AdminScope,
+  ): Promise<AdminEvent[]> {
+    const query = this.getOverviewQuery(periodStartDate, scope);
     const rows = await collection.find(query)
       .sort({ createdAt: -1 })
       .limit(20)
@@ -197,6 +253,7 @@ export class AdminAnalyticsService {
     return rows.map((row) => ({
       timestamp: row.createdAt.toISOString(),
       route: row.route,
+      source: row.source ?? null,
       statusCode: row.statusCode,
       durationMs: row.durationMs,
       nicknames: row.nicknames,
@@ -213,6 +270,17 @@ export class AdminAnalyticsService {
     return keys;
   }
 
+  private getLastHoursKeys(hours: number, now: Date): string[] {
+    const keys: string[] = [];
+    for (let index = hours - 1; index >= 0; index -= 1) {
+      const date = new Date(now);
+      date.setUTCMinutes(0, 0, 0);
+      date.setUTCHours(date.getUTCHours() - index);
+      keys.push(this.getHourKey(date));
+    }
+    return keys;
+  }
+
   private getDateKey(date: Date): string {
     const year = String(date.getUTCFullYear());
     const month = String(date.getUTCMonth() + 1).padStart(2, '0');
@@ -220,9 +288,17 @@ export class AdminAnalyticsService {
     return `${year}-${month}-${day}`;
   }
 
+  private getHourKey(date: Date): string {
+    return date.toISOString().slice(0, 13) + ':00:00.000Z';
+  }
+
   private toChartLabel(dateKey: string): string {
     const [ , month, day ] = dateKey.split('-');
     return `${day}.${month}`;
+  }
+
+  private toHourChartLabel(hourKey: string): string {
+    return hourKey.slice(11, 13);
   }
 
   private getPeriodStartDate(period: AdminPeriod, now: Date): Date | null {
@@ -243,18 +319,29 @@ export class AdminAnalyticsService {
   }
 
   private normalizeNickname(value: string): string {
-    return value.trim().toLowerCase();
+    return value.trim();
   }
 
-  private getPeriodQuery(periodStartDate: Date | null): Record<string, unknown> {
-    if (!periodStartDate) {
-      return {};
+  private async resolveNicknameElo(nickname: string): Promise<number | null> {
+    try {
+      const snapshot = await this.statsService.getPlayerSnapshotByNickname(nickname);
+      return snapshot.currentElo ?? null;
+    } catch {
+      return null;
     }
-    return {
-      createdAt: {
+  }
+
+  private getOverviewQuery(periodStartDate: Date | null, scope: AdminScope): Record<string, unknown> {
+    const query: Record<string, unknown> = {};
+    if (periodStartDate) {
+      query.createdAt = {
         $gte: periodStartDate,
-      },
-    };
+      };
+    }
+    if (scope !== 'overall') {
+      query.source = scope;
+    }
+    return query;
   }
 
   private async getCollection(): Promise<Collection<AdminEventDocument> | null> {
@@ -273,6 +360,7 @@ export class AdminAnalyticsService {
       this.collection = db.collection<AdminEventDocument>('admin_events');
       await this.collection.createIndex({ createdAt: -1 });
       await this.collection.createIndex({ nicknames: 1, createdAt: -1 });
+      await this.collection.createIndex({ source: 1, createdAt: -1 });
       return this.collection;
     } catch (error) {
       this.isRuntimeDisabled = true;
@@ -285,6 +373,7 @@ export class AdminAnalyticsService {
 type AdminEventDocument = {
   createdAt: Date;
   route: string;
+  source?: AdminScope | null;
   statusCode: number;
   durationMs: number;
   nicknames: string[];

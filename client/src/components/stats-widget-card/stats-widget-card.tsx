@@ -106,15 +106,15 @@ export function StatsWidgetCard(props: StatsWidgetCardProps) {
         </StatsWidgetCardValue>
       </div>
 
-      <div className='stats-widget-card__divider' />
+      <div className='stats-widget-card__divider'/>
 
       <div className='stats-widget-card__panels'>
         <div className={`stats-widget-card__panel stats-widget-card__panel--last30 ${getPanelStateClass('last30')}`}>
           <div className='stats-widget-card__subtitle'>LAST 30 MATCHES</div>
           <div className='stats-widget-card__grid'>
-            <StatsWidgetCardMetric value={monthly.winRateValue} label='Win rate' />
-            <StatsWidgetCardMetric value={monthly.avgKillsAdr} label='Avg. Kills / ADR' />
-            <StatsWidgetCardMetric value={monthly.kdKr} label='K/D / K/R' />
+            <StatsWidgetCardMetric value={monthly.winRateValue} label='Win rate'/>
+            <StatsWidgetCardMetric value={monthly.avgKillsAdr} label='Avg. Kills / ADR'/>
+            <StatsWidgetCardMetric value={monthly.kdKr} label='K/D / K/R'/>
           </div>
         </div>
 
@@ -122,8 +122,8 @@ export function StatsWidgetCard(props: StatsWidgetCardProps) {
           <div className='stats-widget-card__subtitle'>STATS TODAY</div>
           <div className='stats-widget-card__grid'>
             <div className='stats-widget-card__match-results'>
-              <StatsWidgetCardMatchResults value={daily.todayWins} result={MatchResult.Win} />
-              <StatsWidgetCardMatchResults value={daily.todayLosses} result={MatchResult.Lose} />
+              <StatsWidgetCardMatchResults value={daily.todayWins} result={MatchResult.Win}/>
+              <StatsWidgetCardMatchResults value={daily.todayLosses} result={MatchResult.Lose}/>
             </div>
             <StatsWidgetCardMetric value={daily.avgKillsAdr} label='Avg. Kills / ADR' className='stats-widget-card__metric'/>
             <StatsWidgetCardMetric value={formatNumberWithFixedDecimals(daily.kdRatioValue, 2)} label='K/D' className='stats-widget-card__metric'/>

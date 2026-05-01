@@ -15,15 +15,15 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
       <Routes>
-        <Route path='/' element={<LandingPage />} />
-        <Route path='/matchResult' element={<MatchResultPage />} />
-        <Route path='/stats' element={<StatsPage />} />
-        <Route path='/duo' element={<DuoFinderPage />} />
-        <Route path='/admin' element={<AdminPage />} />
-        <Route path='/widgets/stats' element={<StatsWidgetPage />} />
-        <Route path='/widgets/match-result' element={<MatchResultWidgetPage />} />
+        <Route path='/' element={<LandingPage/>}/>
+        <Route path='/matchResult' element={<MatchResultPage/>}/>
+        <Route path='/stats' element={<StatsPage/>}/>
+        <Route path='/duo' element={<DuoFinderPage/>}/>
+        <Route path='/admin' element={<AdminPage/>}/>
+        <Route path='/widgets/stats' element={<StatsWidgetPage/>}/>
+        <Route path='/widgets/match-result' element={<MatchResultWidgetPage/>}/>
       </Routes>
     </BrowserRouter>
-    <ToastProvider />
+    <ToastProvider/>
   </StrictMode>,
 );

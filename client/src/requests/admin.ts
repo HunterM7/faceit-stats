@@ -1,6 +1,7 @@
 import { buildApiUrl } from '@config/api'
 
 export type AdminPeriod = 'day' | 'week' | 'month' | 'all'
+export type AdminScope = 'overall' | 'stats_widget' | 'overlay_widget'
 
 export class AdminUnauthorizedError extends Error {
   constructor(message = 'Требуется авторизация для доступа к админке.') {
@@ -11,13 +12,15 @@ export class AdminUnauthorizedError extends Error {
 
 export type AdminOverviewPayload = {
   period: AdminPeriod;
+  scope: AdminScope;
   totalEvents: number;
   uniqueUsers: number;
-  topNicknames: Array<{ nickname: string; count: number }>;
-  chart: Array<{ label: string; count: number }>;
+  topNicknames: Array<{ nickname: string; count: number; elo: number | null }>;
+  chart: Array<{ label: string; count: number; dateKey: string }>;
   latestEvents: Array<{
     timestamp: string;
     route: string;
+    source: AdminScope | null;
     statusCode: number;
     durationMs: number;
     nicknames: string[];
@@ -42,9 +45,13 @@ async function parseErrorMessage(response: Response): Promise<string> {
   }
 }
 
-export async function requestAdminOverview(period: AdminPeriod, authToken?: string): Promise<AdminOverviewPayload> {
+export async function requestAdminOverview(period: AdminPeriod, scope: AdminScope, authToken?: string): Promise<AdminOverviewPayload> {
   const endpoint = buildApiUrl('/api/admin/overview')
-  const response = await fetch(`${endpoint}?period=${encodeURIComponent(period)}`, {
+  const params = new URLSearchParams({
+    period,
+    scope,
+  })
+  const response = await fetch(`${endpoint}?${params.toString()}`, {
     cache: 'no-store',
     headers: authToken ? { Authorization: `Basic ${authToken}` } : undefined,
   })

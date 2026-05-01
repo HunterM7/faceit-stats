@@ -31,6 +31,7 @@ type StatsState = {
 }
 
 export function StatsPage() {
+  const analyticsSource = 'stats_widget'
   const location = useLocation()
   const [ searchParams, setSearchParams ] = useSearchParams()
   const rawNickname = searchParams.get('nickname')
@@ -83,7 +84,7 @@ export function StatsPage() {
       }
 
       try {
-        const stats: StatsPayload = await requestStats(nicknameParam)
+        const stats: StatsPayload = await requestStats(nicknameParam, analyticsSource)
 
         if (!mounted || !stats) {
           return
@@ -106,7 +107,7 @@ export function StatsPage() {
 
       try {
         if (!playerIdRef.current) {
-          const snapshot = await player(nicknameParam)
+          const snapshot = await player(nicknameParam, analyticsSource)
           playerIdRef.current = snapshot.playerId ?? null
         }
 
@@ -115,7 +116,7 @@ export function StatsPage() {
           return
         }
 
-        const matchData = await lastMatch(playerId)
+        const matchData = await lastMatch(playerId, analyticsSource)
         const currentMatchId = matchData.matchId ?? null
 
         if (!latestMatchIdRef.current) {
@@ -128,7 +129,7 @@ export function StatsPage() {
         }
 
         latestMatchIdRef.current = currentMatchId
-        const nextStats = await requestStats(nicknameParam)
+        const nextStats = await requestStats(nicknameParam, analyticsSource)
         if (!mounted || !nextStats) {
           return
         }

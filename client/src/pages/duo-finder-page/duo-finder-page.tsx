@@ -5,7 +5,7 @@ import './duo-finder-page.scss'
 export function DuoFinderPage() {
   return (
     <main className='duo-finder-page'>
-      <AppHeader />
+      <AppHeader/>
       <section className='duo-finder-page__card'>
         <h1 className='duo-finder-page__title'>Duo Finder (CS:GO) временно недоступен</h1>
         <p className='duo-finder-page__subtitle'>

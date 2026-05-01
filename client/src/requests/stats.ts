@@ -1,5 +1,7 @@
 import { buildApiUrl } from '@config/api'
 
+export type WidgetSource = 'stats_widget' | 'overlay_widget'
+
 function extractErrorMessage(raw: unknown, fallback: string): string {
   if (raw && typeof raw === 'object' && 'message' in raw && typeof (raw as { message?: unknown }).message === 'string') {
     return (raw as { message: string }).message
@@ -56,9 +58,16 @@ export type StatsPayload = {
   };
 }
 
-export async function requestStats(nickname?: string): Promise<StatsPayload> {
+export async function requestStats(nickname?: string, source?: WidgetSource): Promise<StatsPayload> {
   const endpoint = buildApiUrl('/api/playerStatistics')
-  const query = nickname?.trim() ? `?nickname=${encodeURIComponent(nickname.trim())}` : ''
+  const params = new URLSearchParams()
+  if (nickname?.trim()) {
+    params.set('nickname', nickname.trim())
+  }
+  if (source) {
+    params.set('source', source)
+  }
+  const query = params.toString() ? `?${params.toString()}` : ''
   const response = await fetch(`${endpoint}${query}`, { cache: 'no-store' })
   if (!response.ok) {
     throw new Error(await parseErrorMessage(response))

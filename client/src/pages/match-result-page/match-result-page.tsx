@@ -4,6 +4,7 @@ import { lastMatch, player } from '@/requests/matchResult'
 import './match-result-page.scss'
 
 export function MatchResultPage() {
+  const analyticsSource = 'overlay_widget'
   const pollMs = 5000
   const durationMs = 7000
   const testPauseMs = 3000
@@ -97,7 +98,7 @@ export function MatchResultPage() {
           setErrorMessage('Не удалось определить playerId для запроса последнего матча.')
           return
         }
-        const matchData = await lastMatch(playerId)
+        const matchData = await lastMatch(playerId, analyticsSource)
         setErrorMessage(null)
         if (!matchData?.matchId) {
           return
@@ -115,7 +116,7 @@ export function MatchResultPage() {
         }
         if (matchData.matchId === lastMatchId) return
 
-        const playerPayload = await player(nickname)
+        const playerPayload = await player(nickname, analyticsSource)
         if (cancelled) return
 
         const nextElo = typeof playerPayload.currentElo === 'number' ? playerPayload.currentElo : null
@@ -141,7 +142,7 @@ export function MatchResultPage() {
 
     const bootstrap = async () => {
       try {
-        const playerPayload = await player(nickname)
+        const playerPayload = await player(nickname, analyticsSource)
         if (cancelled) return
         playerId = typeof playerPayload.playerId === 'string' ? playerPayload.playerId : null
         if (!playerId) {
@@ -153,7 +154,7 @@ export function MatchResultPage() {
         setLevel(typeof playerPayload.currentSkillLevel === 'number' ? playerPayload.currentSkillLevel : null)
         setElo(lastKnownElo)
 
-        const matchData = await lastMatch(playerId)
+        const matchData = await lastMatch(playerId, analyticsSource)
         if (cancelled) return
         if (matchData.matchId) {
           lastMatchId = matchData.matchId
