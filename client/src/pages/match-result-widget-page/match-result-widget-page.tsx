@@ -6,16 +6,29 @@ import { Input } from '../../ui/input/input'
 import { LinkButton } from '../../ui/link-button/link-button'
 import { useToast } from '@components/toast-provider/use-toast'
 import { buildUrl, type BoolSetting } from '@utils/widget-url'
+import { StorageLocal } from '@utils/app-local-storage'
 import './match-result-widget-page.scss'
 
 export function MatchResultWidgetPage() {
+  const nicknameStorage = StorageLocal().path('widgets.overlay.nickname')
   const { showToast } = useToast()
-  const [ nickname, setNickname ] = useState('')
+
+  const [ nickname, setNickname ] = useState(() => nicknameStorage.get(''))
   const [ hideRank, setHideRank ] = useState<BoolSetting>('false')
   const [ hideChallenger, setHideChallenger ] = useState<BoolSetting>('false')
   const [ transparent, setTransparent ] = useState<BoolSetting>('true')
   const [ testMode, setTestMode ] = useState<BoolSetting>('false')
+
   const canBuild = nickname.trim().length > 0
+
+  const handleNicknameChange = (value: string) => {
+    setNickname(value)
+    if (value.trim().length === 0) {
+      nicknameStorage.delete()
+      return
+    }
+    nicknameStorage.set(value)
+  }
 
   const widgetUrl = useMemo(() => {
     if (!canBuild) return ''
@@ -77,11 +90,10 @@ export function MatchResultWidgetPage() {
             <Input
               className='match-result-widget-page__nickname-input'
               isClearable
-              onClear={() => setNickname('')}
               name='nickname'
               type='text'
               value={nickname}
-              onChange={(value) => setNickname(value)}
+              onChange={handleNicknameChange}
               placeholder='например: s1mple'
               autoComplete='nickname'
             />

@@ -7,7 +7,7 @@
 - Поддерживает стандартные `InputHTMLAttributes<HTMLInputElement>`.
 - `className?: string` — внешний класс для страницы/контекста.
 - `isClearable?: boolean` — показать кнопку очистки поля.
-- `onClear?: () => void` — обработчик очистки.
+- `onChange?: (value: string) => void` — обработчик изменения значения.
 
 ## Пример
 
@@ -16,7 +16,7 @@
   name='nickname'
   autoComplete='nickname'
   value={nickname}
-  onChange={(event) => setNickname(event.target.value)}
+  onChange={(value) => setNickname(value)}
   placeholder='например: s1mple'
 />
 ```

@@ -6,12 +6,26 @@ import { Input } from '../../ui/input/input'
 import { LinkButton } from '../../ui/link-button/link-button'
 import { useToast } from '@components/toast-provider/use-toast'
 import { buildUrl } from '@utils/widget-url'
+import { StorageLocal } from '@utils/app-local-storage'
 import './stats-widget-page.scss'
 
 export function StatsWidgetPage() {
+  const nicknameStorage = StorageLocal().path('widgets.statistics.nickname')
+
   const { showToast } = useToast()
-  const [ nickname, setNickname ] = useState('')
+
+  const [ nickname, setNickname ] = useState(() => nicknameStorage.get(''))
+
   const canBuild = nickname.trim().length > 0
+
+  const handleNicknameChange = (value: string) => {
+    setNickname(value)
+    if (!value.trim().length) {
+      nicknameStorage.delete()
+      return
+    }
+    nicknameStorage.set(value)
+  }
 
   const widgetUrl = useMemo(
     () => (canBuild
@@ -66,11 +80,10 @@ export function StatsWidgetPage() {
             <Input
               className='stats-widget-page__text-input'
               isClearable
-              onClear={() => setNickname('')}
               name='nickname'
               type='text'
               value={nickname}
-              onChange={(value) => setNickname(value)}
+              onChange={handleNicknameChange}
               placeholder='например: s1mple'
               autoComplete='nickname'
             />

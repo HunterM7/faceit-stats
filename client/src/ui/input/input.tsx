@@ -11,13 +11,11 @@ interface InputProps extends Pick<InputHTMLAttributes<HTMLInputElement>, 'type' 
   isClearable?: boolean | undefined;
   /** Обработчик очистки поля. */
   onChange?: ((value: string) => void) | undefined;
-  /** Обработчик очистки поля. */
-  onClear?: (() => void) | undefined;
 }
 
 /** Базовый компонент текстового поля ввода. */
 export function Input(props: InputProps) {
-  const { className, isClearable, value, disabled, readOnly, onClear, onChange, ...rest } = props
+  const { className, isClearable, value, disabled, readOnly, onChange, ...rest } = props
 
   const canClear = Boolean(isClearable && value && !disabled && !readOnly)
 
@@ -25,12 +23,8 @@ export function Input(props: InputProps) {
     if (!canClear) {
       return
     }
-    if (onClear) {
-      onClear()
-      return
-    }
     onChange?.('')
-  }, [ canClear, onChange, onClear ])
+  }, [ canClear, onChange ])
 
   const onChangeHandler = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     onChange?.(event.target.value)
