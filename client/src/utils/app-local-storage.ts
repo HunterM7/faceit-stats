@@ -7,8 +7,8 @@ type AppLocalStorageSchema = {
     statistics: {
       /** Ник FACEIT. */
       nickname: string;
-      /** Прозрачность фона карточки (0-100). */
-      backgroundOpacity: string;
+      /** Прозрачность фона карточки (0–100). */
+      backgroundOpacity: number;
       /** Скругление углов виджета в px (0-18). */
       borderRadius: number;
     };

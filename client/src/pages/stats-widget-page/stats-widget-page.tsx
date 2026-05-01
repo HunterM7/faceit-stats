@@ -12,19 +12,26 @@ import './stats-widget-page.scss'
 
 const DEFAULT_WIDGET_BG_PERCENT = 96
 const DEFAULT_WIDGET_BORDER_RADIUS_PX = 16
-/** Дефолт для `get`: если ключа нет, `LocalStorage` вернёт `NaN` (сохранённое 0–18 остаётся обычным числом). */
+/** Дефолт для `get`: если ключа нет, `LocalStorage` вернёт `NaN`. */
 const BORDER_RADIUS_STORAGE_DEFAULT = Number.NaN
+const BACKGROUND_OPACITY_STORAGE_DEFAULT = Number.NaN
 
-function parseBgOpacityPercent(raw: string): number {
-  const trimmed = raw.trim()
-  if (!trimmed.length || !/^\d+$/.test(trimmed)) {
+function normalizeBackgroundOpacityPercent(stored: unknown): number {
+  if (typeof stored === 'string') {
+    const trimmed = stored.trim()
+    if (!trimmed.length || !/^\d+$/.test(trimmed)) {
+      return DEFAULT_WIDGET_BG_PERCENT
+    }
+    stored = Number(trimmed)
+  }
+  if (typeof stored !== 'number' || Number.isNaN(stored) || !Number.isFinite(stored)) {
     return DEFAULT_WIDGET_BG_PERCENT
   }
-  const parsed = Number(trimmed)
-  if (parsed < 0 || parsed > 100) {
+  const rounded = Math.round(stored)
+  if (rounded < 0 || rounded > 100) {
     return DEFAULT_WIDGET_BG_PERCENT
   }
-  return parsed
+  return rounded
 }
 
 function normalizeBorderRadiusPx(stored: unknown): number {
@@ -137,11 +144,16 @@ export function StatsWidgetPage() {
   const { showToast } = useToast()
 
   const [ nickname, setNickname ] = useState(() => nicknameStorage.get(''))
-  const [ backgroundOpacityPercent, setBackgroundOpacityPercent ] = useState(() => parseBgOpacityPercent(backgroundOpacityStorage.get('')))
+  const [ backgroundOpacityPercent, setBackgroundOpacityPercent ] = useState(() => normalizeBackgroundOpacityPercent(
+    backgroundOpacityStorage.get(BACKGROUND_OPACITY_STORAGE_DEFAULT),
+  ))
   const [ borderRadius, setBorderRadius ] = useState(() => normalizeBorderRadiusPx(
     borderRadiusStorage.get(BORDER_RADIUS_STORAGE_DEFAULT),
   ))
-  const [ includeBgInUrl, setIncludeBgInUrl ] = useState(() => backgroundOpacityStorage.get('').trim().length > 0)
+  const [ includeBgInUrl, setIncludeBgInUrl ] = useState(() => {
+    const stored = backgroundOpacityStorage.get(BACKGROUND_OPACITY_STORAGE_DEFAULT)
+    return !Number.isNaN(stored)
+  })
   const [ includeRadiusInUrl, setIncludeRadiusInUrl ] = useState(() => {
     const stored = borderRadiusStorage.get(BORDER_RADIUS_STORAGE_DEFAULT)
     return !Number.isNaN(stored)
@@ -161,7 +173,7 @@ export function StatsWidgetPage() {
   const handleBgOpacityPercentChange = (next: number) => {
     const clamped = Math.min(100, Math.max(0, Math.round(next)))
     setBackgroundOpacityPercent(clamped)
-    backgroundOpacityStorage.set(String(clamped))
+    backgroundOpacityStorage.set(clamped)
     setIncludeBgInUrl(true)
   }
 
