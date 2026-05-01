@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { Button, ButtonVariant } from '../../ui/button/button'
+import { Button, ButtonVariant } from '@/ui/button/button'
+import { BarChart, type BarChartGroup } from '@/components/bar-chart/bar-chart'
 import { useToast } from '@components/toast-provider/use-toast'
 import {
   AdminUnauthorizedError,
@@ -134,41 +135,8 @@ export function AdminPage() {
     storage: 'disabled',
   }
   const data = overview ?? fallbackOverview
-  const maxBarValue = Math.max(1, ...data.chart.map((item) => item.count))
   const scopeDescription = SCOPE_DESCRIPTION_MAP[scope]
-  const daySegments = period === 'day'
-    ? data.chart.reduce<Array<{ dateKey: string; startIndex: number; endIndex: number }>>((segments, item, index) => {
-      const lastSegment = segments[segments.length - 1]
-      if (!lastSegment || lastSegment.dateKey !== item.dateKey) {
-        segments.push({
-          dateKey: item.dateKey,
-          startIndex: index,
-          endIndex: index,
-        })
-        return segments
-      }
-
-      lastSegment.endIndex = index
-      return segments
-    }, [])
-    : []
-  const monthSegments = period === 'month'
-    ? data.chart.reduce<Array<{ monthKey: string; startIndex: number; endIndex: number }>>((segments, item, index) => {
-      const monthKey = getMonthKey(item.dateKey)
-      const lastSegment = segments[segments.length - 1]
-      if (!lastSegment || lastSegment.monthKey !== monthKey) {
-        segments.push({
-          monthKey,
-          startIndex: index,
-          endIndex: index,
-        })
-        return segments
-      }
-
-      lastSegment.endIndex = index
-      return segments
-    }, [])
-    : []
+  const chartGroups = getChartGroups(period, data.chart)
 
   if (!authToken) {
     return (
@@ -275,85 +243,7 @@ export function AdminPage() {
         <div className='admin-page__content-grid'>
           <article className='admin-page__panel'>
             <h2>Активность по дням</h2>
-            {data.chart.length === 0 ? (
-              <p className='admin-page__empty'>Пока нет данных за выбранный период.</p>
-            ) : (
-              <>
-                <div
-                  className='admin-page__chart'
-                  style={{ gridTemplateColumns: `repeat(${data.chart.length}, minmax(18px, 1fr))` }}
-                >
-                  {data.chart.map((item, index) => {
-                    const height = Math.max(8, Math.round((item.count / maxBarValue) * 100))
-                    const hasPeriodSplit = index > 0 && (
-                      (period === 'day' && item.dateKey !== data.chart[index - 1].dateKey)
-                      || (period === 'month' && getMonthKey(item.dateKey) !== getMonthKey(data.chart[index - 1].dateKey))
-                    )
-                    return (
-                      <div
-                        key={`${item.dateKey}-${item.label}-${item.count}`}
-                        className='admin-page__bar-col'
-                      >
-                        <div className='admin-page__bar-value'>{item.count}</div>
-                        <div className={`admin-page__bar-wrap ${hasPeriodSplit ? 'admin-page__bar-wrap--day-split' : ''}`}>
-                          <div className='admin-page__bar' style={{ height: `${height}%` }}/>
-                        </div>
-                        <div
-                          className='admin-page__bar-label'
-                          title={period === 'month' ? formatDateKey(item.dateKey) : undefined}
-                        >
-                          {period === 'month' ? formatMonthDayLabel(item.dateKey) : item.label}
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-                {period === 'day' ? (
-                  <div
-                    className='admin-page__day-segments'
-                    style={{ gridTemplateColumns: `repeat(${data.chart.length}, minmax(18px, 1fr))` }}
-                  >
-                    {daySegments.map((segment, index) => (
-                      <div
-                        key={segment.dateKey}
-                        className={`admin-page__day-segment ${getDaySegmentClassName(
-                          index,
-                          daySegments.length,
-                          segment.startIndex,
-                          segment.endIndex,
-                        )}`}
-                        style={{ gridColumn: `${segment.startIndex + 1} / ${segment.endIndex + 2}` }}
-                        title={formatDateKey(segment.dateKey)}
-                      >
-                        {formatDaySegmentLabel(segment.dateKey)}
-                      </div>
-                    ))}
-                  </div>
-                ) : null}
-                {period === 'month' ? (
-                  <div
-                    className='admin-page__day-segments'
-                    style={{ gridTemplateColumns: `repeat(${data.chart.length}, minmax(18px, 1fr))` }}
-                  >
-                    {monthSegments.map((segment, index) => (
-                      <div
-                        key={segment.monthKey}
-                        className={`admin-page__day-segment ${getDaySegmentClassName(
-                          index,
-                          monthSegments.length,
-                          segment.startIndex,
-                          segment.endIndex,
-                        )}`}
-                        style={{ gridColumn: `${segment.startIndex + 1} / ${segment.endIndex + 2}` }}
-                        title={formatMonthKey(segment.monthKey)}
-                      >
-                        {formatMonthSegmentLabel(segment.monthKey)}
-                      </div>
-                    ))}
-                  </div>
-                ) : null}
-              </>
-            )}
+            <BarChart groups={chartGroups}/>
           </article>
 
           <article className='admin-page__panel'>
@@ -400,6 +290,89 @@ export function AdminPage() {
   )
 }
 
+function encodeBasicAuthToken(login: string, password: string): string | null {
+  try {
+    const value = `${login}:${password}`
+    const bytes = new TextEncoder().encode(value)
+    let binary = ''
+    for (const byte of bytes) {
+      binary += String.fromCharCode(byte)
+    }
+    return window.btoa(binary)
+  } catch {
+    return null
+  }
+}
+
+function getChartGroups(
+  period: AdminPeriod,
+  chart: AdminOverviewPayload['chart'],
+): BarChartGroup[] {
+  if (chart.length === 0) {
+    return []
+  }
+
+  if (period === 'week' || period === 'all') {
+    const items = chart.map((item) => ({
+      label: item.label,
+      value: item.count,
+    }))
+    return [
+      {
+        items,
+      },
+    ]
+  }
+
+  if (period === 'month') {
+    const monthGroups = chart.reduce<Array<{ monthKey: string; items: AdminOverviewPayload['chart'] }>>((acc, item) => {
+      const monthKey = item.dateKey.slice(0, 7)
+      const last = acc[acc.length - 1]
+      if (!last || last.monthKey !== monthKey) {
+        acc.push({
+          monthKey,
+          items: [ item ],
+        })
+        return acc
+      }
+
+      last.items.push(item)
+      return acc
+    }, [])
+    return monthGroups.slice(-2).map((group) => ({
+      label: formatMonthSegmentLabel(group.monthKey),
+      title: formatMonthKey(group.monthKey),
+      items: group.items.map((item) => ({
+        label: formatMonthDayLabel(item.dateKey),
+        value: item.count,
+        hint: formatDateKey(item.dateKey),
+      })),
+    }))
+  }
+
+  const dayGroups = chart.reduce<Array<{ dateKey: string; items: AdminOverviewPayload['chart'] }>>((acc, item) => {
+    const last = acc[acc.length - 1]
+    if (!last || last.dateKey !== item.dateKey) {
+      acc.push({
+        dateKey: item.dateKey,
+        items: [ item ],
+      })
+      return acc
+    }
+
+    last.items.push(item)
+    return acc
+  }, [])
+  return dayGroups.map((group) => ({
+    label: formatDaySegmentLabel(group.dateKey),
+    title: formatDateKey(group.dateKey),
+    items: group.items.map((item) => ({
+      label: item.label,
+      value: item.count,
+    })),
+  }))
+}
+
 function formatDateKey(dateKey: string): string {
   const [ year, month, day ] = dateKey.split('-')
   return `${day}.${month}.${year}`
@@ -435,25 +408,6 @@ function getUtcDateWithOffset(date: Date, offsetDays: number): Date {
   return next
 }
 
-function getMonthKey(dateKey: string): string {
-  return dateKey.slice(0, 7)
-}
-
-function getDaySegmentClassName(
-  index: number,
-  length: number,
-  startIndex: number,
-  endIndex: number,
-): string {
-  const isLast = index === length - 1
-  if (!isLast) {
-    return ''
-  }
-
-  const span = endIndex - startIndex + 1
-  return span <= 2 ? 'admin-page__day-segment--last' : ''
-}
-
 function formatMonthKey(monthKey: string): string {
   const [ year, month ] = monthKey.split('-')
   return `${month}.${year}`
@@ -463,18 +417,4 @@ function formatMonthSegmentLabel(monthKey: string): string {
   const [ year, month ] = monthKey.split('-')
   const date = new Date(Date.UTC(Number(year), Number(month) - 1, 1))
   return date.toLocaleString('ru-RU', { month: 'long', timeZone: 'UTC' })
-}
-
-function encodeBasicAuthToken(login: string, password: string): string | null {
-  try {
-    const value = `${login}:${password}`
-    const bytes = new TextEncoder().encode(value)
-    let binary = ''
-    for (const byte of bytes) {
-      binary += String.fromCharCode(byte)
-    }
-    return window.btoa(binary)
-  } catch {
-    return null
-  }
 }
