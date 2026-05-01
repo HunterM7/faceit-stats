@@ -1,6 +1,6 @@
 .stats-widget-card {
   min-width: 320px;
-  border-radius: 12px;
+  border-radius: var(--stats-widget-card-radius, 16px);
   background: rgba(18, 18, 18, var(--stats-widget-card-bg-opacity, 0.96));
   color: #fff;
   padding: 8px 10px;

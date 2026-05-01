@@ -11,6 +11,7 @@ import { StatsWidgetPagePreview } from './stats-widget-page-preview'
 import './stats-widget-page.scss'
 
 const DEFAULT_WIDGET_BG_PERCENT = 96
+const DEFAULT_WIDGET_BORDER_RADIUS_PX = 16
 
 function parseBgOpacityPercent(raw: string): number {
   const trimmed = raw.trim()
@@ -22,6 +23,20 @@ function parseBgOpacityPercent(raw: string): number {
     return DEFAULT_WIDGET_BG_PERCENT
   }
   return parsed
+}
+
+function normalizeBorderRadiusPx(stored: unknown): number {
+  const parsed = typeof stored === 'number'
+    ? stored
+    : Number(String(stored).trim())
+  if (!Number.isFinite(parsed)) {
+    return DEFAULT_WIDGET_BORDER_RADIUS_PX
+  }
+  const rounded = Math.round(parsed)
+  if (rounded < 0 || rounded > 18) {
+    return DEFAULT_WIDGET_BORDER_RADIUS_PX
+  }
+  return rounded
 }
 
 type StatsWidgetPageBgOpacityFieldProps = {
@@ -69,14 +84,63 @@ function StatsWidgetPageBgOpacityField(props: StatsWidgetPageBgOpacityFieldProps
   )
 }
 
+type StatsWidgetPageBorderRadiusFieldProps = {
+  value: number;
+  defaultPx: number;
+  onChange: (next: number) => void;
+  onReset: () => void;
+}
+
+function StatsWidgetPageBorderRadiusField(props: StatsWidgetPageBorderRadiusFieldProps) {
+  const { value, defaultPx, onChange, onReset } = props
+  const isAtDefault = value === defaultPx
+
+  return (
+    <div className='stats-widget-page__bg-shell stats-widget-page__bg-shell--stacked'>
+      <div className='stats-widget-page__bg-row'>
+        <p className='stats-widget-page__bg-label'>
+          Скругление углов
+        </p>
+        <div className='stats-widget-page__bg-trailing'>
+          <span className='stats-widget-page__bg-value' aria-live='polite'>{value}</span>
+          <Button
+            variant={ButtonVariant.Secondary}
+            className='stats-widget-page__bg-reset'
+            disabled={isAtDefault}
+            onClick={onReset}
+            aria-label='Сбросить скругление углов к значению по умолчанию'
+          >
+            Сброс
+          </Button>
+        </div>
+      </div>
+      <input
+        type='range'
+        name='radius'
+        min={0}
+        max={18}
+        step={1}
+        value={value}
+        onChange={(event) => onChange(Number(event.target.value))}
+        className='stats-widget-page__bg-range'
+        aria-label='Скругление углов виджета в пикселях, от 0 до 18'
+      />
+    </div>
+  )
+}
+
 export function StatsWidgetPage() {
   const nicknameStorage = StorageLocal().path('widgets.statistics.nickname')
   const backgroundOpacityStorage = StorageLocal().path('widgets.statistics.backgroundOpacity')
+  const borderRadiusStorage = StorageLocal().path('widgets.statistics.borderRadius')
 
   const { showToast } = useToast()
 
   const [ nickname, setNickname ] = useState(() => nicknameStorage.get(''))
   const [ backgroundOpacityPercent, setBackgroundOpacityPercent ] = useState(() => parseBgOpacityPercent(backgroundOpacityStorage.get('')))
+  const [ borderRadius, setBorderRadius ] = useState(() => normalizeBorderRadiusPx(
+    borderRadiusStorage.get(DEFAULT_WIDGET_BORDER_RADIUS_PX),
+  ))
 
   const canBuild = nickname.trim().length > 0
 
@@ -104,16 +168,33 @@ export function StatsWidgetPage() {
     backgroundOpacityStorage.delete()
   }
 
+  const handleBorderRadiusPxChange = (next: number) => {
+    const clamped = Math.min(18, Math.max(0, Math.round(next)))
+    setBorderRadius(clamped)
+    if (clamped === DEFAULT_WIDGET_BORDER_RADIUS_PX) {
+      borderRadiusStorage.delete()
+      return
+    }
+    borderRadiusStorage.set(clamped)
+  }
+
+  const handleBorderRadiusReset = () => {
+    setBorderRadius(DEFAULT_WIDGET_BORDER_RADIUS_PX)
+    borderRadiusStorage.delete()
+  }
+
   const bgForUrl = backgroundOpacityPercent === DEFAULT_WIDGET_BG_PERCENT ? undefined : backgroundOpacityPercent
+  const radiusForUrl = borderRadius === DEFAULT_WIDGET_BORDER_RADIUS_PX ? undefined : borderRadius
 
   const widgetUrl = useMemo(
     () => (canBuild
       ? buildUrl('/stats', {
         nickname: nickname.trim(),
         bg: bgForUrl,
+        radius: radiusForUrl,
       })
       : ''),
-    [ bgForUrl, canBuild, nickname ],
+    [ bgForUrl, canBuild, nickname, radiusForUrl ],
   )
 
   const copy = async () => {
@@ -173,6 +254,12 @@ export function StatsWidgetPage() {
               onChange={handleBgOpacityPercentChange}
               onReset={handleBackgroundOpacityReset}
             />
+            <StatsWidgetPageBorderRadiusField
+              value={borderRadius}
+              defaultPx={DEFAULT_WIDGET_BORDER_RADIUS_PX}
+              onChange={handleBorderRadiusPxChange}
+              onReset={handleBorderRadiusReset}
+            />
           </article>
 
           <article className='stats-widget-page__panel stats-widget-page__metric stats-widget-page__metric--preview'>
@@ -180,6 +267,7 @@ export function StatsWidgetPage() {
             <StatsWidgetPagePreview
               nickname={nickname}
               backgroundOpacityPercent={backgroundOpacityPercent}
+              borderRadius={borderRadius}
             />
           </article>
         </div>

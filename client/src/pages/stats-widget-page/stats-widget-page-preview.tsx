@@ -45,10 +45,11 @@ function mapStatsPayloadToWidgetProps(stats: StatsPayload) {
 type StatsWidgetPagePreviewProps = {
   nickname: string;
   backgroundOpacityPercent: number;
+  borderRadius: number;
 }
 
 export function StatsWidgetPagePreview(props: StatsWidgetPagePreviewProps) {
-  const { nickname, backgroundOpacityPercent } = props
+  const { nickname, backgroundOpacityPercent, borderRadius } = props
   const trimmedNickname = nickname.trim()
   const [ preview, setPreview ] = useState<PreviewStatus>({ status: 'idle' })
 
@@ -128,6 +129,7 @@ export function StatsWidgetPagePreview(props: StatsWidgetPagePreviewProps) {
           <StatsWidgetCard
             {...cardProps}
             backgroundOpacityPercent={backgroundOpacityPercent}
+            borderRadius={borderRadius}
             className='stats-widget-page__preview-card'
           />
         </div>

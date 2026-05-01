@@ -53,13 +53,17 @@ type StatsWidgetCardProps = {
   className?: string | undefined;
   /** Прозрачность фона карточки в процентах (0-100). */
   backgroundOpacityPercent?: number | undefined;
+  /** Скругление углов карточки в px (0-18). */
+  borderRadius?: number | undefined;
 }
 
 export function StatsWidgetCard(props: StatsWidgetCardProps) {
-  const { common, daily, monthly, className, backgroundOpacityPercent = 96 } = props
+  const { common, daily, monthly, className, backgroundOpacityPercent = 96, borderRadius = 16 } = props
   const normalizedOpacity = Math.min(100, Math.max(0, backgroundOpacityPercent)) / 100
+  const normalizedBorderRadiusPx = Math.min(18, Math.max(0, Math.round(borderRadius)))
   const cardStyle = {
     '--stats-widget-card-bg-opacity': normalizedOpacity,
+    '--stats-widget-card-radius': `${normalizedBorderRadiusPx}px`,
   } as CSSProperties
 
   // Для показа определенной панели

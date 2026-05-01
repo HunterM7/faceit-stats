@@ -9,6 +9,8 @@ type AppLocalStorageSchema = {
       nickname: string;
       /** Прозрачность фона карточки (0-100). */
       backgroundOpacity: string;
+      /** Скругление углов виджета в px (0-18). */
+      borderRadius: number;
     };
     /** Виджет оверлея. */
     overlay: {

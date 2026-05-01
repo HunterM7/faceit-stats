@@ -37,12 +37,21 @@ export function StatsPage() {
 
   const rawNickname = searchParams.get('nickname')
   const rawBg = searchParams.get('bg')
+  const rawRadius = searchParams.get('radius')
   const nicknameParam = rawNickname?.trim()
   const backgroundOpacityParam = (() => {
     if (!rawBg) return undefined
     if (!/^\d+$/.test(rawBg)) return undefined
     const parsed = Number(rawBg)
     if (parsed < 0 || parsed > 100) return undefined
+    return parsed
+  })()
+
+  const borderRadiusParam = (() => {
+    if (!rawRadius) return undefined
+    if (!/^\d+$/.test(rawRadius)) return undefined
+    const parsed = Number(rawRadius)
+    if (parsed < 0 || parsed > 18) return undefined
     return parsed
   })()
 
@@ -83,6 +92,9 @@ export function StatsPage() {
       nextParams.set('nickname', rawNickname ?? '')
       if (backgroundOpacityParam !== undefined) {
         nextParams.set('bg', String(backgroundOpacityParam))
+      }
+      if (borderRadiusParam !== undefined) {
+        nextParams.set('radius', String(borderRadiusParam))
       }
 
       const hasNicknameWithoutEquals = /(?:\?|&)nickname(?:&|$)/.test(location.search)
@@ -162,7 +174,7 @@ export function StatsPage() {
       mounted = false
       window.clearInterval(timer)
     }
-  }, [ backgroundOpacityParam, location.search, nicknameParam, rawNickname, searchParams, setSearchParams ])
+  }, [ backgroundOpacityParam, borderRadiusParam, location.search, nicknameParam, rawNickname, searchParams, setSearchParams ])
 
   if (state === undefined) {
     return null
@@ -206,6 +218,7 @@ export function StatsPage() {
         daily={daily}
         monthly={monthly}
         backgroundOpacityPercent={backgroundOpacityParam}
+        borderRadius={borderRadiusParam}
         className='stats-page__widget'
       />
     </div>
