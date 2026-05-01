@@ -119,6 +119,8 @@ export default tseslint.config([
       'prefer-const': ['error', { destructuring: 'all', ignoreReadBeforeAssign: false }],
       quotes: ['error', 'single'],
       'jsx-quotes': ['error', 'prefer-single'],
+      // Убирает лишние фигурные скобки у строк в JSX-пропсах: prop='value' вместо prop={'value'}.
+      'react/jsx-curly-brace-presence': ['error', { props: 'never', children: 'ignore', propElementValues: 'always' }],
 
       'max-depth': ['error', { max: 5 }],
       'max-params': ['error', { max: 5 }],
