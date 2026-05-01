@@ -12,6 +12,8 @@ import './stats-widget-page.scss'
 
 const DEFAULT_WIDGET_BG_PERCENT = 96
 const DEFAULT_WIDGET_BORDER_RADIUS_PX = 16
+/** Дефолт для `get`: если ключа нет, `LocalStorage` вернёт `NaN` (сохранённое 0–18 остаётся обычным числом). */
+const BORDER_RADIUS_STORAGE_DEFAULT = Number.NaN
 
 function parseBgOpacityPercent(raw: string): number {
   const trimmed = raw.trim()
@@ -41,14 +43,13 @@ function normalizeBorderRadiusPx(stored: unknown): number {
 
 type StatsWidgetPageBgOpacityFieldProps = {
   value: number;
-  defaultPercent: number;
   onChange: (next: number) => void;
   onReset: () => void;
+  isResetDisabled: boolean;
 }
 
 function StatsWidgetPageBgOpacityField(props: StatsWidgetPageBgOpacityFieldProps) {
-  const { value, defaultPercent, onChange, onReset } = props
-  const isAtDefault = value === defaultPercent
+  const { value, onChange, onReset, isResetDisabled } = props
 
   return (
     <div className='stats-widget-page__bg-shell'>
@@ -61,7 +62,7 @@ function StatsWidgetPageBgOpacityField(props: StatsWidgetPageBgOpacityFieldProps
           <Button
             variant={ButtonVariant.Secondary}
             className='stats-widget-page__bg-reset'
-            disabled={isAtDefault}
+            disabled={isResetDisabled}
             onClick={onReset}
             aria-label='Сбросить прозрачность фона к значению по умолчанию'
           >
@@ -86,14 +87,13 @@ function StatsWidgetPageBgOpacityField(props: StatsWidgetPageBgOpacityFieldProps
 
 type StatsWidgetPageBorderRadiusFieldProps = {
   value: number;
-  defaultPx: number;
   onChange: (next: number) => void;
   onReset: () => void;
+  isResetDisabled: boolean;
 }
 
 function StatsWidgetPageBorderRadiusField(props: StatsWidgetPageBorderRadiusFieldProps) {
-  const { value, defaultPx, onChange, onReset } = props
-  const isAtDefault = value === defaultPx
+  const { value, onChange, onReset, isResetDisabled } = props
 
   return (
     <div className='stats-widget-page__bg-shell stats-widget-page__bg-shell--stacked'>
@@ -106,7 +106,7 @@ function StatsWidgetPageBorderRadiusField(props: StatsWidgetPageBorderRadiusFiel
           <Button
             variant={ButtonVariant.Secondary}
             className='stats-widget-page__bg-reset'
-            disabled={isAtDefault}
+            disabled={isResetDisabled}
             onClick={onReset}
             aria-label='Сбросить скругление углов к значению по умолчанию'
           >
@@ -139,8 +139,13 @@ export function StatsWidgetPage() {
   const [ nickname, setNickname ] = useState(() => nicknameStorage.get(''))
   const [ backgroundOpacityPercent, setBackgroundOpacityPercent ] = useState(() => parseBgOpacityPercent(backgroundOpacityStorage.get('')))
   const [ borderRadius, setBorderRadius ] = useState(() => normalizeBorderRadiusPx(
-    borderRadiusStorage.get(DEFAULT_WIDGET_BORDER_RADIUS_PX),
+    borderRadiusStorage.get(BORDER_RADIUS_STORAGE_DEFAULT),
   ))
+  const [ includeBgInUrl, setIncludeBgInUrl ] = useState(() => backgroundOpacityStorage.get('').trim().length > 0)
+  const [ includeRadiusInUrl, setIncludeRadiusInUrl ] = useState(() => {
+    const stored = borderRadiusStorage.get(BORDER_RADIUS_STORAGE_DEFAULT)
+    return !Number.isNaN(stored)
+  })
 
   const canBuild = nickname.trim().length > 0
 
@@ -156,35 +161,31 @@ export function StatsWidgetPage() {
   const handleBgOpacityPercentChange = (next: number) => {
     const clamped = Math.min(100, Math.max(0, Math.round(next)))
     setBackgroundOpacityPercent(clamped)
-    if (clamped === DEFAULT_WIDGET_BG_PERCENT) {
-      backgroundOpacityStorage.delete()
-      return
-    }
     backgroundOpacityStorage.set(String(clamped))
+    setIncludeBgInUrl(true)
   }
 
   const handleBackgroundOpacityReset = () => {
     setBackgroundOpacityPercent(DEFAULT_WIDGET_BG_PERCENT)
     backgroundOpacityStorage.delete()
+    setIncludeBgInUrl(false)
   }
 
   const handleBorderRadiusPxChange = (next: number) => {
     const clamped = Math.min(18, Math.max(0, Math.round(next)))
     setBorderRadius(clamped)
-    if (clamped === DEFAULT_WIDGET_BORDER_RADIUS_PX) {
-      borderRadiusStorage.delete()
-      return
-    }
     borderRadiusStorage.set(clamped)
+    setIncludeRadiusInUrl(true)
   }
 
   const handleBorderRadiusReset = () => {
     setBorderRadius(DEFAULT_WIDGET_BORDER_RADIUS_PX)
     borderRadiusStorage.delete()
+    setIncludeRadiusInUrl(false)
   }
 
-  const bgForUrl = backgroundOpacityPercent === DEFAULT_WIDGET_BG_PERCENT ? undefined : backgroundOpacityPercent
-  const radiusForUrl = borderRadius === DEFAULT_WIDGET_BORDER_RADIUS_PX ? undefined : borderRadius
+  const bgForUrl = includeBgInUrl ? backgroundOpacityPercent : undefined
+  const radiusForUrl = includeRadiusInUrl ? borderRadius : undefined
 
   const widgetUrl = useMemo(
     () => (canBuild
@@ -250,15 +251,15 @@ export function StatsWidgetPage() {
             />
             <StatsWidgetPageBgOpacityField
               value={backgroundOpacityPercent}
-              defaultPercent={DEFAULT_WIDGET_BG_PERCENT}
               onChange={handleBgOpacityPercentChange}
               onReset={handleBackgroundOpacityReset}
+              isResetDisabled={!includeBgInUrl}
             />
             <StatsWidgetPageBorderRadiusField
               value={borderRadius}
-              defaultPx={DEFAULT_WIDGET_BORDER_RADIUS_PX}
               onChange={handleBorderRadiusPxChange}
               onReset={handleBorderRadiusReset}
+              isResetDisabled={!includeRadiusInUrl}
             />
           </article>
 
