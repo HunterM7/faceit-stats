@@ -34,8 +34,17 @@ export function StatsPage() {
   const analyticsSource = 'stats_widget'
   const location = useLocation()
   const [ searchParams, setSearchParams ] = useSearchParams()
+
   const rawNickname = searchParams.get('nickname')
+  const rawBg = searchParams.get('bg')
   const nicknameParam = rawNickname?.trim()
+  const backgroundOpacityParam = (() => {
+    if (!rawBg) return undefined
+    if (!/^\d+$/.test(rawBg)) return undefined
+    const parsed = Number(rawBg)
+    if (parsed < 1 || parsed > 100) return undefined
+    return parsed
+  })()
 
   const [ state, setState ] = useState<StatsState | undefined>(undefined)
   const playerIdRef = useRef<string | null>(null)
@@ -72,6 +81,9 @@ export function StatsPage() {
     const refresh = async () => {
       const nextParams = new URLSearchParams()
       nextParams.set('nickname', rawNickname ?? '')
+      if (backgroundOpacityParam !== undefined) {
+        nextParams.set('bg', String(backgroundOpacityParam))
+      }
 
       const hasNicknameWithoutEquals = /(?:\?|&)nickname(?:&|$)/.test(location.search)
       if (hasNicknameWithoutEquals || nextParams.toString() !== searchParams.toString()) {
@@ -150,7 +162,7 @@ export function StatsPage() {
       mounted = false
       window.clearInterval(timer)
     }
-  }, [ location.search, nicknameParam, rawNickname, searchParams, setSearchParams ])
+  }, [ backgroundOpacityParam, location.search, nicknameParam, rawNickname, searchParams, setSearchParams ])
 
   if (state === undefined) {
     return null
@@ -193,6 +205,7 @@ export function StatsPage() {
         common={common}
         daily={daily}
         monthly={monthly}
+        backgroundOpacityPercent={backgroundOpacityParam}
         className='stats-page__widget'
       />
     </div>

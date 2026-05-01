@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import type { CSSProperties } from 'react'
 import { classNames } from '@/utils/classNames'
 import { formatNumberWithFixedDecimals } from '@/utils/number-format'
 import { SkillLevelIcon } from '@/components/skill-level-icon/skill-level-icon'
@@ -50,10 +51,16 @@ type StatsWidgetCardProps = {
   monthly: MonthlyStatistic;
   /** Дополнительный класс для стилизации компонента. */
   className?: string | undefined;
+  /** Прозрачность фона карточки в процентах (1-100). */
+  backgroundOpacityPercent?: number | undefined;
 }
 
 export function StatsWidgetCard(props: StatsWidgetCardProps) {
-  const { common, daily, monthly, className } = props
+  const { common, daily, monthly, className, backgroundOpacityPercent = 96 } = props
+  const normalizedOpacity = Math.min(100, Math.max(1, backgroundOpacityPercent)) / 100
+  const cardStyle = {
+    '--stats-widget-card-bg-opacity': normalizedOpacity,
+  } as CSSProperties
 
   // Для показа определенной панели
   // const panel: 'last30' | 'today' = 'today'
@@ -87,7 +94,7 @@ export function StatsWidgetCard(props: StatsWidgetCardProps) {
   }
 
   return (
-    <div className={classNames('stats-widget-card', className)}>
+    <div className={classNames('stats-widget-card', className)} style={cardStyle}>
       <div className='stats-widget-card__top'>
         <div className='stats-widget-card__level-badge'>
           <SkillLevelIcon level={common.levelValue} className='stats-widget-card__level-icon'/>

@@ -7,14 +7,76 @@ import { LinkButton } from '../../ui/link-button/link-button'
 import { useToast } from '@components/toast-provider/use-toast'
 import { buildUrl } from '@utils/widget-url'
 import { StorageLocal } from '@utils/app-local-storage'
+import { StatsWidgetPagePreview } from './stats-widget-page-preview'
 import './stats-widget-page.scss'
+
+const DEFAULT_WIDGET_BG_PERCENT = 96
+
+function parseBgOpacityPercent(raw: string): number {
+  const trimmed = raw.trim()
+  if (!trimmed.length || !/^\d+$/.test(trimmed)) {
+    return DEFAULT_WIDGET_BG_PERCENT
+  }
+  const parsed = Number(trimmed)
+  if (parsed < 1 || parsed > 100) {
+    return DEFAULT_WIDGET_BG_PERCENT
+  }
+  return parsed
+}
+
+type StatsWidgetPageBgOpacityFieldProps = {
+  value: number;
+  defaultPercent: number;
+  onChange: (next: number) => void;
+  onReset: () => void;
+}
+
+function StatsWidgetPageBgOpacityField(props: StatsWidgetPageBgOpacityFieldProps) {
+  const { value, defaultPercent, onChange, onReset } = props
+  const isAtDefault = value === defaultPercent
+
+  return (
+    <div className='stats-widget-page__bg-shell'>
+      <div className='stats-widget-page__bg-row'>
+        <p className='stats-widget-page__bg-label'>
+          Прозрачность фона
+        </p>
+        <div className='stats-widget-page__bg-trailing'>
+          <span className='stats-widget-page__bg-value' aria-live='polite'>{value}</span>
+          <Button
+            variant={ButtonVariant.Secondary}
+            className='stats-widget-page__bg-reset'
+            disabled={isAtDefault}
+            onClick={onReset}
+            aria-label='Сбросить прозрачность фона к значению по умолчанию'
+          >
+            Сброс
+          </Button>
+        </div>
+      </div>
+      <input
+        type='range'
+        name='bg'
+        min={1}
+        max={100}
+        step={1}
+        value={value}
+        onChange={(event) => onChange(Number(event.target.value))}
+        className='stats-widget-page__bg-range'
+        aria-label='Прозрачность фона виджета, проценты от 1 до 100'
+      />
+    </div>
+  )
+}
 
 export function StatsWidgetPage() {
   const nicknameStorage = StorageLocal().path('widgets.statistics.nickname')
+  const backgroundOpacityStorage = StorageLocal().path('widgets.statistics.backgroundOpacity')
 
   const { showToast } = useToast()
 
   const [ nickname, setNickname ] = useState(() => nicknameStorage.get(''))
+  const [ backgroundOpacityPercent, setBackgroundOpacityPercent ] = useState(() => parseBgOpacityPercent(backgroundOpacityStorage.get('')))
 
   const canBuild = nickname.trim().length > 0
 
@@ -27,13 +89,31 @@ export function StatsWidgetPage() {
     nicknameStorage.set(value)
   }
 
+  const handleBgOpacityPercentChange = (next: number) => {
+    const clamped = Math.min(100, Math.max(1, Math.round(next)))
+    setBackgroundOpacityPercent(clamped)
+    if (clamped === DEFAULT_WIDGET_BG_PERCENT) {
+      backgroundOpacityStorage.delete()
+      return
+    }
+    backgroundOpacityStorage.set(String(clamped))
+  }
+
+  const handleBackgroundOpacityReset = () => {
+    setBackgroundOpacityPercent(DEFAULT_WIDGET_BG_PERCENT)
+    backgroundOpacityStorage.delete()
+  }
+
+  const bgForUrl = backgroundOpacityPercent === DEFAULT_WIDGET_BG_PERCENT ? undefined : backgroundOpacityPercent
+
   const widgetUrl = useMemo(
     () => (canBuild
       ? buildUrl('/stats', {
         nickname: nickname.trim(),
+        bg: bgForUrl,
       })
       : ''),
-    [ canBuild, nickname ],
+    [ bgForUrl, canBuild, nickname ],
   )
 
   const copy = async () => {
@@ -87,15 +167,20 @@ export function StatsWidgetPage() {
               placeholder='например: s1mple'
               autoComplete='nickname'
             />
+            <StatsWidgetPageBgOpacityField
+              value={backgroundOpacityPercent}
+              defaultPercent={DEFAULT_WIDGET_BG_PERCENT}
+              onChange={handleBgOpacityPercentChange}
+              onReset={handleBackgroundOpacityReset}
+            />
           </article>
 
-          <article className='stats-widget-page__panel stats-widget-page__metric'>
-            <p className='stats-widget-page__metric-label'>Как использовать</p>
-            <div className='stats-widget-page__hint-list stats-widget-page__hint-list--plain'>
-              <span>1) Укажи ник FACEIT</span>
-              <span>2) Скопируй URL</span>
-              <span>3) Вставь ссылку в OBS Browser Source</span>
-            </div>
+          <article className='stats-widget-page__panel stats-widget-page__metric stats-widget-page__metric--preview'>
+            <p className='stats-widget-page__metric-label'>Предпросмотр</p>
+            <StatsWidgetPagePreview
+              nickname={nickname}
+              backgroundOpacityPercent={backgroundOpacityPercent}
+            />
           </article>
         </div>
 
