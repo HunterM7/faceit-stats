@@ -187,9 +187,9 @@ export function StatsWidgetCard(props: StatsWidgetCardProps) {
         <div className={`stats-widget-card__panel stats-widget-card__panel--last30 ${getPanelStateClass('last30')}`}>
           <div className='stats-widget-card__subtitle'>LAST 30 MATCHES</div>
           <div className='stats-widget-card__grid'>
-            <StatsWidgetCardMetric value={monthly.winRateValue} label='Win rate'/>
-            <StatsWidgetCardMetric value={monthly.avgKillsAdr} label='Avg. Kills / ADR'/>
-            <StatsWidgetCardMetric value={monthly.kdKr} label='K/D / K/R'/>
+            <StatsWidgetCardMetric value={monthly.winRateValue} label='Win rate' className='stats-widget-card__metric'/>
+            <StatsWidgetCardMetric value={monthly.avgKillsAdr} label='Avg. Kills / ADR' className='stats-widget-card__metric'/>
+            <StatsWidgetCardMetric value={monthly.kdKr} label='K/D / K/R' className='stats-widget-card__metric'/>
           </div>
         </div>
 
