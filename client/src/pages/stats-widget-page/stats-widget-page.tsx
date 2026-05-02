@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react'
+import { startTransition, useEffect, useMemo, useState } from 'react'
+import { requestStats, type StatsPayload, type StatsRatingQuery } from '@requests/stats'
 import { Link } from 'react-router-dom'
 import { AppHeader } from '@components/app-header/app-header'
 import { Button, ButtonVariant } from '../../ui/button/button'
@@ -7,11 +8,20 @@ import { LinkButton } from '../../ui/link-button/link-button'
 import { useToast } from '@components/toast-provider/use-toast'
 import { buildUrl } from '@utils/widget-url'
 import { StorageLocal } from '@utils/app-local-storage'
-import { StatsWidgetPagePreview } from './stats-widget-page-preview'
+import { StatsWidgetPagePreview, type StatsWidgetPagePreviewState } from './stats-widget-page-preview'
 import './stats-widget-page.scss'
 
 const DEFAULT_WIDGET_BG_PERCENT = 96
 const DEFAULT_WIDGET_BORDER_RADIUS_PX = 16
+const DEFAULT_RATING_MODE: StatsRatingQuery = 'country'
+const STATS_WIDGET_PREVIEW_SOURCE = 'stats_widget' as const
+
+function parseRatingMode(stored: unknown): StatsRatingQuery {
+  if (stored === 'region' || stored === 'both') {
+    return stored
+  }
+  return 'country'
+}
 /** Дефолт для `get`: если ключа нет, `LocalStorage` вернёт `NaN`. */
 const BORDER_RADIUS_STORAGE_DEFAULT = Number.NaN
 const BACKGROUND_OPACITY_STORAGE_DEFAULT = Number.NaN
@@ -103,7 +113,7 @@ function StatsWidgetPageBorderRadiusField(props: StatsWidgetPageBorderRadiusFiel
   const { value, onChange, onReset, isResetDisabled } = props
 
   return (
-    <div className='stats-widget-page__bg-shell stats-widget-page__bg-shell--stacked'>
+    <div className='stats-widget-page__bg-shell stats-widget-page__bg-shell--stacked stats-widget-page__bg-shell--rating'>
       <div className='stats-widget-page__bg-row'>
         <p className='stats-widget-page__bg-label'>
           Скругление углов
@@ -136,10 +146,41 @@ function StatsWidgetPageBorderRadiusField(props: StatsWidgetPageBorderRadiusFiel
   )
 }
 
+type StatsWidgetPageRatingFieldProps = {
+  value: StatsRatingQuery;
+  onChange: (next: StatsRatingQuery) => void;
+}
+
+/** Настройка query-параметра `rating` (лидерборд FACEIT для блока RANK), оформление как у bg / radius. */
+function StatsWidgetPageRatingField(props: StatsWidgetPageRatingFieldProps) {
+  const { value, onChange } = props
+
+  return (
+    <div className='stats-widget-page__bg-shell stats-widget-page__bg-shell--stacked'>
+      <div className='stats-widget-page__bg-row'>
+        <p className='stats-widget-page__bg-label'>
+          Отображаемый рейтинг
+        </p>
+      </div>
+      <select
+        className='stats-widget-page__rating-select'
+        value={value}
+        onChange={(event) => onChange(event.target.value as StatsRatingQuery)}
+        aria-label='Значение query-параметра rating для ссылки на виджет'
+      >
+        <option value='country'>Только страна</option>
+        <option value='region'>Только регион</option>
+        <option value='both'>Страна и регион</option>
+      </select>
+    </div>
+  )
+}
+
 export function StatsWidgetPage() {
   const nicknameStorage = StorageLocal().path('widgets.statistics.nickname')
   const backgroundOpacityStorage = StorageLocal().path('widgets.statistics.backgroundOpacity')
   const borderRadiusStorage = StorageLocal().path('widgets.statistics.borderRadius')
+  const ratingModeStorage = StorageLocal().path('widgets.statistics.ratingMode')
 
   const { showToast } = useToast()
 
@@ -158,6 +199,41 @@ export function StatsWidgetPage() {
     const stored = borderRadiusStorage.get(BORDER_RADIUS_STORAGE_DEFAULT)
     return !Number.isNaN(stored)
   })
+  const [ ratingMode, setRatingMode ] = useState<StatsRatingQuery>(() =>
+    parseRatingMode(ratingModeStorage.get(DEFAULT_RATING_MODE)),
+  )
+  const [ previewState, setPreviewState ] = useState<StatsWidgetPagePreviewState>({ kind: 'empty' })
+
+  useEffect(() => {
+    const trimmed = nickname.trim()
+    if (!trimmed) {
+      startTransition(() => {
+        setPreviewState({ kind: 'empty' })
+      })
+      return
+    }
+    let cancelled = false
+    startTransition(() => {
+      setPreviewState({ kind: 'loading', nickname: trimmed })
+    })
+    void requestStats(trimmed, STATS_WIDGET_PREVIEW_SOURCE, 'both')
+      .then((stats: StatsPayload) => {
+        if (cancelled) {
+          return
+        }
+        setPreviewState({ kind: 'ready', nickname: trimmed, stats })
+      })
+      .catch((error: unknown) => {
+        if (cancelled) {
+          return
+        }
+        const message = error instanceof Error ? error.message : 'Не удалось загрузить данные'
+        setPreviewState({ kind: 'error', nickname: trimmed, message })
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [ nickname ])
 
   const canBuild = nickname.trim().length > 0
 
@@ -196,8 +272,14 @@ export function StatsWidgetPage() {
     setIncludeRadiusInUrl(false)
   }
 
+  const handleRatingModeChange = (next: StatsRatingQuery) => {
+    setRatingMode(next)
+    ratingModeStorage.set(next)
+  }
+
   const bgForUrl = includeBgInUrl ? backgroundOpacityPercent : undefined
   const radiusForUrl = includeRadiusInUrl ? borderRadius : undefined
+  const ratingForUrl = ratingMode === 'country' ? undefined : ratingMode
 
   const widgetUrl = useMemo(
     () => (canBuild
@@ -205,9 +287,10 @@ export function StatsWidgetPage() {
         nickname: nickname.trim(),
         bg: bgForUrl,
         radius: radiusForUrl,
+        rating: ratingForUrl,
       })
       : ''),
-    [ bgForUrl, canBuild, nickname, radiusForUrl ],
+    [ bgForUrl, canBuild, nickname, radiusForUrl, ratingForUrl ],
   )
 
   const copy = async () => {
@@ -273,12 +356,17 @@ export function StatsWidgetPage() {
               onReset={handleBorderRadiusReset}
               isResetDisabled={!includeRadiusInUrl}
             />
+            <StatsWidgetPageRatingField
+              value={ratingMode}
+              onChange={handleRatingModeChange}
+            />
           </article>
 
           <article className='stats-widget-page__panel stats-widget-page__metric stats-widget-page__metric--preview'>
             <p className='stats-widget-page__metric-label'>Предпросмотр</p>
             <StatsWidgetPagePreview
-              nickname={nickname}
+              preview={previewState}
+              ratingMode={ratingMode}
               backgroundOpacityPercent={backgroundOpacityPercent}
               borderRadius={borderRadius}
             />
@@ -287,6 +375,17 @@ export function StatsWidgetPage() {
 
         <div className='stats-widget-page__panel stats-widget-page__comment'>
           <p className='stats-widget-page__comment-title'>Ссылка на Stats Widget</p>
+          <div className='stats-widget-page__hint-list stats-widget-page__hint-list--plain stats-widget-page__hint-list--query-docs'>
+            <span>
+              Обязательный query: <code className='stats-widget-page__code'>nickname</code>
+            </span>
+            <span>
+              Опционально: <code className='stats-widget-page__code'>bg</code> (0–100),{' '}
+              <code className='stats-widget-page__code'>radius</code> (0–18),{' '}
+              <code className='stats-widget-page__code'>rating</code> — без него или <code className='stats-widget-page__code'>country</code>: только страна;{' '}
+              <code className='stats-widget-page__code'>region</code> / <code className='stats-widget-page__code'>both</code>: как в настройках выше.
+            </span>
+          </div>
           <div className='stats-widget-page__hint-list stats-widget-page__hint-list--muted'>
             <span>Заполни nickname, чтобы сгенерировать ссылку</span>
           </div>

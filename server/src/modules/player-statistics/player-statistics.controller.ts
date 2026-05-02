@@ -6,7 +6,12 @@ export class PlayerStatisticsController {
   constructor(private readonly playerStatisticsService: PlayerStatisticsService) {}
 
   @Get('playerStatistics')
-  async getPlayerStatistics(@Query('nickname') nickname?: string) {
-    return this.playerStatisticsService.getPlayerStatisticsResponse(nickname);
+  async getPlayerStatistics(
+    @Query('nickname') nickname?: string,
+    @Query('rating') rating?: string,
+  ) {
+    const normalizedRating =
+      rating === 'country' || rating === 'region' || rating === 'both' ? rating : undefined;
+    return this.playerStatisticsService.getPlayerStatisticsResponse(nickname, normalizedRating);
   }
 }

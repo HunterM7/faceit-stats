@@ -4,6 +4,7 @@ import { AppConfigService } from '../config/app-config.service';
 import {
   type InternalMatchStatsResponse,
   type MatchHistoryResponse,
+  type PlayerGlobalRankingResponse,
   type PlayerResponse,
 } from '../stats/stats.types';
 
@@ -58,6 +59,29 @@ export class FaceitService {
         offset,
       },
     });
+    return response.data;
+  }
+
+  /**
+   * Позиция игрока в глобальном рейтинге игры по региону.
+   * @see https://docs.faceit.com/docs/data-api/data — Retrieve user position in the global ranking of a game
+   */
+  async getPlayerRanking(
+    gameId: string,
+    region: string,
+    playerId: string,
+    options?: { country?: string; limit?: number },
+  ): Promise<PlayerGlobalRankingResponse> {
+    const params: Record<string, string | number> = {
+      limit: options?.limit ?? 20,
+    };
+    if (options?.country) {
+      params.country = options.country;
+    }
+    const response = await this.http.get<PlayerGlobalRankingResponse>(
+      `/rankings/games/${encodeURIComponent(gameId)}/regions/${encodeURIComponent(region)}/players/${encodeURIComponent(playerId)}`,
+      { params },
+    );
     return response.data;
   }
 }

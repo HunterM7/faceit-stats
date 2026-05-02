@@ -8,11 +8,11 @@ interface CountryFlagIconProps {
   className?: string | undefined;
 }
 
+/** Компонент отображения иконки страны. */
 export function CountryFlagIcon(props: CountryFlagIconProps) {
   const { countryCode, className } = props
 
   const normalizedCode = countryCode.trim().toLowerCase()
-  if (!normalizedCode) return null
 
   return <img src={`/flags/${normalizedCode}.svg`} alt={normalizedCode} className={classNames('country-flag-icon', className)}/>
 }

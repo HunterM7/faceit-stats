@@ -1,10 +1,18 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLocation, useSearchParams } from 'react-router-dom'
 import { StatsWidgetCard } from '@components/stats-widget-card/stats-widget-card'
-import { requestStats, type StatsPayload } from '@requests/stats'
+import { requestStats, type StatsPayload, type StatsRankBlock, type StatsRatingQuery } from '@requests/stats'
 import { lastMatch, player } from '@requests/matchResult'
 import { formatNumberWithFixedDecimals } from '@/utils/number-format'
 import './stats-page.scss'
+
+/** Без `rating` и для `country` API по умолчанию отдаёт только страну — параметр не дублируем. */
+function ratingParamForRequest(rating: StatsRatingQuery | undefined): StatsRatingQuery | undefined {
+  if (rating === undefined || rating === 'country') {
+    return undefined
+  }
+  return rating
+}
 
 type StatsState = {
   country: string | null;
@@ -12,7 +20,7 @@ type StatsState = {
     level: number;
     elo: number;
     kdRatio: number;
-    rankLabel: string;
+    rank: StatsRankBlock;
   };
   daily: {
     wins: number;
@@ -55,6 +63,10 @@ export function StatsPage() {
     return parsed
   })()
 
+  const rawRating = searchParams.get('rating')
+  const ratingParam =
+    rawRating === 'country' || rawRating === 'region' || rawRating === 'both' ? rawRating : undefined
+
   const [ state, setState ] = useState<StatsState | undefined>(undefined)
   const playerIdRef = useRef<string | null>(null)
   const latestMatchIdRef = useRef<string | null>(null)
@@ -66,7 +78,7 @@ export function StatsPage() {
       level: stats.common.skillLevel,
       elo: stats.common.faceitElo,
       kdRatio: stats.common.kdRatio,
-      rankLabel: stats.common.rankLabel,
+      rank: stats.common.rank,
     },
     daily: {
       wins: stats.daily.wins,
@@ -96,6 +108,9 @@ export function StatsPage() {
       if (borderRadiusParam !== undefined) {
         nextParams.set('radius', String(borderRadiusParam))
       }
+      if (ratingParam) {
+        nextParams.set('rating', ratingParam)
+      }
 
       const hasNicknameWithoutEquals = /(?:\?|&)nickname(?:&|$)/.test(location.search)
       if (hasNicknameWithoutEquals || nextParams.toString() !== searchParams.toString()) {
@@ -108,7 +123,11 @@ export function StatsPage() {
       }
 
       try {
-        const stats: StatsPayload = await requestStats(nicknameParam, analyticsSource)
+        const stats: StatsPayload = await requestStats(
+          nicknameParam,
+          analyticsSource,
+          ratingParamForRequest(ratingParam),
+        )
 
         if (!mounted || !stats) {
           return
@@ -153,7 +172,11 @@ export function StatsPage() {
         }
 
         latestMatchIdRef.current = currentMatchId
-        const nextStats = await requestStats(nicknameParam, analyticsSource)
+        const nextStats = await requestStats(
+          nicknameParam,
+          analyticsSource,
+          ratingParamForRequest(ratingParam),
+        )
         if (!mounted || !nextStats) {
           return
         }
@@ -174,7 +197,7 @@ export function StatsPage() {
       mounted = false
       window.clearInterval(timer)
     }
-  }, [ backgroundOpacityParam, borderRadiusParam, location.search, nicknameParam, rawNickname, searchParams, setSearchParams ])
+  }, [ backgroundOpacityParam, borderRadiusParam, location.search, nicknameParam, ratingParam, rawNickname, searchParams, setSearchParams ])
 
   if (state === undefined) {
     return null
@@ -195,7 +218,7 @@ export function StatsPage() {
     eloValue,
     kdRatioValue: state.common.kdRatio,
     countryCode,
-    rankLabel: state.common.rankLabel,
+    rank: state.common.rank,
   }
 
   const daily = {

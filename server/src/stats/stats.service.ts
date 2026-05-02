@@ -7,7 +7,10 @@ import {
   type LastMatchResponse,
   type MatchHistoryItem,
   type MatchResult,
+  type PlayerGlobalRankingResponse,
   type PlayerSnapshotResponse,
+  type StatsRankBlock,
+  type StatsRatingQuery,
   type StatsResponse,
 } from './stats.types';
 
@@ -35,7 +38,10 @@ export class StatsService {
     };
   }
 
-  async getStatsByNickname(rawNickname: string): Promise<StatsResponse> {
+  async getStatsByNickname(
+    rawNickname: string,
+    options?: { rating?: StatsRatingQuery },
+  ): Promise<StatsResponse> {
     const nickname = rawNickname.trim();
     if (!nickname) {
       throw new Error('Никнейм пустой');
@@ -47,14 +53,35 @@ export class StatsService {
       throw new Error('Игрок FACEIT не найден по никнейму');
     }
 
-    const [ history, gameStatsRaw, internalStats ] = await Promise.all([
-      this.faceit.getPlayerHistory(playerId, this.config.gameId, 30),
-      this.faceit.getPlayerGameStats(playerId, this.config.gameId),
-      this.faceit.getPlayerInternalMatchesStats(playerId, this.config.gameId, 30),
+    const gameId = this.config.gameId;
+    const gameStatsFromPlayer = player.games?.[gameId] || {};
+    const regionRaw = gameStatsFromPlayer.region;
+    const region = typeof regionRaw === 'string' && regionRaw.trim() ? regionRaw.trim() : null;
+    const countryLower = player.country?.trim() ? player.country.trim().toLowerCase() : null;
+
+    const ratingFilter: StatsRatingQuery =
+      options?.rating === 'region' || options?.rating === 'both' ? options.rating : 'country';
+    const wantBoth = ratingFilter === 'both';
+    const wantRegion = wantBoth || ratingFilter === 'region';
+    const wantCountry = wantBoth || ratingFilter === 'country';
+
+    const rankingRegionPromise =
+      wantRegion && region ? this.fetchPlayerRankingSafe(gameId, region, playerId) : Promise.resolve(null);
+    const rankingCountryPromise =
+      wantCountry && region && countryLower
+        ? this.fetchPlayerRankingSafe(gameId, region, playerId, countryLower)
+        : Promise.resolve(null);
+
+    const [ history, gameStatsRaw, internalStats, rankingRegion, rankingCountry ] = await Promise.all([
+      this.faceit.getPlayerHistory(playerId, gameId, 30),
+      this.faceit.getPlayerGameStats(playerId, gameId),
+      this.faceit.getPlayerInternalMatchesStats(playerId, gameId, 30),
+      rankingRegionPromise,
+      rankingCountryPromise,
     ]);
     const items = history?.items || [];
     const latest = items[0] || null;
-    const gameStats = player?.games?.[this.config.gameId] || {};
+    const gameStats = player?.games?.[gameId] || {};
     const lifetime = this.getLifetimeStats(gameStatsRaw);
     const internalItems = (internalStats?.items || [])
       .map((item) => this.parseInternalMatch(item))
@@ -68,18 +95,27 @@ export class StatsService {
     const faceitElo = typeof gameStats.faceit_elo === 'number' ? gameStats.faceit_elo : 0;
     const skillLevel = typeof gameStats.skill_level === 'number' ? gameStats.skill_level : 0;
     const commonKdRatio = this.pickNumber(lifetime, [ 'Average K/D Ratio', 'K/D Ratio' ]) ?? 0;
-    const rankLabel = faceitElo ? `#${Math.max(1, Math.round(5000 - faceitElo)).toString()}` : '#----';
+    const rankCountryPos = this.parseGlobalRankingPosition(rankingCountry, playerId);
+    const rankRegionPos = this.parseGlobalRankingPosition(rankingRegion, playerId);
+    const rank = this.buildRankBlock({
+      region,
+      countryCode: countryLower,
+      rankRegionPos,
+      rankCountryPos,
+      wantRegion,
+      wantCountry,
+    });
 
     return {
       nickname: player.nickname || nickname,
       country: player.country?.toUpperCase() || null,
       playerId,
-      gameId: this.config.gameId,
+      gameId,
       common: {
         faceitElo,
         skillLevel,
         kdRatio: commonKdRatio,
-        rankLabel,
+        rank,
       },
       daily: {
         wins: today.wins,
@@ -382,6 +418,55 @@ export class StatsService {
     }
 
     return allItems;
+  }
+
+  private buildRankBlock(args: {
+    region: string | null;
+    countryCode: string | null;
+    rankRegionPos: number | null;
+    rankCountryPos: number | null;
+    wantRegion: boolean;
+    wantCountry: boolean;
+  }): StatsRankBlock {
+    const rank: StatsRankBlock = {};
+    if (args.wantRegion && args.region && args.rankRegionPos !== null && args.rankRegionPos > 0) {
+      rank.region = { code: args.region, rating: Math.round(args.rankRegionPos) };
+    }
+    if (args.wantCountry && args.countryCode && args.rankCountryPos !== null && args.rankCountryPos > 0) {
+      rank.country = { code: args.countryCode.toUpperCase(), rating: Math.round(args.rankCountryPos) };
+    }
+    return rank;
+  }
+
+  private parseGlobalRankingPosition(data: PlayerGlobalRankingResponse | null, playerId: string): number | null {
+    if (!data) return null;
+    if (typeof data.position === 'number' && data.position > 0) {
+      return data.position;
+    }
+    const row = data.items?.find((item) => item.player_id === playerId);
+    if (row && typeof row.position === 'number' && row.position > 0) {
+      return row.position;
+    }
+    return null;
+  }
+
+  private async fetchPlayerRankingSafe(
+    gameId: string,
+    region: string | null,
+    playerId: string,
+    country?: string,
+  ): Promise<PlayerGlobalRankingResponse | null> {
+    if (!region) {
+      return null;
+    }
+    try {
+      return await this.faceit.getPlayerRanking(gameId, region, playerId, {
+        country,
+        limit: 20,
+      });
+    } catch {
+      return null;
+    }
   }
 
   private toFiniteNumber(value: unknown): number | null {

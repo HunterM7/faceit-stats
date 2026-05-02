@@ -1,13 +1,18 @@
-import { useEffect, useState } from 'react';
 import type { CSSProperties } from 'react'
+import { useEffect, useState } from 'react'
 import { classNames } from '@/utils/classNames'
 import { formatNumberWithFixedDecimals } from '@/utils/number-format'
 import { SkillLevelIcon } from '@/components/skill-level-icon/skill-level-icon'
 import { CountryFlagIcon } from '@components/country-flag-icon/country-flag-icon'
+import { RegionFlagIcon } from '@components/region-flag-icon/region-flag-icon'
 import { StatsWidgetCardMetric } from './stats-widget-card-metric/stats-widget-card-metric'
 import { MatchResult, StatsWidgetCardMatchResults } from './stats-widget-card-match-results/stats-widget-card-match-results'
 import { StatsWidgetCardValue } from './stats-widget-card-value/stats-widget-card-value'
+import type { StatsRankBlock } from '@requests/stats'
 import './stats-widget-card.scss'
+
+const CARD_SWITCH_MS = 5000
+const CARD_FADE_MS = 700
 
 interface CommonStatistic {
   /** Текущий уровень FACEIT (skill level). */
@@ -18,8 +23,8 @@ interface CommonStatistic {
   kdRatioValue: number;
   /** Код страны игрока (ISO alpha-2), например `ru` или `ua`. */
   countryCode: string;
-  /** Текстовый label ранга игрока (например, `#1234`). */
-  rankLabel: string;
+  /** Лидерборд: регион и/или страна с позицией из FACEIT Rankings API. */
+  rank: StatsRankBlock;
 }
 
 interface DailyStatistic {
@@ -66,12 +71,54 @@ export function StatsWidgetCard(props: StatsWidgetCardProps) {
     '--stats-widget-card-radius': `${normalizedBorderRadiusPx}px`,
   } as CSSProperties
 
+  const rk = common.rank
+  const hasCountry = Boolean(rk.country)
+  const hasRegion = Boolean(rk.region)
+  const hasBoth = hasCountry && hasRegion
+
+  const [ rankView, setRankView ] = useState<'country' | 'region'>('country')
+  const [ rankVisible, setRankVisible ] = useState(true)
+
+  const getRankSlideClass = (target: 'country' | 'region') => {
+    if (!hasBoth) {
+      const isActiveSingle =
+        (hasCountry && target === 'country') || (hasRegion && target === 'region')
+      return isActiveSingle
+        ? 'stats-widget-card__rank-slide--active'
+        : 'stats-widget-card__rank-slide--hidden'
+    }
+    if (rankView !== target) return 'stats-widget-card__rank-slide--hidden'
+    return rankVisible ? 'stats-widget-card__rank-slide--active' : 'stats-widget-card__rank-slide--hiding'
+  }
+
+  const renderRankPlaceholder = () => (
+    <div className='stats-widget-card__rank-row'>
+      <CountryFlagIcon countryCode={common.countryCode} className='stats-widget-card__country-flag-icon'/>
+      <span>#----</span>
+    </div>
+  )
+
+  const renderCountrySlide = (slideClass: string) => (
+    <div className={classNames('stats-widget-card__rank-slide', slideClass)} aria-hidden={hasBoth ? rankView !== 'country' : undefined}>
+      <div className='stats-widget-card__rank-row'>
+        <CountryFlagIcon countryCode={common.countryCode} className='stats-widget-card__country-flag-icon'/>
+        <span>#{rk.country!.rating}</span>
+      </div>
+    </div>
+  )
+
+  const renderRegionSlide = (slideClass: string) => (
+    <div className={classNames('stats-widget-card__rank-slide', slideClass)} aria-hidden={hasBoth ? rankView !== 'region' : undefined}>
+      <div className='stats-widget-card__rank-row stats-widget-card__rank-row--region'>
+        <RegionFlagIcon regionCode={rk.region!.code} className='stats-widget-card__country-flag-icon'/>
+        <span>#{rk.region!.rating}</span>
+      </div>
+    </div>
+  )
+
   // Для показа определенной панели
   // const panel: 'last30' | 'today' = 'today'
   // const isPanelVisible = true
-
-  const PANEL_SWITCH_MS = 5000
-  const PANEL_FADE_MS = 700
 
   const [ panel, setPanel ] = useState<'last30' | 'today'>('last30')
   const [ isPanelVisible, setIsPanelVisible ] = useState(true)
@@ -80,17 +127,25 @@ export function StatsWidgetCard(props: StatsWidgetCardProps) {
     let fadeTimer: number | null = null
     const panelTimer = window.setInterval(() => {
       setIsPanelVisible(false)
+      if (hasBoth) {
+        setRankVisible(false)
+      }
       fadeTimer = window.setTimeout(() => {
+        fadeTimer = null
         setPanel((prev) => (prev === 'last30' ? 'today' : 'last30'))
         setIsPanelVisible(true)
-      }, PANEL_FADE_MS)
-    }, PANEL_SWITCH_MS)
+        if (hasBoth) {
+          setRankView((prev) => (prev === 'country' ? 'region' : 'country'))
+          setRankVisible(true)
+        }
+      }, CARD_FADE_MS)
+    }, CARD_SWITCH_MS)
 
     return () => {
       window.clearInterval(panelTimer)
-      if (fadeTimer) window.clearTimeout(fadeTimer)
+      if (fadeTimer !== null) window.clearTimeout(fadeTimer)
     }
-  }, [])
+  }, [ hasBoth ])
 
   const getPanelStateClass = (target: 'last30' | 'today') => {
     if (panel !== target) return 'stats-widget-card__panel--hidden'
@@ -112,8 +167,17 @@ export function StatsWidgetCard(props: StatsWidgetCardProps) {
         </StatsWidgetCardValue>
 
         <StatsWidgetCardValue label='RANK' className='stats-widget-card__rank'>
-          <CountryFlagIcon countryCode={common.countryCode} className='stats-widget-card__country-flag-icon'/>
-          <span>{common.rankLabel}</span>
+          <div className='stats-widget-card__rank-slots'>
+            {!hasCountry && !hasRegion ? renderRankPlaceholder() : null}
+            {hasBoth ? (
+              <>
+                {renderCountrySlide(getRankSlideClass('country'))}
+                {renderRegionSlide(getRankSlideClass('region'))}
+              </>
+            ) : null}
+            {hasCountry && !hasRegion ? renderCountrySlide('stats-widget-card__rank-slide--active') : null}
+            {hasRegion && !hasCountry ? renderRegionSlide('stats-widget-card__rank-slide--active') : null}
+          </div>
         </StatsWidgetCardValue>
       </div>
 

@@ -3,6 +3,25 @@ export type MatchResult = 'WIN' | 'LOSS' | 'UNKNOWN';
 export interface PlayerGameData {
   faceit_elo?: number;
   skill_level?: number;
+  /** Регион матчмейкинга для игры (например `EU`), нужен для Rankings API. */
+  region?: string;
+}
+
+/** Ответ `GET /rankings/games/.../regions/.../players/...`. */
+export interface PlayerGlobalRankingItem {
+  country?: string;
+  faceit_elo?: number;
+  game_skill_level?: number;
+  nickname?: string;
+  player_id?: string;
+  position?: number;
+}
+
+export interface PlayerGlobalRankingResponse {
+  start?: number;
+  end?: number;
+  position?: number;
+  items?: PlayerGlobalRankingItem[];
 }
 
 export interface PlayerResponse {
@@ -46,6 +65,22 @@ export interface InternalMatchStatsResponse {
   items?: InternalMatchStatsItem[];
 }
 
+/**
+ * `?rating=` для `/api/playerStatistics`.
+ * Без параметра или `country` — только лидерборд по стране; `region` — по региону; `both` — оба.
+ */
+export type StatsRatingQuery = 'country' | 'region' | 'both';
+
+export interface StatsRankSlice {
+  code: string;
+  rating: number;
+}
+
+export interface StatsRankBlock {
+  region?: StatsRankSlice;
+  country?: StatsRankSlice;
+}
+
 export interface StatsResponse {
   nickname: string;
   country: string | null;
@@ -55,7 +90,8 @@ export interface StatsResponse {
     faceitElo: number;
     skillLevel: number;
     kdRatio: number;
-    rankLabel: string;
+    /** Лидерборд FACEIT: по умолчанию (`?rating` нет или `country`) только страна; `both` — страна и регион. */
+    rank: StatsRankBlock;
   };
   daily: {
     wins: number;

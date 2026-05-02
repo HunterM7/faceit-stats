@@ -93,6 +93,10 @@
       padding: 0;
       color: rgba(212, 224, 247, 0.76);
     }
+
+    &--query-docs {
+      margin-bottom: 10px;
+    }
   }
 
   &__metrics {
@@ -190,6 +194,10 @@
     &--stacked {
       margin-top: 10px;
     }
+
+    &--rating {
+      margin-top: 14px;
+    }
   }
 
   &__bg-row {
@@ -229,6 +237,10 @@
     border: 1px solid rgba(255, 255, 255, 0.2);
     background: rgba(255, 255, 255, 0.06);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+    &--wide {
+      min-width: 52px;
+    }
   }
 
   &__bg-range {
@@ -308,6 +320,24 @@
   &__text-input {
     width: 100%;
     box-sizing: border-box;
+  }
+
+  &__rating-select {
+    box-sizing: border-box;
+    width: 100%;
+    margin: 10px 0 0;
+    padding: 9px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.32);
+    color: #f1f3f7;
+    font: inherit;
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid rgba(118, 164, 255, 0.55);
+      outline-offset: 2px;
+    }
   }
 
   &__comment-title {

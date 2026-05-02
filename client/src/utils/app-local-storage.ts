@@ -11,6 +11,8 @@ type AppLocalStorageSchema = {
       backgroundOpacity: number;
       /** Скругление углов виджета в px (0-18). */
       borderRadius: number;
+      /** Режим лидерборда в ссылке виджета: страна (по умолчанию), регион или оба. */
+      ratingMode: 'country' | 'region' | 'both';
     };
     /** Виджет оверлея. */
     overlay: {

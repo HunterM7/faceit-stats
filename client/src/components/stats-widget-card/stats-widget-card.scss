@@ -31,11 +31,51 @@
   &__rank {
     justify-self: end;
     display: inline-flex;
-    align-items: center;
-    gap: 6px;
+    align-items: flex-start;
   }
 
-  &__country-flag-icon {
+  &__rank-slots {
+    display: grid;
+    justify-items: end;
+    min-width: 0;
+  }
+
+  &__rank-slide {
+    grid-area: 1 / 1;
+    justify-self: end;
+    opacity: 0;
+    visibility: hidden;
+
+    &--active {
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.25s ease;
+    }
+
+    &--hiding {
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.7s ease, visibility 0s linear 0.7s;
+    }
+
+    &--hidden {
+      opacity: 0;
+      visibility: hidden;
+      transition: none;
+    }
+  }
+
+  &__rank-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    &--region {
+      gap: 5px;
+    }
+  }
+
+  &__country-flag-icon, &__region-flag-icon {
     height: 14px;
     width: auto;
     border-radius: 2px;
