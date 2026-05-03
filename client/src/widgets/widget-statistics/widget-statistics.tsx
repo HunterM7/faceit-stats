@@ -9,23 +9,21 @@ import { WidgetStatisticsLast30WinRate } from './widget-statistics-last30-win-ra
 import { WidgetStatisticsMetric } from './widget-statistics-metric/widget-statistics-metric'
 import { MatchResult, WidgetStatisticsMatchResults } from './widget-statistics-match-results/widget-statistics-match-results'
 import { WidgetStatisticsValue } from './widget-statistics-value/widget-statistics-value'
-import type { StatsRankBlock } from '@requests/stats'
+import type { Rank } from '@requests/stats'
 import './widget-statistics.scss'
 
 const CARD_SWITCH_MS = 5000
 const CARD_FADE_MS = 700
 
 interface CommonStatistic {
-  /** Текущий уровень FACEIT (skill level). */
-  levelValue: number;
+  /** Текущий уровень FACEIT игрока. */
+  level: number;
   /** Текущее значение ELO игрока. */
-  eloValue: number;
-  /** Текущее значение K/D для верхнего блока. */
-  kdRatioValue: number;
-  /** Код страны игрока (ISO alpha-2), например `ru` или `ua`. */
-  countryCode: string;
-  /** Лидерборд: регион и/или страна с позицией из FACEIT Rankings API. */
-  rank: StatsRankBlock;
+  elo: number;
+  /** Текущее значение K/D игрока. */
+  kd: number;
+  /** Ранг игрока. */
+  rank: Rank;
 }
 
 interface DailyStatistic {
@@ -36,7 +34,7 @@ interface DailyStatistic {
   /** Средние kills/ADR за сегодня (подготовленная строка). */
   avgKillsAdr: string;
   /** Значение K/D за сегодня (подготовленная строка). */
-  kdRatioValue: number;
+  kd: number;
 }
 
 interface MonthlyStatistic {
@@ -94,17 +92,10 @@ export function WidgetStatistics(props: WidgetStatisticsProps) {
     return rankVisible ? 'widget-statistics__rank-slide--active' : 'widget-statistics__rank-slide--hiding'
   }
 
-  const renderRankPlaceholder = () => (
-    <div className='widget-statistics__rank-row'>
-      <CountryFlagIcon countryCode={common.countryCode} className='widget-statistics__country-flag-icon'/>
-      <span>#----</span>
-    </div>
-  )
-
   const renderCountrySlide = (slideClass: string) => (
     <div className={classNames('widget-statistics__rank-slide', slideClass)} aria-hidden={hasBoth ? rankView !== 'country' : undefined}>
       <div className='widget-statistics__rank-row'>
-        <CountryFlagIcon countryCode={common.countryCode} className='widget-statistics__country-flag-icon'/>
+        <CountryFlagIcon countryCode={rk.country!.code} className='widget-statistics__country-flag-icon'/>
         <span>#{rk.country!.rating}</span>
       </div>
     </div>
@@ -159,27 +150,26 @@ export function WidgetStatistics(props: WidgetStatisticsProps) {
     <div className={classNames('widget-statistics', className)} style={cardStyle}>
       <div className='widget-statistics__top'>
         <div className='widget-statistics__level-badge'>
-          <SkillLevelIcon level={common.levelValue} className='widget-statistics__level-icon'/>
+          <SkillLevelIcon level={common.level} className='widget-statistics__level-icon'/>
           <WidgetStatisticsValue label='ELO'>
-            {common.eloValue}
+            {common.elo}
           </WidgetStatisticsValue>
         </div>
 
         <WidgetStatisticsValue label='K/D' className='widget-statistics__kd'>
-          {formatNumberWithFixedDecimals(common.kdRatioValue, 2)}
+          {formatNumberWithFixedDecimals(common.kd, 2)}
         </WidgetStatisticsValue>
 
         <WidgetStatisticsValue label='RANK' className='widget-statistics__rank'>
           <div className='widget-statistics__rank-slots'>
-            {!hasCountry && !hasRegion ? renderRankPlaceholder() : null}
-            {hasBoth ? (
+            {hasBoth && (
               <>
                 {renderCountrySlide(getRankSlideClass('country'))}
                 {renderRegionSlide(getRankSlideClass('region'))}
               </>
-            ) : null}
-            {hasCountry && !hasRegion ? renderCountrySlide('widget-statistics__rank-slide--active') : null}
-            {hasRegion && !hasCountry ? renderRegionSlide('widget-statistics__rank-slide--active') : null}
+            )}
+            {hasCountry && !hasRegion && renderCountrySlide('widget-statistics__rank-slide--active')}
+            {hasRegion && !hasCountry && renderRegionSlide('widget-statistics__rank-slide--active')}
           </div>
         </WidgetStatisticsValue>
       </div>
@@ -208,7 +198,7 @@ export function WidgetStatistics(props: WidgetStatisticsProps) {
               <WidgetStatisticsMatchResults value={daily.todayLosses} result={MatchResult.Lose}/>
             </div>
             <WidgetStatisticsMetric value={daily.avgKillsAdr} label='Avg. Kills / ADR' className='widget-statistics__metric'/>
-            <WidgetStatisticsMetric value={formatNumberWithFixedDecimals(daily.kdRatioValue, 2)} label='K/D' className='widget-statistics__metric'/>
+            <WidgetStatisticsMetric value={formatNumberWithFixedDecimals(daily.kd, 2)} label='K/D' className='widget-statistics__metric'/>
           </div>
         </div>
       </div>

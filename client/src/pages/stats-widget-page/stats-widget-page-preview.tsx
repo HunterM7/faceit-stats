@@ -1,6 +1,7 @@
 import { WidgetStatistics } from '@widgets/widget-statistics/widget-statistics'
-import type { StatsPayload, StatsRankBlock, StatsRatingQuery } from '@requests/stats'
+import type { StatsPayload, Rank, StatsRatingQuery } from '@requests/stats'
 import { formatNumberWithFixedDecimals } from '@/utils/number-format'
+import type { ComponentProps } from 'react';
 
 export type StatsWidgetPagePreviewState =
   | { kind: 'empty' }
@@ -8,7 +9,7 @@ export type StatsWidgetPagePreviewState =
   | { kind: 'error'; nickname: string; message: string }
   | { kind: 'ready'; nickname: string; stats: StatsPayload };
 
-function filterRankForRatingMode(rank: StatsRankBlock, mode: StatsRatingQuery): StatsRankBlock {
+function filterRankForRatingMode(rank: Rank, mode: StatsRatingQuery): Rank {
   if (mode === 'both') {
     return { ...rank }
   }
@@ -18,28 +19,26 @@ function filterRankForRatingMode(rank: StatsRankBlock, mode: StatsRatingQuery): 
   return rank.region ? { region: rank.region } : {}
 }
 
-function mapStatsPayloadToWidgetProps(stats: StatsPayload, ratingMode: StatsRatingQuery) {
-  const countryCode = (stats.country || '').toLowerCase()
+function mapStatsPayloadToWidgetProps(stats: StatsPayload, ratingMode: StatsRatingQuery): ComponentProps<typeof WidgetStatistics> {
   const dailyAvgKillsAdr =
     `${formatNumberWithFixedDecimals(stats.daily.averageKills, 0)} / ${formatNumberWithFixedDecimals(stats.daily.averageAdr, 0)}`
   const monthlyAvgKillsAdr =
     `${formatNumberWithFixedDecimals(stats.last30.averageKills, 0)} / ${formatNumberWithFixedDecimals(stats.last30.averageAdr, 0)}`
   const monthlyKdKr =
-    `${formatNumberWithFixedDecimals(stats.last30.kdRatio, 2)} / ${formatNumberWithFixedDecimals(stats.last30.krRatio, 2)}`
+    `${formatNumberWithFixedDecimals(stats.last30.kd, 2)} / ${formatNumberWithFixedDecimals(stats.last30.krRatio, 2)}`
 
   return {
     common: {
-      levelValue: stats.common.skillLevel,
-      eloValue: stats.common.faceitElo,
-      kdRatioValue: stats.common.kdRatio,
-      countryCode,
+      level: stats.common.skillLevel,
+      elo: stats.common.faceitElo,
+      kd: stats.common.kd,
       rank: filterRankForRatingMode(stats.common.rank, ratingMode),
     },
     daily: {
       todayWins: stats.daily.wins,
       todayLosses: stats.daily.losses,
       avgKillsAdr: dailyAvgKillsAdr,
-      kdRatioValue: stats.daily.kdRatio,
+      kd: stats.daily.kd,
     },
     monthly: {
       winRatePercent: stats.last30.winRate,

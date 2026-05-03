@@ -83,13 +83,12 @@ export interface StatsRankBlock {
 
 export interface StatsResponse {
   nickname: string;
-  country: string | null;
   playerId: string;
   gameId: string;
   common: {
     faceitElo: number;
     skillLevel: number;
-    kdRatio: number;
+    kd: number;
     /** Лидерборд FACEIT: по умолчанию (`?rating` нет или `country`) только страна; `both` — страна и регион. */
     rank: StatsRankBlock;
   };
@@ -98,7 +97,7 @@ export interface StatsResponse {
     losses: number;
     averageKills: number;
     averageAdr: number;
-    kdRatio: number;
+    kd: number;
   };
   last30: {
     wins: number;
@@ -106,7 +105,7 @@ export interface StatsResponse {
     winRate: number;
     averageKills: number;
     averageAdr: number;
-    kdRatio: number;
+    kd: number;
     krRatio: number;
     /** Победы за последние матчи по времени: `true` — победа, `false` — поражение (слева старые). */
     matchResults: boolean[];

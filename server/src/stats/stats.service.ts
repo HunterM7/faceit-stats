@@ -109,13 +109,12 @@ export class StatsService {
 
     return {
       nickname: player.nickname || nickname,
-      country: player.country?.toUpperCase() || null,
       playerId,
       gameId,
       common: {
         faceitElo,
         skillLevel,
-        kdRatio: commonKdRatio,
+        kd: commonKdRatio,
         rank,
       },
       daily: {
@@ -123,7 +122,7 @@ export class StatsService {
         losses: today.losses,
         averageKills: today.avgKills,
         averageAdr: today.adr,
-        kdRatio: today.avgKD,
+        kd: today.avgKD,
       },
       last30: {
         wins: last30.wins,
@@ -131,7 +130,7 @@ export class StatsService {
         winRate: last30.winRate,
         averageKills: last30.avgKills,
         averageAdr: last30.adr,
-        kdRatio: last30.avgKD,
+        kd: last30.avgKD,
         krRatio: last30.avgKR || fallback.krRatio || 0,
         matchResults: last30MatchResults,
       },
@@ -290,22 +289,22 @@ export class StatsService {
 
   /** Сортирует матчи по времени окончания (старые первые) и отдаёт последовательность побед для графика. */
   private buildChronologicalMatchResults(items: ParsedInternalMatch[]): boolean[] {
-    const indexed = items.map((item, index) => ({ item, index }))
+    const indexed = items.map((item, index) => ({ item, index }));
     indexed.sort((a, b) => {
-      const ta = a.item.finishedAtMs
-      const tb = b.item.finishedAtMs
+      const ta = a.item.finishedAtMs;
+      const tb = b.item.finishedAtMs;
       if (ta !== null && tb !== null) {
-        return ta - tb
+        return ta - tb;
       }
       if (ta !== null) {
-        return -1
+        return -1;
       }
       if (tb !== null) {
-        return 1
+        return 1;
       }
-      return a.index - b.index
-    })
-    return indexed.map(({ item }) => item.isWin)
+      return a.index - b.index;
+    });
+    return indexed.map(({ item }) => item.isWin);
   }
 
   private aggregateInternalMatches(items: ParsedInternalMatch[]): {

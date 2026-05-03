@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ComponentProps } from 'react'
 import { useLocation, useSearchParams } from 'react-router-dom'
 import { WidgetStatistics } from '@widgets/widget-statistics/widget-statistics'
-import { requestStats, type StatsPayload, type StatsRankBlock, type StatsRatingQuery } from '@requests/stats'
+import { requestStats, type StatsPayload, type Rank, type StatsRatingQuery } from '@requests/stats'
 import { lastMatch, player } from '@requests/matchResult'
 import { formatNumberWithFixedDecimals } from '@/utils/number-format'
 import './stats-page.scss'
@@ -15,26 +15,25 @@ function ratingParamForRequest(rating: StatsRatingQuery | undefined): StatsRatin
 }
 
 type StatsState = {
-  country: string | null;
   common: {
     level: number;
     elo: number;
-    kdRatio: number;
-    rank: StatsRankBlock;
+    kd: number;
+    rank: Rank;
   };
   daily: {
     wins: number;
     losses: number;
     averageKills: number;
     averageAdr: number;
-    kdRatio: number;
+    kd: number;
   };
   monthly: {
     winRate: number;
     matchResults: boolean[];
     averageKills: number;
     averageAdr: number;
-    kdRatio: number;
+    kd: number;
     krRatio: number;
   };
 }
@@ -74,11 +73,10 @@ export function StatsPage() {
   const isPollingRef = useRef(false)
 
   const mapStatsToState = (stats: StatsPayload): StatsState => ({
-    country: stats.country,
     common: {
       level: stats.common.skillLevel,
       elo: stats.common.faceitElo,
-      kdRatio: stats.common.kdRatio,
+      kd: stats.common.kd,
       rank: stats.common.rank,
     },
     daily: {
@@ -86,14 +84,14 @@ export function StatsPage() {
       losses: stats.daily.losses,
       averageKills: stats.daily.averageKills,
       averageAdr: stats.daily.averageAdr,
-      kdRatio: stats.daily.kdRatio,
+      kd: stats.daily.kd,
     },
     monthly: {
       winRate: stats.last30.winRate,
       matchResults: stats.last30.matchResults ?? [],
       averageKills: stats.last30.averageKills,
       averageAdr: stats.last30.averageAdr,
-      kdRatio: stats.last30.kdRatio,
+      kd: stats.last30.kd,
       krRatio: stats.last30.krRatio,
     },
   })
@@ -205,21 +203,16 @@ export function StatsPage() {
     return null
   }
 
-  const levelValue = state.common.level
-  const eloValue = state.common.elo
-
-  const countryCode = (state.country || '').toLowerCase()
   const dailyAvgKillsAdr =
     `${formatNumberWithFixedDecimals(state.daily.averageKills, 0)} / ${formatNumberWithFixedDecimals(state.daily.averageAdr, 0)}`
   const monthlyAvgKillsAdr =
     `${formatNumberWithFixedDecimals(state.monthly.averageKills, 0)} / ${formatNumberWithFixedDecimals(state.monthly.averageAdr, 0)}`
-  const monthlyKdKr = `${formatNumberWithFixedDecimals(state.monthly.kdRatio, 2)} / ${formatNumberWithFixedDecimals(state.monthly.krRatio, 2)}`
+  const monthlyKdKr = `${formatNumberWithFixedDecimals(state.monthly.kd, 2)} / ${formatNumberWithFixedDecimals(state.monthly.krRatio, 2)}`
 
-  const common = {
-    levelValue,
-    eloValue,
-    kdRatioValue: state.common.kdRatio,
-    countryCode,
+  const common: ComponentProps<typeof WidgetStatistics>['common'] = {
+    level: state.common.level,
+    elo: state.common.elo,
+    kd: state.common.kd,
     rank: state.common.rank,
   }
 
@@ -227,7 +220,7 @@ export function StatsPage() {
     todayWins: state.daily.wins,
     todayLosses: state.daily.losses,
     avgKillsAdr: dailyAvgKillsAdr,
-    kdRatioValue: state.daily.kdRatio,
+    kd: state.daily.kd,
   }
 
   const monthly = {

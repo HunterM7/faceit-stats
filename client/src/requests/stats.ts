@@ -16,7 +16,7 @@ export type StatsRankSlice = {
 }
 
 /** Рейтинг игрока в регионе и стране. */
-export type StatsRankBlock = {
+export type Rank = {
   /** Рейтинг игрока в регионе. */
   region?: StatsRankSlice;
   /** Рейтинг игрока в стране. */
@@ -42,21 +42,20 @@ async function parseErrorMessage(response: Response): Promise<string> {
 
 export type StatsPayload = {
   nickname: string;
-  country: string | null;
   playerId?: string | null;
   common: {
     faceitElo: number;
     skillLevel: number;
-    kdRatio: number;
+    kd: number;
     /** Рейтинг игрока в регионе и стране. */
-    rank: StatsRankBlock;
+    rank: Rank;
   };
   daily: {
     wins: number;
     losses: number;
     averageKills: number;
     averageAdr: number;
-    kdRatio: number;
+    kd: number;
   };
   last30: {
     wins: number;
@@ -64,7 +63,7 @@ export type StatsPayload = {
     winRate: number;
     averageKills: number;
     averageAdr: number;
-    kdRatio: number;
+    kd: number;
     krRatio: number;
     /** Победы по времени, слева — более старые матчи (для графика). */
     matchResults?: boolean[];
