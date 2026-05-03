@@ -123,20 +123,20 @@ export function StatsWidgetCard(props: StatsWidgetCardProps) {
   // const panel: 'last30' | 'today' = 'today'
   // const isPanelVisible = true
 
-  const [ panel ] = useState<'last30' | 'today'>('last30')
-  const [ isPanelVisible ] = useState(true)
+  const [ panel, setPanel ] = useState<'last30' | 'today'>('last30')
+  const [ isPanelVisible, setIsPanelVisible ] = useState(true)
 
   useEffect(() => {
     let fadeTimer: number | null = null
     const panelTimer = window.setInterval(() => {
-      // setIsPanelVisible(false)
+      setIsPanelVisible(false)
       if (hasBoth) {
         setRankVisible(false)
       }
       fadeTimer = window.setTimeout(() => {
         fadeTimer = null
-        // setPanel((prev) => (prev === 'last30' ? 'today' : 'last30'))
-        // setIsPanelVisible(true)
+        setPanel((prev) => (prev === 'last30' ? 'today' : 'last30'))
+        setIsPanelVisible(true)
         if (hasBoth) {
           setRankView((prev) => (prev === 'country' ? 'region' : 'country'))
           setRankVisible(true)
