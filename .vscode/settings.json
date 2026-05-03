@@ -2,5 +2,12 @@
   "eslint.workingDirectories": ["server", "client"],
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "always"
+  },
+  // .svg в редакторе часто в режиме XML; отключаем автоформат, чтобы не менять разметку.
+  "[svg]": {
+    "editor.formatOnSave": false
+  },
+  "[xml]": {
+    "editor.formatOnSave": false
   }
 }
