@@ -315,7 +315,20 @@ function getChartGroups(
     return []
   }
 
-  if (period === 'week' || period === 'all') {
+  if (period === 'week') {
+    const items = chart.map((item) => ({
+      label: formatWeekdayShortRu(item.dateKey),
+      value: item.count,
+      hint: formatDateKey(item.dateKey),
+    }))
+    return [
+      {
+        items,
+      },
+    ]
+  }
+
+  if (period === 'all') {
     const items = chart.map((item) => ({
       label: item.label,
       value: item.count,
@@ -372,6 +385,7 @@ function getChartGroups(
     items: group.items.map((item) => ({
       label: item.label,
       value: item.count,
+      hint: formatDayHourHint(item.dateKey, item.label),
     })),
   }))
 }
@@ -379,6 +393,21 @@ function getChartGroups(
 function formatDateKey(dateKey: string): string {
   const [ year, month, day ] = dateKey.split('-')
   return `${day}.${month}.${year}`
+}
+
+function formatDayHourHint(dateKey: string, hourLabel: string): string {
+  const hour = Number.parseInt(hourLabel, 10)
+  const h = Number.isFinite(hour) ? Math.min(23, Math.max(0, hour)) : 0
+  const hh = String(h).padStart(2, '0')
+  return `${formatDateKey(dateKey)} · ${hh}:00 UTC`
+}
+
+const WEEKDAY_SHORT_RU = [ 'вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб' ] as const
+
+/** Короткое название дня недели по UTC (пн … вс). */
+function formatWeekdayShortRu(dateKey: string): string {
+  const d = new Date(`${dateKey}T12:00:00.000Z`)
+  return WEEKDAY_SHORT_RU[d.getUTCDay()]
 }
 
 function formatMonthDayLabel(dateKey: string): string {

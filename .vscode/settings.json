@@ -1,5 +1,6 @@
 {
   "eslint.workingDirectories": ["server", "client"],
+  "stylelint.configFile": "${workspaceFolder}/client/.stylelintrc.json",
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "always"
   },

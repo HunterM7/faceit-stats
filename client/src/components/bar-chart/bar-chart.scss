@@ -1,44 +1,88 @@
 .bar-chart {
+  --bar-chart-bars-height: clamp(11rem, 32vh, 17.5rem);
+
+  &__plot {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  &__y-axis {
+    position: relative;
+    flex-shrink: 0;
+    min-width: 2.75rem;
+    width: max-content;
+    height: var(--bar-chart-bars-height);
+    box-sizing: border-box;
+  }
+
+  &__y-tick {
+    position: absolute;
+    left: 0;
+    right: 0;
+    text-align: right;
+    font-size: 11px;
+    line-height: 1;
+    color: rgba(208, 220, 245, 0.72);
+    font-variant-numeric: tabular-nums;
+    pointer-events: none;
+
+    &--max {
+      top: 0;
+      bottom: auto;
+      transform: none;
+    }
+  }
+
+  &__chart-column {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
   &__grid {
-    height: 250px;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(18px, 1fr));
     gap: 6px;
-    align-items: end;
+
+    &--bars {
+      height: var(--bar-chart-bars-height);
+      align-items: end;
+    }
+
+    &--labels {
+      margin-top: 6px;
+    }
   }
 
   &__bar-col {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 6px;
+    justify-content: flex-end;
     min-width: 0;
     height: 100%;
   }
 
-  &__bar-value {
-    font-size: 12px;
-    color: rgba(206, 228, 255, 0.82);
-    min-height: 16px;
-  }
-
   &__bar-wrap {
     position: relative;
-    flex: 1;
     width: 100%;
+    height: 100%;
     display: flex;
     align-items: flex-end;
     justify-content: center;
   }
 
-  &__bar-wrap--split::before {
-    content: '';
-    position: absolute;
-    left: -3px;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    background: rgba(176, 196, 247, 0.45);
+  &__bar-wrap--split {
+    &::before {
+      content: '';
+      position: absolute;
+      left: -3px;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: rgba(176, 196, 247, 0.45);
+    }
   }
 
   &__bar {
@@ -46,16 +90,18 @@
     border-radius: 4px;
     background: linear-gradient(180deg, rgba(94, 202, 152, 0.96), rgba(55, 142, 113, 0.92));
     box-shadow: 0 6px 14px rgba(86, 186, 146, 0.24);
-    min-height: 8%;
+    min-height: 5%;
   }
 
   &__bar-label {
     font-size: 11px;
     color: rgba(208, 220, 245, 0.66);
+    text-align: center;
+    min-width: 0;
   }
 
   &__groups {
-    margin-top: 6px;
+    margin-top: 12px;
     display: grid;
     gap: 6px;
   }
@@ -65,6 +111,7 @@
     font-size: 11px;
     color: rgba(208, 220, 245, 0.8);
     padding-top: 6px;
+    height: 20px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
