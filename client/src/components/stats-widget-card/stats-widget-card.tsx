@@ -5,6 +5,7 @@ import { formatNumberWithFixedDecimals } from '@/utils/number-format'
 import { SkillLevelIcon } from '@/components/skill-level-icon/skill-level-icon'
 import { CountryFlagIcon } from '@components/country-flag-icon/country-flag-icon'
 import { RegionFlagIcon } from '@components/region-flag-icon/region-flag-icon'
+import { StatsWidgetCardLast30WinRate } from './stats-widget-card-last30-win-rate/stats-widget-card-last30-win-rate'
 import { StatsWidgetCardMetric } from './stats-widget-card-metric/stats-widget-card-metric'
 import { MatchResult, StatsWidgetCardMatchResults } from './stats-widget-card-match-results/stats-widget-card-match-results'
 import { StatsWidgetCardValue } from './stats-widget-card-value/stats-widget-card-value'
@@ -39,8 +40,10 @@ interface DailyStatistic {
 }
 
 interface MonthlyStatistic {
-  /** Win rate за последние 30 матчей (подготовленная строка). */
-  winRateValue: string;
+  /** Win rate за последние 30 матчей, 0–100. */
+  winRatePercent: number;
+  /** Победы по времени для графика: `true` — победа (слева старые матчи). */
+  last30MatchResults: boolean[];
   /** Средние kills/ADR за последние 30 матчей (подготовленная строка). */
   avgKillsAdr: string;
   /** Сводное значение K/D / K/R за последние 30 матчей (подготовленная строка). */
@@ -120,20 +123,20 @@ export function StatsWidgetCard(props: StatsWidgetCardProps) {
   // const panel: 'last30' | 'today' = 'today'
   // const isPanelVisible = true
 
-  const [ panel, setPanel ] = useState<'last30' | 'today'>('last30')
-  const [ isPanelVisible, setIsPanelVisible ] = useState(true)
+  const [ panel ] = useState<'last30' | 'today'>('last30')
+  const [ isPanelVisible ] = useState(true)
 
   useEffect(() => {
     let fadeTimer: number | null = null
     const panelTimer = window.setInterval(() => {
-      setIsPanelVisible(false)
+      // setIsPanelVisible(false)
       if (hasBoth) {
         setRankVisible(false)
       }
       fadeTimer = window.setTimeout(() => {
         fadeTimer = null
-        setPanel((prev) => (prev === 'last30' ? 'today' : 'last30'))
-        setIsPanelVisible(true)
+        // setPanel((prev) => (prev === 'last30' ? 'today' : 'last30'))
+        // setIsPanelVisible(true)
         if (hasBoth) {
           setRankView((prev) => (prev === 'country' ? 'region' : 'country'))
           setRankVisible(true)
@@ -187,7 +190,11 @@ export function StatsWidgetCard(props: StatsWidgetCardProps) {
         <div className={`stats-widget-card__panel stats-widget-card__panel--last30 ${getPanelStateClass('last30')}`}>
           <div className='stats-widget-card__subtitle'>LAST 30 MATCHES</div>
           <div className='stats-widget-card__grid'>
-            <StatsWidgetCardMetric value={monthly.winRateValue} label='Win rate' className='stats-widget-card__metric'/>
+            <StatsWidgetCardLast30WinRate
+              winRatePercent={monthly.winRatePercent}
+              matchResults={monthly.last30MatchResults}
+              className='stats-widget-card__metric'
+            />
             <StatsWidgetCardMetric value={monthly.avgKillsAdr} label='Avg. Kills / ADR' className='stats-widget-card__metric'/>
             <StatsWidgetCardMetric value={monthly.kdKr} label='K/D / K/R' className='stats-widget-card__metric'/>
           </div>

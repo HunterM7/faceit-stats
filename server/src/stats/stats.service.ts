@@ -87,6 +87,7 @@ export class StatsService {
       .map((item) => this.parseInternalMatch(item))
       .filter((item): item is ParsedInternalMatch => item !== null);
     const last30 = this.aggregateInternalMatches(internalItems);
+    const last30MatchResults = this.buildChronologicalMatchResults(internalItems);
     const todayStartMs = this.getDailyStartMs(7);
     const today = this.aggregateInternalMatches(
       internalItems.filter((item) => item.finishedAtMs !== null && item.finishedAtMs > todayStartMs),
@@ -132,6 +133,7 @@ export class StatsService {
         averageAdr: last30.adr,
         kdRatio: last30.avgKD,
         krRatio: last30.avgKR || fallback.krRatio || 0,
+        matchResults: last30MatchResults,
       },
       latestMatchId: latest?.match_id || null,
       latestMatchStatus: latest?.status || null,
@@ -284,6 +286,26 @@ export class StatsService {
       damage,
       finishedAtMs,
     };
+  }
+
+  /** Сортирует матчи по времени окончания (старые первые) и отдаёт последовательность побед для графика. */
+  private buildChronologicalMatchResults(items: ParsedInternalMatch[]): boolean[] {
+    const indexed = items.map((item, index) => ({ item, index }))
+    indexed.sort((a, b) => {
+      const ta = a.item.finishedAtMs
+      const tb = b.item.finishedAtMs
+      if (ta !== null && tb !== null) {
+        return ta - tb
+      }
+      if (ta !== null) {
+        return -1
+      }
+      if (tb !== null) {
+        return 1
+      }
+      return a.index - b.index
+    })
+    return indexed.map(({ item }) => item.isWin)
   }
 
   private aggregateInternalMatches(items: ParsedInternalMatch[]): {

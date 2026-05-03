@@ -108,6 +108,8 @@ export interface StatsResponse {
     averageAdr: number;
     kdRatio: number;
     krRatio: number;
+    /** Победы за последние матчи по времени: `true` — победа, `false` — поражение (слева старые). */
+    matchResults: boolean[];
   };
   latestMatchId: string | null;
   latestMatchStatus: string | null;

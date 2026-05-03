@@ -42,7 +42,8 @@ function mapStatsPayloadToWidgetProps(stats: StatsPayload, ratingMode: StatsRati
       kdRatioValue: stats.daily.kdRatio,
     },
     monthly: {
-      winRateValue: `${stats.last30.winRate}%`,
+      winRatePercent: stats.last30.winRate,
+      last30MatchResults: stats.last30.matchResults ?? [],
       avgKillsAdr: monthlyAvgKillsAdr,
       kdKr: monthlyKdKr,
     },

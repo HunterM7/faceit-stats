@@ -31,6 +31,7 @@ type StatsState = {
   };
   monthly: {
     winRate: number;
+    matchResults: boolean[];
     averageKills: number;
     averageAdr: number;
     kdRatio: number;
@@ -89,6 +90,7 @@ export function StatsPage() {
     },
     monthly: {
       winRate: stats.last30.winRate,
+      matchResults: stats.last30.matchResults ?? [],
       averageKills: stats.last30.averageKills,
       averageAdr: stats.last30.averageAdr,
       kdRatio: stats.last30.kdRatio,
@@ -229,7 +231,8 @@ export function StatsPage() {
   }
 
   const monthly = {
-    winRateValue: `${state.monthly.winRate}%`,
+    winRatePercent: state.monthly.winRate,
+    last30MatchResults: state.monthly.matchResults,
     avgKillsAdr: monthlyAvgKillsAdr,
     kdKr: monthlyKdKr,
   }
