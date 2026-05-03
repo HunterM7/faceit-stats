@@ -129,6 +129,8 @@ export function AdminPage() {
     period,
     scope,
     totalEvents: 0,
+    productionEvents: 0,
+    previewEvents: 0,
     uniqueUsers: 0,
     topNicknames: [],
     chart: [],
@@ -149,8 +151,8 @@ export function AdminPage() {
         <div className='admin-page__container'>
           <section className='admin-page__card admin-page__card--auth'>
             <div className='admin-page__auth'>
-              <h2>Вход в админку</h2>
-              <p>Доступ только по логину и паролю администратора.</p>
+              <h2 className='admin-page__auth-title'>Вход в админку</h2>
+              <p className='admin-page__auth-lead'>Доступ только по логину и паролю администратора.</p>
               <Input
                 className='admin-page__auth-input'
                 type='text'
@@ -211,7 +213,7 @@ export function AdminPage() {
         <div className='admin-page__top'>
           <div>
             <p className='admin-page__badge'>ADMIN DASHBOARD</p>
-            <h1>Статистика сервиса</h1>
+            <h1 className='admin-page__title'>Статистика сервиса</h1>
             <p className='admin-page__subtitle'>
               {scopeDescription}
             </p>
@@ -232,34 +234,44 @@ export function AdminPage() {
 
         <div className='admin-page__kpi-grid'>
           <article className='admin-page__kpi-item'>
-            <span>Запросов</span>
-            <strong>{data.totalEvents}</strong>
-            <small>За выбранный период</small>
+            <span className='admin-page__kpi-label'>Всего запросов</span>
+            <span className='admin-page__kpi-value'>{data.totalEvents}</span>
+            <span className='admin-page__kpi-hint'>Реальные + превью за период</span>
           </article>
           <article className='admin-page__kpi-item'>
-            <span>Уникальных пользователей</span>
-            <strong>{data.uniqueUsers}</strong>
-            <small>По уникальным FACEIT-никам</small>
+            <span className='admin-page__kpi-label'>Реальных запросов</span>
+            <span className='admin-page__kpi-value'>{data.productionEvents}</span>
+            <span className='admin-page__kpi-hint'>Без демо-превью на страницах виджетов</span>
+          </article>
+          <article className='admin-page__kpi-item'>
+            <span className='admin-page__kpi-label'>Превью</span>
+            <span className='admin-page__kpi-value'>{data.previewEvents}</span>
+            <span className='admin-page__kpi-hint'>С параметром preview (пример на странице виджета)</span>
+          </article>
+          <article className='admin-page__kpi-item'>
+            <span className='admin-page__kpi-label'>Уникальных пользователей</span>
+            <span className='admin-page__kpi-value'>{data.uniqueUsers}</span>
+            <span className='admin-page__kpi-hint'>По FACEIT-никам из реальных ответов</span>
           </article>
         </div>
 
         <div className='admin-page__content-grid'>
           <article className='admin-page__panel'>
-            <h2>Активность по дням</h2>
+            <h2 className='admin-page__panel-title'>Активность по дням</h2>
             <BarChart groups={chartGroups}/>
           </article>
 
           <article className='admin-page__panel'>
-            <h2>Топ FACEIT-ники</h2>
+            <h2 className='admin-page__panel-title'>Топ FACEIT-ники</h2>
             {data.topNicknames.length === 0 ? (
               <p className='admin-page__empty'>Пока никто не вводил никнеймы.</p>
             ) : (
               <ul className='admin-page__nickname-list'>
                 {data.topNicknames.map((item) => (
-                  <li key={`${item.nickname}-${item.count}`}>
-                    <span>{item.nickname}</span>
+                  <li key={`${item.nickname}-${item.count}`} className='admin-page__nickname-item'>
+                    <span className='admin-page__nickname-name'>{item.nickname}</span>
                     <span className='admin-page__nickname-elo'>{item.elo ?? '—'} ELO</span>
-                    <strong>{item.count}</strong>
+                    <span className='admin-page__nickname-count'>{item.count}</span>
                   </li>
                 ))}
               </ul>
@@ -267,17 +279,20 @@ export function AdminPage() {
           </article>
         </div>
 
-        <article className='admin-page__panel'>
-          <h2>Последние события</h2>
+        <article className='admin-page__panel admin-page__panel--below-content-grid'>
+          <h2 className='admin-page__panel-title'>Последние события</h2>
           {data.latestEvents.length === 0 ? (
             <p className='admin-page__empty'>Нет событий.</p>
           ) : (
             <ul className='admin-page__events'>
               {data.latestEvents.map((event) => (
-                <li key={`${event.timestamp}-${event.route}-${event.statusCode}`}>
-                  <span>{new Date(event.timestamp).toLocaleString('ru-RU')}</span>
-                  <span>{event.nicknames.join(', ') || '—'}</span>
-                  <span>{event.route} · {event.statusCode} · {event.durationMs}ms</span>
+                <li key={`${event.timestamp}-${event.route}-${event.statusCode}`} className='admin-page__event-row'>
+                  <span className='admin-page__event-cell'>{new Date(event.timestamp).toLocaleString('ru-RU')}</span>
+                  <span className='admin-page__event-cell'>{event.nicknames.join(', ') || '—'}</span>
+                  <span className='admin-page__event-cell'>
+                    {event.route} · {event.statusCode} · {event.durationMs}ms
+                    {event.preview ? ' · preview' : ''}
+                  </span>
                 </li>
               ))}
             </ul>

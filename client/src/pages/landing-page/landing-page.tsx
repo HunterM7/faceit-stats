@@ -11,36 +11,38 @@ export function LandingPage() {
 
       <section className='landing-page__hero'>
         <p className='landing-page__badge'>ДЛЯ OBS / BROWSER SOURCE</p>
-        <h1>FACEIT виджеты на стрим</h1>
+        <h1 className='landing-page__hero-title'>FACEIT виджеты на стрим</h1>
         <p className='landing-page__subtitle'>
           Отдельные страницы каждого виджета с понятными настройками, инструкциями для OBS и быстрым копированием ссылок.
         </p>
       </section>
 
       <section className='landing-page__showcase' id='widgets'>
-        <article
-          className='landing-page__widget-block'
-          style={{ '--widget-bg': `url(${cs2Bg})` } as CSSProperties}
-        >
-          <div className='landing-page__widget-head'>
-            <p>Твоя статистика</p>
-          </div>
-          <Link to='/widgets/stats' className='landing-page__widget-cta'>Создать виджет</Link>
-        </article>
+        <div className='landing-page__showcase-inner'>
+          <article
+            className='landing-page__widget-block'
+            style={{ '--widget-bg': `url(${cs2Bg})` } as CSSProperties}
+          >
+            <div className='landing-page__widget-head'>
+              <p className='landing-page__widget-headline'>Твоя статистика</p>
+            </div>
+            <Link to='/widgets/stats' className='landing-page__widget-cta'>Создать виджет</Link>
+          </article>
 
-        <article
-          className='landing-page__widget-block'
-          style={{ '--widget-bg': `url(${cs2Bg})` } as CSSProperties}
-        >
-          <div className='landing-page__widget-head'>
-            <p>Итог матча</p>
-          </div>
-          <Link to='/widgets/match-result' className='landing-page__widget-cta'>Создать виджет</Link>
-        </article>
+          <article
+            className='landing-page__widget-block'
+            style={{ '--widget-bg': `url(${cs2Bg})` } as CSSProperties}
+          >
+            <div className='landing-page__widget-head'>
+              <p className='landing-page__widget-headline'>Итог матча</p>
+            </div>
+            <Link to='/widgets/match-result' className='landing-page__widget-cta'>Создать виджет</Link>
+          </article>
+        </div>
       </section>
 
       <footer className='landing-page__footer'>
-        <p>FACEIT Widgets for OBS</p>
+        <p className='landing-page__footer-text'>FACEIT Widgets for OBS</p>
       </footer>
     </main>
   )

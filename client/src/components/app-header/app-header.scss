@@ -66,15 +66,18 @@
     &:hover {
       color: #fff;
       text-shadow: 0 0 12px rgba(255, 170, 136, 0.28);
+
+      &::after {
+        transform: scaleX(1);
+      }
     }
 
-    &:hover::after,
-    &.active::after {
-      transform: scaleX(1);
-    }
-
-    &.active {
+    &--active {
       color: #fff;
+
+      &::after {
+        transform: scaleX(1);
+      }
     }
   }
 }

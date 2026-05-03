@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
+import { classNames } from '@/utils/classNames'
 import './app-header.scss'
 
 export function AppHeader() {
@@ -19,8 +20,18 @@ export function AppHeader() {
           FACEIT WIDGETS
         </NavLink>
         <nav className='app-header__nav'>
-          <NavLink to='/widgets/stats' className='app-header__nav-link'>Stats Widget</NavLink>
-          <NavLink to='/widgets/match-result' className='app-header__nav-link'>Match Result</NavLink>
+          <NavLink
+            to='/widgets/stats'
+            className={({ isActive }) => classNames('app-header__nav-link', isActive && 'app-header__nav-link--active')}
+          >
+            Stats Widget
+          </NavLink>
+          <NavLink
+            to='/widgets/match-result'
+            className={({ isActive }) => classNames('app-header__nav-link', isActive && 'app-header__nav-link--active')}
+          >
+            Match Result
+          </NavLink>
         </nav>
       </div>
     </header>

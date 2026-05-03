@@ -8,7 +8,10 @@
   }
 
   &__y-axis {
-    position: relative;
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: space-between;
+    align-items: flex-end;
     flex-shrink: 0;
     min-width: 2.75rem;
     width: max-content;
@@ -17,21 +20,12 @@
   }
 
   &__y-tick {
-    position: absolute;
-    left: 0;
-    right: 0;
-    text-align: right;
+    flex-shrink: 0;
     font-size: 11px;
     line-height: 1;
     color: rgba(208, 220, 245, 0.72);
     font-variant-numeric: tabular-nums;
     pointer-events: none;
-
-    &--max {
-      top: 0;
-      bottom: auto;
-      transform: none;
-    }
   }
 
   &__chart-column {

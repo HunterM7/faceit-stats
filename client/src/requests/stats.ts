@@ -80,7 +80,17 @@ export type StatsPayload = {
   };
 }
 
-export async function requestStats( nickname?: string, source?: WidgetSource, rating?: StatsRatingQuery): Promise<StatsPayload> {
+export type RequestStatsOptions = {
+  /** Запрос с страницы превью виджета — не учитывается в основной аналитике. */
+  preview?: boolean;
+};
+
+export async function requestStats(
+  nickname?: string,
+  source?: WidgetSource,
+  rating?: StatsRatingQuery,
+  options?: RequestStatsOptions,
+): Promise<StatsPayload> {
   const endpoint = buildApiUrl('/api/playerStatistics')
   const params = new URLSearchParams()
   if (nickname?.trim()) {
@@ -91,6 +101,9 @@ export async function requestStats( nickname?: string, source?: WidgetSource, ra
   }
   if (rating) {
     params.set('rating', rating)
+  }
+  if (options?.preview) {
+    params.set('preview', '1')
   }
   const query = params.toString() ? `?${params.toString()}` : ''
   const response = await fetch(`${endpoint}${query}`, { cache: 'no-store' })

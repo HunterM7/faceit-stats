@@ -65,27 +65,27 @@ export function MatchResultWidgetPage() {
       <section className='match-result-widget-page__card'>
         <div className='match-result-widget-page__top'>
           <p className='match-result-widget-page__badge'>WIDGET PAGE</p>
-          <h1>Match Result Widget</h1>
-          <p>
+          <h1 className='match-result-widget-page__top-title'>Match Result Widget</h1>
+          <p className='match-result-widget-page__top-lead'>
             Алерт для стрима: показывает VICTORY/DEFEAT при новом завершенном матче. Можно включить тестовый режим и
             проверить анимацию без ожидания реальной игры.
           </p>
         </div>
 
         <div className='match-result-widget-page__hint-list'>
-          <span>
+          <span className='match-result-widget-page__hint-chip'>
             Обязательный параметр: nickname
           </span>
-          <span>
+          <span className='match-result-widget-page__hint-chip'>
             Тест: test=true
           </span>
-          <span>
+          <span className='match-result-widget-page__hint-chip'>
             Для OBS используйте Browser Source
           </span>
         </div>
 
         <div className='match-result-widget-page__grid'>
-          <label>
+          <label className='match-result-widget-page__grid-field'>
             Ник FACEIT
             <Input
               className='match-result-widget-page__nickname-input'
@@ -99,33 +99,49 @@ export function MatchResultWidgetPage() {
             />
           </label>
 
-          <label>
+          <label className='match-result-widget-page__grid-field'>
             test
-            <select value={testMode} onChange={(e) => setTestMode(e.target.value as BoolSetting)}>
+            <select
+              className='match-result-widget-page__grid-select'
+              value={testMode}
+              onChange={(e) => setTestMode(e.target.value as BoolSetting)}
+            >
               <option value='false'>false</option>
               <option value='true'>true</option>
             </select>
           </label>
 
-          <label>
+          <label className='match-result-widget-page__grid-field'>
             hideRank
-            <select value={hideRank} onChange={(e) => setHideRank(e.target.value as BoolSetting)}>
+            <select
+              className='match-result-widget-page__grid-select'
+              value={hideRank}
+              onChange={(e) => setHideRank(e.target.value as BoolSetting)}
+            >
               <option value='false'>false</option>
               <option value='true'>true</option>
             </select>
           </label>
 
-          <label>
+          <label className='match-result-widget-page__grid-field'>
             hideChallenger
-            <select value={hideChallenger} onChange={(e) => setHideChallenger(e.target.value as BoolSetting)}>
+            <select
+              className='match-result-widget-page__grid-select'
+              value={hideChallenger}
+              onChange={(e) => setHideChallenger(e.target.value as BoolSetting)}
+            >
               <option value='false'>false</option>
               <option value='true'>true</option>
             </select>
           </label>
 
-          <label>
+          <label className='match-result-widget-page__grid-field'>
             transparent
-            <select value={transparent} onChange={(e) => setTransparent(e.target.value as BoolSetting)}>
+            <select
+              className='match-result-widget-page__grid-select'
+              value={transparent}
+              onChange={(e) => setTransparent(e.target.value as BoolSetting)}
+            >
               <option value='true'>true</option>
               <option value='false'>false</option>
             </select>
@@ -134,16 +150,27 @@ export function MatchResultWidgetPage() {
 
         <div className='match-result-widget-page__link-row'>
           <input
+            className='match-result-widget-page__link-url'
             type='text'
             readOnly
             value={widgetUrl}
             placeholder='Укажи nickname, чтобы сгенерировать ссылку'
             aria-label='Ссылка на match result widget'
           />
-          <Button variant={ButtonVariant.Primary} onClick={() => void copy()} disabled={!canBuild}>
+          <Button
+            variant={ButtonVariant.Primary}
+            className='match-result-widget-page__copy-url'
+            onClick={() => void copy()}
+            disabled={!canBuild}
+          >
             Копировать URL
           </Button>
-          <LinkButton href={widgetUrl} target='_blank' disabled={!canBuild}>
+          <LinkButton
+            className='match-result-widget-page__open-widget'
+            href={widgetUrl}
+            target='_blank'
+            disabled={!canBuild}
+          >
             Открыть виджет
           </LinkButton>
         </div>

@@ -3,6 +3,7 @@ import { Collection, MongoClient } from 'mongodb';
 import { StatsService } from '../../stats/stats.service';
 import {
   type AdminEvent,
+  type AdminEventSource,
   type AdminNicknameStat,
   type AdminOverviewResponse,
   type AdminPeriod,
@@ -11,10 +12,11 @@ import {
 
 type TrackRequestPayload = {
   route: string;
-  source: AdminScope | null;
+  source: 'stats_widget' | 'overlay_widget' | null;
   statusCode: number;
   durationMs: number;
   nicknames: string[];
+  preview: boolean;
 };
 
 @Injectable()
@@ -55,6 +57,7 @@ export class AdminAnalyticsService {
         statusCode: payload.statusCode,
         durationMs: payload.durationMs,
         nicknames: normalizedNicknames,
+        preview: payload.preview,
       });
     } catch (error) {
       this.isRuntimeDisabled = true;
@@ -68,6 +71,8 @@ export class AdminAnalyticsService {
         period,
         scope,
         totalEvents: 0,
+        productionEvents: 0,
+        previewEvents: 0,
         uniqueUsers: 0,
         topNicknames: [],
         chart: [],
@@ -83,6 +88,8 @@ export class AdminAnalyticsService {
           period,
           scope,
           totalEvents: 0,
+          productionEvents: 0,
+          previewEvents: 0,
           uniqueUsers: 0,
           topNicknames: [],
           chart: [],
@@ -93,8 +100,8 @@ export class AdminAnalyticsService {
 
       const now = new Date();
       const periodStartDate = this.getPeriodStartDate(period, now);
-      const [ totalEvents, uniqueUsers, topNicknames, chart, latestEvents ] = await Promise.all([
-        this.getTotalEvents(collection, periodStartDate, scope),
+      const [ requestVolume, uniqueUsers, topNicknames, chart, latestEvents ] = await Promise.all([
+        this.getRequestVolume(collection, periodStartDate, scope),
         this.getUniqueUsers(collection, periodStartDate, scope),
         this.getTopNicknames(collection, periodStartDate, scope),
         this.getChart(collection, period, now, scope),
@@ -104,7 +111,9 @@ export class AdminAnalyticsService {
       return {
         period,
         scope,
-        totalEvents,
+        totalEvents: requestVolume.totalEvents,
+        productionEvents: requestVolume.productionEvents,
+        previewEvents: requestVolume.previewEvents,
         uniqueUsers,
         topNicknames,
         chart,
@@ -118,6 +127,8 @@ export class AdminAnalyticsService {
         period,
         scope,
         totalEvents: 0,
+        productionEvents: 0,
+        previewEvents: 0,
         uniqueUsers: 0,
         topNicknames: [],
         chart: [],
@@ -127,13 +138,20 @@ export class AdminAnalyticsService {
     }
   }
 
-  private async getTotalEvents(
+  private async getRequestVolume(
     collection: Collection<AdminEventDocument>,
     periodStartDate: Date | null,
     scope: AdminScope,
-  ): Promise<number> {
-    const query = this.getOverviewQuery(periodStartDate, scope);
-    return await collection.countDocuments(query);
+  ): Promise<{ totalEvents: number; productionEvents: number; previewEvents: number }> {
+    const base = this.getScopeBaseQuery(periodStartDate, scope);
+    const productionClause = { preview: { $ne: true } as const };
+    const previewClause = { preview: true as const };
+    const [ totalEvents, productionEvents, previewEvents ] = await Promise.all([
+      collection.countDocuments(base),
+      collection.countDocuments({ ...base, ...productionClause }),
+      collection.countDocuments({ ...base, ...previewClause }),
+    ]);
+    return { totalEvents, productionEvents, previewEvents };
   }
 
   private async getUniqueUsers(
@@ -141,7 +159,7 @@ export class AdminAnalyticsService {
     periodStartDate: Date | null,
     scope: AdminScope,
   ): Promise<number> {
-    const query = this.getOverviewQuery(periodStartDate, scope);
+    const query = this.getProductionOverviewQuery(periodStartDate, scope);
     const result = await collection.aggregate<{ count: number }>([
       { $match: query },
       { $unwind: '$nicknames' },
@@ -156,7 +174,7 @@ export class AdminAnalyticsService {
     periodStartDate: Date | null,
     scope: AdminScope,
   ): Promise<AdminNicknameStat[]> {
-    const query = this.getOverviewQuery(periodStartDate, scope);
+    const query = this.getProductionOverviewQuery(periodStartDate, scope);
     const rawTop = await collection.aggregate<{ nickname: string; count: number }>([
       { $match: query },
       { $unwind: '$nicknames' },
@@ -181,7 +199,7 @@ export class AdminAnalyticsService {
     if (period === 'day') {
       const hourKeys = this.getLastHoursKeys(24, now);
       const startDate = new Date(hourKeys[0]);
-      const chartQuery = this.getOverviewQuery(startDate, scope);
+      const chartQuery = this.getProductionOverviewQuery(startDate, scope);
       const aggregated = await collection.aggregate<{ _id: string; count: number }>([
         { $match: chartQuery },
         {
@@ -214,7 +232,7 @@ export class AdminAnalyticsService {
     const dayKeys = this.getLastDaysKeys(points, now);
     const startDate = new Date(`${dayKeys[0]}T00:00:00.000Z`);
 
-    const chartQuery = this.getOverviewQuery(startDate, scope);
+    const chartQuery = this.getProductionOverviewQuery(startDate, scope);
     const aggregated = await collection.aggregate<{ _id: string; count: number }>([
       { $match: chartQuery },
       {
@@ -245,7 +263,7 @@ export class AdminAnalyticsService {
     periodStartDate: Date | null,
     scope: AdminScope,
   ): Promise<AdminEvent[]> {
-    const query = this.getOverviewQuery(periodStartDate, scope);
+    const query = this.getProductionOverviewQuery(periodStartDate, scope);
     const rows = await collection.find(query)
       .sort({ createdAt: -1 })
       .limit(20)
@@ -253,10 +271,11 @@ export class AdminAnalyticsService {
     return rows.map((row) => ({
       timestamp: row.createdAt.toISOString(),
       route: row.route,
-      source: row.source ?? null,
+      source: this.toAdminEventSource(row.source),
       statusCode: row.statusCode,
       durationMs: row.durationMs,
       nicknames: row.nicknames,
+      preview: row.preview === true,
     }));
   }
 
@@ -318,6 +337,13 @@ export class AdminAnalyticsService {
     return date;
   }
 
+  private toAdminEventSource(raw: unknown): AdminEventSource {
+    if (raw === 'stats_widget' || raw === 'overlay_widget') {
+      return raw;
+    }
+    return null;
+  }
+
   private normalizeNickname(value: string): string {
     return value.trim();
   }
@@ -331,7 +357,8 @@ export class AdminAnalyticsService {
     }
   }
 
-  private getOverviewQuery(periodStartDate: Date | null, scope: AdminScope): Record<string, unknown> {
+  /** Период и источник, без фильтра по preview (для подсчёта всех запросов и доли превью). */
+  private getScopeBaseQuery(periodStartDate: Date | null, scope: AdminScope): Record<string, unknown> {
     const query: Record<string, unknown> = {};
     if (periodStartDate) {
       query.createdAt = {
@@ -342,6 +369,14 @@ export class AdminAnalyticsService {
       query.source = scope;
     }
     return query;
+  }
+
+  /** Только «боевые» события: без превью (график, топ ников, уникальные пользователи). */
+  private getProductionOverviewQuery(periodStartDate: Date | null, scope: AdminScope): Record<string, unknown> {
+    return {
+      ...this.getScopeBaseQuery(periodStartDate, scope),
+      preview: { $ne: true },
+    };
   }
 
   private async getCollection(): Promise<Collection<AdminEventDocument> | null> {
@@ -361,6 +396,7 @@ export class AdminAnalyticsService {
       await this.collection.createIndex({ createdAt: -1 });
       await this.collection.createIndex({ nicknames: 1, createdAt: -1 });
       await this.collection.createIndex({ source: 1, createdAt: -1 });
+      await this.collection.createIndex({ preview: 1, createdAt: -1 });
       return this.collection;
     } catch (error) {
       this.isRuntimeDisabled = true;
@@ -373,8 +409,9 @@ export class AdminAnalyticsService {
 type AdminEventDocument = {
   createdAt: Date;
   route: string;
-  source?: AdminScope | null;
+  source?: 'stats_widget' | 'overlay_widget' | string | null;
   statusCode: number;
   durationMs: number;
   nicknames: string[];
+  preview?: boolean;
 };

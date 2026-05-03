@@ -31,12 +31,12 @@
     align-items: flex-start;
   }
 
-  &__top h1 {
+  &__top-title {
     margin: 10px 0;
     font-size: clamp(24px, 4vw, 34px);
   }
 
-  &__top p {
+  &__top-lead {
     margin: 0;
     max-width: 760px;
     color: rgba(230, 233, 239, 0.86);
@@ -68,34 +68,34 @@
     flex-wrap: wrap;
     gap: 8px;
 
-    span {
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.22);
-      background: rgba(255, 255, 255, 0.06);
-      padding: 6px 10px;
-      font-size: 13px;
+    &--query-docs {
+      margin-bottom: 10px;
     }
 
     &--plain {
       display: grid;
       gap: 8px;
+    }
+  }
 
-      span {
-        border-radius: 8px;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        background: rgba(255, 255, 255, 0.02);
-      }
+  &__hint-chip {
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background: rgba(255, 255, 255, 0.06);
+    padding: 6px 10px;
+    font-size: 13px;
+
+    &--plain {
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.02);
     }
 
-    &--muted span {
+    &--muted {
       border: none;
       background: transparent;
       padding: 0;
       color: rgba(212, 224, 247, 0.76);
-    }
-
-    &--query-docs {
-      margin-bottom: 10px;
     }
   }
 
@@ -353,18 +353,17 @@
     display: grid;
     grid-template-columns: 1fr auto auto;
     gap: 10px;
+  }
 
-    input {
-      border-radius: 8px;
-      padding: 9px 10px;
-      background: rgba(0, 0, 0, 0.32);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: #f1f3f7;
-      font: inherit;
-      width: 100%;
-      box-sizing: border-box;
-    }
-
+  &__link-url {
+    border-radius: 8px;
+    padding: 9px 10px;
+    background: rgba(0, 0, 0, 0.32);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #f1f3f7;
+    font: inherit;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   &__link {

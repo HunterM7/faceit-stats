@@ -21,49 +21,43 @@ export class AdminAnalyticsInterceptor implements NestInterceptor {
       return next.handle();
     }
 
+    const query = request.query ?? {};
+    const preview = this.isPreviewQuery(query);
     const start = Date.now();
     return next.handle().pipe(
       tap({
         next: (responsePayload) => {
-          const responseNicknames = this.extractNicknamesFromResponse(responsePayload);
+          const statusCode = response.statusCode ?? 200;
+          const nicknames =
+            statusCode >= 200 && statusCode < 400
+              ? this.extractNicknamesFromResponse(responsePayload)
+              : [];
           void this.analyticsService.trackRequest({
             route,
-            source: this.extractSource(request.query ?? {}),
-            statusCode: response.statusCode ?? 200,
+            source: this.extractSource(query),
+            statusCode,
             durationMs: Date.now() - start,
-            nicknames: this.extractNicknames(request.query ?? {}, responseNicknames),
+            nicknames,
+            preview,
           });
         },
         error: () => {
           void this.analyticsService.trackRequest({
             route,
-            source: this.extractSource(request.query ?? {}),
+            source: this.extractSource(query),
             statusCode: response.statusCode ?? 500,
             durationMs: Date.now() - start,
-            nicknames: this.extractNicknames(request.query ?? {}),
+            nicknames: [],
+            preview,
           });
         },
       }),
     );
   }
 
-  private extractNicknames(
-    query: Record<string, string | undefined>,
-    responseNicknames: string[] = [],
-  ): string[] {
-    const result = new Set<string>();
-    const nickname = query.nickname?.trim();
-    const teammateNickname = query.teammateNickname?.trim();
-    if (nickname) {
-      result.add(nickname);
-    }
-    if (teammateNickname) {
-      result.add(teammateNickname);
-    }
-    for (const value of responseNicknames) {
-      result.add(value);
-    }
-    return Array.from(result);
+  private isPreviewQuery(query: Record<string, string | undefined>): boolean {
+    const raw = query.preview?.trim().toLowerCase();
+    return raw === '1' || raw === 'true' || raw === 'yes';
   }
 
   private extractNicknamesFromResponse(responsePayload: unknown): string[] {

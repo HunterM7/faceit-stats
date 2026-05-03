@@ -92,35 +92,11 @@ export function BarChart(props: BarChartProps) {
     <div className='bar-chart'>
       <div className='bar-chart__plot'>
         <div className='bar-chart__y-axis' aria-hidden>
-          {axisTicks.map((tick) => {
-            if (tick === axisMax) {
-              return (
-                <span
-                  key={tick}
-                  className='bar-chart__y-tick bar-chart__y-tick--max'
-                >
-                  {tick.toLocaleString('ru-RU')}
-                </span>
-              )
-            }
-            const fromBottomPct = (tick / axisMax) * 100
-            let transform = 'translateY(-50%)'
-            if (tick === 0) {
-              transform = 'translateY(0)'
-            }
-            return (
-              <span
-                key={tick}
-                className='bar-chart__y-tick'
-                style={{
-                  bottom: `${fromBottomPct}%`,
-                  transform,
-                }}
-              >
-                {tick.toLocaleString('ru-RU')}
-              </span>
-            )
-          })}
+          {axisTicks.map((tick) => (
+            <span key={tick} className='bar-chart__y-tick'>
+              {tick.toLocaleString('ru-RU')}
+            </span>
+          ))}
         </div>
         <div className='bar-chart__chart-column'>
           <div className='bar-chart__grid bar-chart__grid--bars' style={{ gridTemplateColumns }}>

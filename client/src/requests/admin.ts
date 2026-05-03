@@ -3,6 +3,8 @@ import { buildApiUrl } from '@config/api'
 export type AdminPeriod = 'day' | 'week' | 'month' | 'all'
 export type AdminScope = 'overall' | 'stats_widget' | 'overlay_widget'
 
+export type AdminEventSource = 'stats_widget' | 'overlay_widget' | null
+
 export class AdminUnauthorizedError extends Error {
   constructor(message = 'Требуется авторизация для доступа к админке.') {
     super(message)
@@ -14,16 +16,19 @@ export type AdminOverviewPayload = {
   period: AdminPeriod;
   scope: AdminScope;
   totalEvents: number;
+  productionEvents: number;
+  previewEvents: number;
   uniqueUsers: number;
   topNicknames: Array<{ nickname: string; count: number; elo: number | null }>;
   chart: Array<{ label: string; count: number; dateKey: string }>;
   latestEvents: Array<{
     timestamp: string;
     route: string;
-    source: AdminScope | null;
+    source: AdminEventSource;
     statusCode: number;
     durationMs: number;
     nicknames: string[];
+    preview: boolean;
   }>;
   storage: 'mongo' | 'disabled';
 }

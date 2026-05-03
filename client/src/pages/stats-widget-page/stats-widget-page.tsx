@@ -216,7 +216,7 @@ export function StatsWidgetPage() {
     startTransition(() => {
       setPreviewState({ kind: 'loading', nickname: trimmed })
     })
-    void requestStats(trimmed, STATS_WIDGET_PREVIEW_SOURCE, 'both')
+    void requestStats(trimmed, STATS_WIDGET_PREVIEW_SOURCE, 'both', { preview: true })
       .then((stats: StatsPayload) => {
         if (cancelled) {
           return
@@ -318,8 +318,8 @@ export function StatsWidgetPage() {
         <div className='stats-widget-page__panel stats-widget-page__panel--header'>
           <div className='stats-widget-page__top'>
             <p className='stats-widget-page__badge'>WIDGET PAGE</p>
-            <h1>Stats Widget</h1>
-            <p>
+            <h1 className='stats-widget-page__top-title'>Stats Widget</h1>
+            <p className='stats-widget-page__top-lead'>
               Виджет с ELO, уровнем, winrate и актуальной статистикой игрока FACEIT. Здесь можно настроить параметры и сразу
               получить ссылку для OBS.
             </p>
@@ -376,10 +376,10 @@ export function StatsWidgetPage() {
         <div className='stats-widget-page__panel stats-widget-page__comment'>
           <p className='stats-widget-page__comment-title'>Ссылка на Stats Widget</p>
           <div className='stats-widget-page__hint-list stats-widget-page__hint-list--plain stats-widget-page__hint-list--query-docs'>
-            <span>
+            <span className='stats-widget-page__hint-chip stats-widget-page__hint-chip--plain'>
               Обязательный query: <code className='stats-widget-page__code'>nickname</code>
             </span>
-            <span>
+            <span className='stats-widget-page__hint-chip stats-widget-page__hint-chip--plain'>
               Опционально: <code className='stats-widget-page__code'>bg</code> (0–100),{' '}
               <code className='stats-widget-page__code'>radius</code> (0–18),{' '}
               <code className='stats-widget-page__code'>rating</code> — без него или <code className='stats-widget-page__code'>country</code>: только страна;{' '}
@@ -387,10 +387,11 @@ export function StatsWidgetPage() {
             </span>
           </div>
           <div className='stats-widget-page__hint-list stats-widget-page__hint-list--muted'>
-            <span>Заполни nickname, чтобы сгенерировать ссылку</span>
+            <span className='stats-widget-page__hint-chip stats-widget-page__hint-chip--muted'>Заполни nickname, чтобы сгенерировать ссылку</span>
           </div>
           <div className='stats-widget-page__link-row'>
             <input
+              className='stats-widget-page__link-url'
               type='text'
               readOnly
               value={widgetUrl}

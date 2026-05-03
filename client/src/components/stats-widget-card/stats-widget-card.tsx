@@ -110,7 +110,7 @@ export function StatsWidgetCard(props: StatsWidgetCardProps) {
   const renderRegionSlide = (slideClass: string) => (
     <div className={classNames('stats-widget-card__rank-slide', slideClass)} aria-hidden={hasBoth ? rankView !== 'region' : undefined}>
       <div className='stats-widget-card__rank-row stats-widget-card__rank-row--region'>
-        <RegionFlagIcon regionCode={rk.region!.code} className='stats-widget-card__country-flag-icon'/>
+        <RegionFlagIcon regionCode={rk.region!.code} className='stats-widget-card__region-flag-icon'/>
         <span>#{rk.region!.rating}</span>
       </div>
     </div>
