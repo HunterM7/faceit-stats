@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLocation, useSearchParams } from 'react-router-dom'
-import { StatsWidgetCard } from '@components/stats-widget-card/stats-widget-card'
+import { WidgetStatistics } from '@widgets/widget-statistics/widget-statistics'
 import { requestStats, type StatsPayload, type StatsRankBlock, type StatsRatingQuery } from '@requests/stats'
 import { lastMatch, player } from '@requests/matchResult'
 import { formatNumberWithFixedDecimals } from '@/utils/number-format'
@@ -239,7 +239,7 @@ export function StatsPage() {
 
   return (
     <div className='stats-page'>
-      <StatsWidgetCard
+      <WidgetStatistics
         common={common}
         daily={daily}
         monthly={monthly}

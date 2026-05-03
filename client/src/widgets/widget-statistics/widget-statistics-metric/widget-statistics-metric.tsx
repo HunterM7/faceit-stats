@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react'
-import './stats-widget-card-metric.scss'
+import './widget-statistics-metric.scss'
 import { classNames } from '@/utils/classNames';
 
-type StatsWidgetCardMetricProps = {
+type WidgetStatisticsMetricProps = {
   /** Отображаемое значение метрики. */
   value: ReactNode;
   /** Подпись метрики. */
@@ -13,13 +13,13 @@ type StatsWidgetCardMetricProps = {
   className?: string | undefined;
 }
 
-export function StatsWidgetCardMetric(props: StatsWidgetCardMetricProps) {
+export function WidgetStatisticsMetric(props: WidgetStatisticsMetricProps) {
   const { value, label, valueClassName, className } = props
 
   return (
-    <div className={classNames('stats-widget-card-metric', className)}>
-      <div className={valueClassName ? `stats-widget-card-metric__value ${valueClassName}` : 'stats-widget-card-metric__value'}>{value}</div>
-      <div className='stats-widget-card-metric__label'>{label}</div>
+    <div className={classNames('widget-statistics-metric', className)}>
+      <div className={valueClassName ? `widget-statistics-metric__value ${valueClassName}` : 'widget-statistics-metric__value'}>{value}</div>
+      <div className='widget-statistics-metric__label'>{label}</div>
     </div>
   )
 }

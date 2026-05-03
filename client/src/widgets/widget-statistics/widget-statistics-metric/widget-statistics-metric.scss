@@ -1,4 +1,4 @@
-.stats-widget-card-metric {
+.widget-statistics-metric {
   min-width: 0;
   overflow: hidden;
 
@@ -27,7 +27,7 @@
   }
 }
 
-.stats-widget-card__grid--today .stats-widget-card-metric:nth-child(3) .stats-widget-card-metric__value,
-.stats-widget-card__grid .stats-widget-card-metric:nth-child(2) .stats-widget-card-metric__value {
+.widget-statistics__grid--today .widget-statistics-metric:nth-child(3) .widget-statistics-metric__value,
+.widget-statistics__grid .widget-statistics-metric:nth-child(2) .widget-statistics-metric__value {
   font-size: 16px;
 }

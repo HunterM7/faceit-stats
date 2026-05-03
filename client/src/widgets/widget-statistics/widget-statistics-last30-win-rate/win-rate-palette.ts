@@ -1,4 +1,4 @@
-/** Цвета как у плашек W/L в виджете (`stats-widget-card-match-results`). */
+/** Цвета как у плашек W/L в виджете (`widget-statistics-match-results`). */
 const RED = { r: 255, g: 32, b: 82 }
 const GREEN = { r: 0, g: 230, b: 118 }
 const WHITE = { r: 255, g: 255, b: 255 }

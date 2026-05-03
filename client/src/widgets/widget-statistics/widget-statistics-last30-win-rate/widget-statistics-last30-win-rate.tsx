@@ -2,9 +2,9 @@ import type { CSSProperties } from 'react'
 import { useId, useMemo } from 'react'
 import { classNames } from '@/utils/classNames'
 import { getWinRateThemeRgb, rgbToCss } from './win-rate-palette'
-import './stats-widget-card-last30-win-rate.scss'
+import './widget-statistics-last30-win-rate.scss'
 
-type StatsWidgetCardLast30WinRateProps = {
+type WidgetStatisticsLast30WinRateProps = {
   /** Процент побед 0–100 (как с сервера). */
   winRatePercent: number;
   /** Последовательность матчей: `true` — победа, `false` — поражение (слева старые). */
@@ -99,7 +99,7 @@ function Last30WinRateChartSvg(props: Last30WinRateChartSvgProps) {
   const { gradId, accent, linePath, areaPath } = props
   return (
     <svg
-      className='stats-widget-card-last30-win-rate__svg'
+      className='widget-statistics-last30-win-rate__svg'
       viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
       preserveAspectRatio='none'
     >
@@ -110,13 +110,13 @@ function Last30WinRateChartSvg(props: Last30WinRateChartSvgProps) {
           <stop offset='100%' stopColor={accent} stopOpacity={0}/>
         </linearGradient>
       </defs>
-      <path className='stats-widget-card-last30-win-rate__area' d={areaPath} fill={`url(#${gradId})`}/>
-      <path className='stats-widget-card-last30-win-rate__line' d={linePath} fill='none'/>
+      <path className='widget-statistics-last30-win-rate__area' d={areaPath} fill={`url(#${gradId})`}/>
+      <path className='widget-statistics-last30-win-rate__line' d={linePath} fill='none'/>
     </svg>
   )
 }
 
-export function StatsWidgetCardLast30WinRate(props: StatsWidgetCardLast30WinRateProps) {
+export function WidgetStatisticsLast30WinRate(props: WidgetStatisticsLast30WinRateProps) {
   const { winRatePercent, matchResults, className } = props
   const uid = useId()
   const gradId = `${uid.replace(/:/g, '')}-wr-fill`
@@ -162,20 +162,20 @@ export function StatsWidgetCardLast30WinRate(props: StatsWidgetCardLast30WinRate
 
   return (
     <div
-      className={classNames('stats-widget-card-last30-win-rate', className)}
+      className={classNames('widget-statistics-last30-win-rate', className)}
       style={style}
       role='img'
       aria-label={`Win rate за последние матчи: ${displayPercent} процентов`}
     >
-      <div className='stats-widget-card-last30-win-rate__chart'>
-        <div className='stats-widget-card-last30-win-rate__plate' aria-hidden>
+      <div className='widget-statistics-last30-win-rate__chart'>
+        <div className='widget-statistics-last30-win-rate__plate' aria-hidden>
           <Last30WinRateChartSvg gradId={gradId} accent={accent} linePath={linePath} areaPath={areaPath}/>
         </div>
-        <div className='stats-widget-card-last30-win-rate__front' aria-hidden>
-          <span className='stats-widget-card-last30-win-rate__value'>{`${displayPercent}%`}</span>
+        <div className='widget-statistics-last30-win-rate__front' aria-hidden>
+          <span className='widget-statistics-last30-win-rate__value'>{`${displayPercent}%`}</span>
         </div>
       </div>
-      <div className='stats-widget-card-last30-win-rate__label'>Win rate</div>
+      <div className='widget-statistics-last30-win-rate__label'>Win rate</div>
     </div>
   )
 }

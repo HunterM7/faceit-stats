@@ -5,12 +5,12 @@ import { formatNumberWithFixedDecimals } from '@/utils/number-format'
 import { SkillLevelIcon } from '@/components/skill-level-icon/skill-level-icon'
 import { CountryFlagIcon } from '@components/country-flag-icon/country-flag-icon'
 import { RegionFlagIcon } from '@components/region-flag-icon/region-flag-icon'
-import { StatsWidgetCardLast30WinRate } from './stats-widget-card-last30-win-rate/stats-widget-card-last30-win-rate'
-import { StatsWidgetCardMetric } from './stats-widget-card-metric/stats-widget-card-metric'
-import { MatchResult, StatsWidgetCardMatchResults } from './stats-widget-card-match-results/stats-widget-card-match-results'
-import { StatsWidgetCardValue } from './stats-widget-card-value/stats-widget-card-value'
+import { WidgetStatisticsLast30WinRate } from './widget-statistics-last30-win-rate/widget-statistics-last30-win-rate'
+import { WidgetStatisticsMetric } from './widget-statistics-metric/widget-statistics-metric'
+import { MatchResult, WidgetStatisticsMatchResults } from './widget-statistics-match-results/widget-statistics-match-results'
+import { WidgetStatisticsValue } from './widget-statistics-value/widget-statistics-value'
 import type { StatsRankBlock } from '@requests/stats'
-import './stats-widget-card.scss'
+import './widget-statistics.scss'
 
 const CARD_SWITCH_MS = 5000
 const CARD_FADE_MS = 700
@@ -50,7 +50,7 @@ interface MonthlyStatistic {
   kdKr: string;
 }
 
-type StatsWidgetCardProps = {
+type WidgetStatisticsProps = {
   /** Общая статистика игрока. */
   common: CommonStatistic;
   /** Статистика игрока за текущий игровой день. */
@@ -65,13 +65,13 @@ type StatsWidgetCardProps = {
   borderRadius?: number | undefined;
 }
 
-export function StatsWidgetCard(props: StatsWidgetCardProps) {
+export function WidgetStatistics(props: WidgetStatisticsProps) {
   const { common, daily, monthly, className, backgroundOpacityPercent = 96, borderRadius = 16 } = props
   const normalizedOpacity = Math.min(100, Math.max(0, backgroundOpacityPercent)) / 100
   const normalizedBorderRadiusPx = Math.min(18, Math.max(0, Math.round(borderRadius)))
   const cardStyle = {
-    '--stats-widget-card-bg-opacity': normalizedOpacity,
-    '--stats-widget-card-radius': `${normalizedBorderRadiusPx}px`,
+    '--widget-statistics-bg-opacity': normalizedOpacity,
+    '--widget-statistics-radius': `${normalizedBorderRadiusPx}px`,
   } as CSSProperties
 
   const rk = common.rank
@@ -87,33 +87,33 @@ export function StatsWidgetCard(props: StatsWidgetCardProps) {
       const isActiveSingle =
         (hasCountry && target === 'country') || (hasRegion && target === 'region')
       return isActiveSingle
-        ? 'stats-widget-card__rank-slide--active'
-        : 'stats-widget-card__rank-slide--hidden'
+        ? 'widget-statistics__rank-slide--active'
+        : 'widget-statistics__rank-slide--hidden'
     }
-    if (rankView !== target) return 'stats-widget-card__rank-slide--hidden'
-    return rankVisible ? 'stats-widget-card__rank-slide--active' : 'stats-widget-card__rank-slide--hiding'
+    if (rankView !== target) return 'widget-statistics__rank-slide--hidden'
+    return rankVisible ? 'widget-statistics__rank-slide--active' : 'widget-statistics__rank-slide--hiding'
   }
 
   const renderRankPlaceholder = () => (
-    <div className='stats-widget-card__rank-row'>
-      <CountryFlagIcon countryCode={common.countryCode} className='stats-widget-card__country-flag-icon'/>
+    <div className='widget-statistics__rank-row'>
+      <CountryFlagIcon countryCode={common.countryCode} className='widget-statistics__country-flag-icon'/>
       <span>#----</span>
     </div>
   )
 
   const renderCountrySlide = (slideClass: string) => (
-    <div className={classNames('stats-widget-card__rank-slide', slideClass)} aria-hidden={hasBoth ? rankView !== 'country' : undefined}>
-      <div className='stats-widget-card__rank-row'>
-        <CountryFlagIcon countryCode={common.countryCode} className='stats-widget-card__country-flag-icon'/>
+    <div className={classNames('widget-statistics__rank-slide', slideClass)} aria-hidden={hasBoth ? rankView !== 'country' : undefined}>
+      <div className='widget-statistics__rank-row'>
+        <CountryFlagIcon countryCode={common.countryCode} className='widget-statistics__country-flag-icon'/>
         <span>#{rk.country!.rating}</span>
       </div>
     </div>
   )
 
   const renderRegionSlide = (slideClass: string) => (
-    <div className={classNames('stats-widget-card__rank-slide', slideClass)} aria-hidden={hasBoth ? rankView !== 'region' : undefined}>
-      <div className='stats-widget-card__rank-row stats-widget-card__rank-row--region'>
-        <RegionFlagIcon regionCode={rk.region!.code} className='stats-widget-card__region-flag-icon'/>
+    <div className={classNames('widget-statistics__rank-slide', slideClass)} aria-hidden={hasBoth ? rankView !== 'region' : undefined}>
+      <div className='widget-statistics__rank-row widget-statistics__rank-row--region'>
+        <RegionFlagIcon regionCode={rk.region!.code} className='widget-statistics__region-flag-icon'/>
         <span>#{rk.region!.rating}</span>
       </div>
     </div>
@@ -151,26 +151,26 @@ export function StatsWidgetCard(props: StatsWidgetCardProps) {
   }, [ hasBoth ])
 
   const getPanelStateClass = (target: 'last30' | 'today') => {
-    if (panel !== target) return 'stats-widget-card__panel--hidden'
-    return isPanelVisible ? 'stats-widget-card__panel--active' : 'stats-widget-card__panel--hiding'
+    if (panel !== target) return 'widget-statistics__panel--hidden'
+    return isPanelVisible ? 'widget-statistics__panel--active' : 'widget-statistics__panel--hiding'
   }
 
   return (
-    <div className={classNames('stats-widget-card', className)} style={cardStyle}>
-      <div className='stats-widget-card__top'>
-        <div className='stats-widget-card__level-badge'>
-          <SkillLevelIcon level={common.levelValue} className='stats-widget-card__level-icon'/>
-          <StatsWidgetCardValue label='ELO'>
+    <div className={classNames('widget-statistics', className)} style={cardStyle}>
+      <div className='widget-statistics__top'>
+        <div className='widget-statistics__level-badge'>
+          <SkillLevelIcon level={common.levelValue} className='widget-statistics__level-icon'/>
+          <WidgetStatisticsValue label='ELO'>
             {common.eloValue}
-          </StatsWidgetCardValue>
+          </WidgetStatisticsValue>
         </div>
 
-        <StatsWidgetCardValue label='K/D' className='stats-widget-card__kd'>
+        <WidgetStatisticsValue label='K/D' className='widget-statistics__kd'>
           {formatNumberWithFixedDecimals(common.kdRatioValue, 2)}
-        </StatsWidgetCardValue>
+        </WidgetStatisticsValue>
 
-        <StatsWidgetCardValue label='RANK' className='stats-widget-card__rank'>
-          <div className='stats-widget-card__rank-slots'>
+        <WidgetStatisticsValue label='RANK' className='widget-statistics__rank'>
+          <div className='widget-statistics__rank-slots'>
             {!hasCountry && !hasRegion ? renderRankPlaceholder() : null}
             {hasBoth ? (
               <>
@@ -178,37 +178,37 @@ export function StatsWidgetCard(props: StatsWidgetCardProps) {
                 {renderRegionSlide(getRankSlideClass('region'))}
               </>
             ) : null}
-            {hasCountry && !hasRegion ? renderCountrySlide('stats-widget-card__rank-slide--active') : null}
-            {hasRegion && !hasCountry ? renderRegionSlide('stats-widget-card__rank-slide--active') : null}
+            {hasCountry && !hasRegion ? renderCountrySlide('widget-statistics__rank-slide--active') : null}
+            {hasRegion && !hasCountry ? renderRegionSlide('widget-statistics__rank-slide--active') : null}
           </div>
-        </StatsWidgetCardValue>
+        </WidgetStatisticsValue>
       </div>
 
-      <div className='stats-widget-card__divider'/>
+      <div className='widget-statistics__divider'/>
 
-      <div className='stats-widget-card__panels'>
-        <div className={`stats-widget-card__panel stats-widget-card__panel--last30 ${getPanelStateClass('last30')}`}>
-          <div className='stats-widget-card__subtitle'>LAST 30 MATCHES</div>
-          <div className='stats-widget-card__grid'>
-            <StatsWidgetCardLast30WinRate
+      <div className='widget-statistics__panels'>
+        <div className={`widget-statistics__panel widget-statistics__panel--last30 ${getPanelStateClass('last30')}`}>
+          <div className='widget-statistics__subtitle'>LAST 30 MATCHES</div>
+          <div className='widget-statistics__grid'>
+            <WidgetStatisticsLast30WinRate
               winRatePercent={monthly.winRatePercent}
               matchResults={monthly.last30MatchResults}
-              className='stats-widget-card__metric'
+              className='widget-statistics__metric'
             />
-            <StatsWidgetCardMetric value={monthly.avgKillsAdr} label='Avg. Kills / ADR' className='stats-widget-card__metric'/>
-            <StatsWidgetCardMetric value={monthly.kdKr} label='K/D / K/R' className='stats-widget-card__metric'/>
+            <WidgetStatisticsMetric value={monthly.avgKillsAdr} label='Avg. Kills / ADR' className='widget-statistics__metric'/>
+            <WidgetStatisticsMetric value={monthly.kdKr} label='K/D / K/R' className='widget-statistics__metric'/>
           </div>
         </div>
 
-        <div className={`stats-widget-card__panel stats-widget-card__panel--today ${getPanelStateClass('today')}`}>
-          <div className='stats-widget-card__subtitle'>STATS TODAY</div>
-          <div className='stats-widget-card__grid'>
-            <div className='stats-widget-card__match-results'>
-              <StatsWidgetCardMatchResults value={daily.todayWins} result={MatchResult.Win}/>
-              <StatsWidgetCardMatchResults value={daily.todayLosses} result={MatchResult.Lose}/>
+        <div className={`widget-statistics__panel widget-statistics__panel--today ${getPanelStateClass('today')}`}>
+          <div className='widget-statistics__subtitle'>STATS TODAY</div>
+          <div className='widget-statistics__grid'>
+            <div className='widget-statistics__match-results'>
+              <WidgetStatisticsMatchResults value={daily.todayWins} result={MatchResult.Win}/>
+              <WidgetStatisticsMatchResults value={daily.todayLosses} result={MatchResult.Lose}/>
             </div>
-            <StatsWidgetCardMetric value={daily.avgKillsAdr} label='Avg. Kills / ADR' className='stats-widget-card__metric'/>
-            <StatsWidgetCardMetric value={formatNumberWithFixedDecimals(daily.kdRatioValue, 2)} label='K/D' className='stats-widget-card__metric'/>
+            <WidgetStatisticsMetric value={daily.avgKillsAdr} label='Avg. Kills / ADR' className='widget-statistics__metric'/>
+            <WidgetStatisticsMetric value={formatNumberWithFixedDecimals(daily.kdRatioValue, 2)} label='K/D' className='widget-statistics__metric'/>
           </div>
         </div>
       </div>

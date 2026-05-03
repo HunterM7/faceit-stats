@@ -1,4 +1,4 @@
-import { StatsWidgetCard } from '@components/stats-widget-card/stats-widget-card'
+import { WidgetStatistics } from '@widgets/widget-statistics/widget-statistics'
 import type { StatsPayload, StatsRankBlock, StatsRatingQuery } from '@requests/stats'
 import { formatNumberWithFixedDecimals } from '@/utils/number-format'
 
@@ -95,7 +95,7 @@ export function StatsWidgetPagePreview(props: StatsWidgetPagePreviewProps) {
   return (
     <div className='stats-widget-page__preview'>
       <div className='stats-widget-page__preview-stage'>
-        <StatsWidgetCard
+        <WidgetStatistics
           {...cardProps}
           backgroundOpacityPercent={backgroundOpacityPercent}
           borderRadius={borderRadius}

@@ -1,8 +1,8 @@
 import type { PropsWithChildren } from 'react';
 import { classNames } from '@/utils/classNames'
-import './stats-widget-card-value.scss'
+import './widget-statistics-value.scss'
 
-type StatsWidgetCardValueProps = {
+type WidgetStatisticsValueProps = {
   /** Подпись под значением. */
   label: string;
   /** Дополнительный класс для стилизации компонента. */
@@ -10,13 +10,13 @@ type StatsWidgetCardValueProps = {
 }
 
 /** Компонент для отображения значения в статистической карточке. */
-export function StatsWidgetCardValue(props: PropsWithChildren<StatsWidgetCardValueProps>) {
+export function WidgetStatisticsValue(props: PropsWithChildren<WidgetStatisticsValueProps>) {
   const { label, className, children } = props
 
   return (
-    <div className={classNames('stats-widget-card-value', className)}>
+    <div className={classNames('widget-statistics-value', className)}>
       {children}
-      <div className='stats-widget-card-value__label'>{label}</div>
+      <div className='widget-statistics-value__label'>{label}</div>
     </div>
   )
 }
