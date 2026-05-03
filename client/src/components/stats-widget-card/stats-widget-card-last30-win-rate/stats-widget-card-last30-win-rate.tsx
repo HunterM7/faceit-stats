@@ -48,6 +48,45 @@ function normalizeYs(series: number[]): number[] {
   })
 }
 
+type ChartPoint = { x: number; y: number }
+
+/** Uniform Catmull–Rom → кубические Безье (`C`), концы через дубли соседних точек. */
+const CATMULL_TO_CUBIC = 6
+
+function smoothBezierChain(points: ChartPoint[]): string {
+  const n = points.length
+  if (n < 2) {
+    return ''
+  }
+  let d = ''
+  for (let i = 0; i < n - 1; i++) {
+    const p0 = points[Math.max(0, i - 1)]
+    const p1 = points[i]
+    const p2 = points[i + 1]
+    const p3 = points[Math.min(n - 1, i + 2)]
+    const cp1x = p1.x + (p2.x - p0.x) / CATMULL_TO_CUBIC
+    const cp1y = p1.y + (p2.y - p0.y) / CATMULL_TO_CUBIC
+    const cp2x = p2.x - (p3.x - p1.x) / CATMULL_TO_CUBIC
+    const cp2y = p2.y - (p3.y - p1.y) / CATMULL_TO_CUBIC
+    d += ` C ${cp1x} ${cp1y} ${cp2x} ${cp2y} ${p2.x} ${p2.y}`
+  }
+  return d
+}
+
+function smoothLinePath(points: ChartPoint[]): string {
+  if (points.length === 0) {
+    return ''
+  }
+  if (points.length === 1) {
+    return `M ${points[0].x} ${points[0].y}`
+  }
+  if (points.length === 2) {
+    const [ a, b ] = points
+    return `M ${a.x} ${a.y} L ${b.x} ${b.y}`
+  }
+  return `M ${points[0].x} ${points[0].y}${smoothBezierChain(points)}`
+}
+
 type Last30WinRateChartSvgProps = {
   gradId: string;
   accent: string;
@@ -100,21 +139,21 @@ export function StatsWidgetCardLast30WinRate(props: StatsWidgetCardLast30WinRate
     const cumulative = buildCumulative(matchResults)
     const ys = normalizeYs(cumulative)
     const xs = cumulative.map((_, i) => (n === 1 ? VIEW_W / 2 : (i / (n - 1)) * VIEW_W))
+    const poly = xs.map((x, i) => ({ x, y: ys[i] }))
 
     const line =
       n === 1
         ? `M ${VIEW_W * 0.2} ${ys[0]} L ${VIEW_W * 0.8} ${ys[0]}`
-        : `M ${xs[0]} ${ys[0]}` + xs.slice(1).map((x, i) => ` L ${x} ${ys[i + 1]}`).join('')
+        : smoothLinePath(poly)
 
     const xFirst = n === 1 ? VIEW_W * 0.2 : xs[0]
     const xLast = n === 1 ? VIEW_W * 0.8 : xs[xs.length - 1]
     const yFirst = ys[0]
 
     const area =
-      `M ${xFirst} ${BASELINE_Y} L ${xFirst} ${yFirst}` +
-      (n === 1 ? '' : xs.slice(1).map((x, i) => ` L ${x} ${ys[i + 1]}`).join('')) +
-      (n === 1 ? ` L ${xLast} ${yFirst}` : '') +
-      ` L ${xLast} ${BASELINE_Y} Z`
+      n === 1
+        ? `M ${xFirst} ${BASELINE_Y} L ${xFirst} ${yFirst} L ${xLast} ${yFirst} L ${xLast} ${BASELINE_Y} Z`
+        : `M ${xFirst} ${BASELINE_Y} L ${xFirst} ${yFirst}${smoothBezierChain(poly)} L ${xLast} ${BASELINE_Y} Z`
 
     return { linePath: line, areaPath: area }
   }, [ matchResults ])
