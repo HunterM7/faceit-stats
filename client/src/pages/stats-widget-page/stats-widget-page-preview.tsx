@@ -1,6 +1,5 @@
 import { WidgetStatistics } from '@widgets/widget-statistics/widget-statistics'
 import type { StatsPayload, Rank, StatsRatingQuery } from '@requests/stats'
-import { formatNumberWithFixedDecimals } from '@/utils/number-format'
 import type { ComponentProps } from 'react';
 
 export type StatsWidgetPagePreviewState =
@@ -20,13 +19,6 @@ function filterRankForRatingMode(rank: Rank, mode: StatsRatingQuery): Rank {
 }
 
 function mapStatsPayloadToWidgetProps(stats: StatsPayload, ratingMode: StatsRatingQuery): ComponentProps<typeof WidgetStatistics> {
-  const dailyAvgKillsAdr =
-    `${formatNumberWithFixedDecimals(stats.daily.averageKills, 0)} / ${formatNumberWithFixedDecimals(stats.daily.averageAdr, 0)}`
-  const monthlyAvgKillsAdr =
-    `${formatNumberWithFixedDecimals(stats.last30.averageKills, 0)} / ${formatNumberWithFixedDecimals(stats.last30.averageAdr, 0)}`
-  const monthlyKdKr =
-    `${formatNumberWithFixedDecimals(stats.last30.kd, 2)} / ${formatNumberWithFixedDecimals(stats.last30.krRatio, 2)}`
-
   return {
     common: {
       level: stats.common.skillLevel,
@@ -35,16 +27,19 @@ function mapStatsPayloadToWidgetProps(stats: StatsPayload, ratingMode: StatsRati
       rank: filterRankForRatingMode(stats.common.rank, ratingMode),
     },
     daily: {
-      todayWins: stats.daily.wins,
-      todayLosses: stats.daily.losses,
-      avgKillsAdr: dailyAvgKillsAdr,
+      wins: stats.daily.wins,
+      losses: stats.daily.losses,
+      avg: stats.daily.averageKills,
+      adr: stats.daily.averageAdr,
       kd: stats.daily.kd,
     },
     monthly: {
       winRatePercent: stats.last30.winRate,
-      last30MatchResults: stats.last30.matchResults ?? [],
-      avgKillsAdr: monthlyAvgKillsAdr,
-      kdKr: monthlyKdKr,
+      results: stats.last30.matchResults ?? [],
+      avg: stats.last30.averageKills,
+      adr: stats.last30.averageAdr,
+      kd: stats.last30.kd,
+      kr: stats.last30.krRatio,
     },
   }
 }
@@ -52,12 +47,12 @@ function mapStatsPayloadToWidgetProps(stats: StatsPayload, ratingMode: StatsRati
 type StatsWidgetPagePreviewProps = {
   preview: StatsWidgetPagePreviewState;
   ratingMode: StatsRatingQuery;
-  backgroundOpacityPercent: number;
+  backgroundOpacity: number;
   borderRadius: number;
 }
 
 export function StatsWidgetPagePreview(props: StatsWidgetPagePreviewProps) {
-  const { preview, ratingMode, backgroundOpacityPercent, borderRadius } = props
+  const { preview, ratingMode, backgroundOpacity, borderRadius } = props
 
   if (preview.kind === 'empty') {
     return (
@@ -96,7 +91,7 @@ export function StatsWidgetPagePreview(props: StatsWidgetPagePreviewProps) {
       <div className='stats-widget-page__preview-stage'>
         <WidgetStatistics
           {...cardProps}
-          backgroundOpacityPercent={backgroundOpacityPercent}
+          backgroundOpacity={backgroundOpacity}
           borderRadius={borderRadius}
           className='stats-widget-page__preview-card'
         />

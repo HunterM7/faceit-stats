@@ -3,7 +3,6 @@ import { useLocation, useSearchParams } from 'react-router-dom'
 import { WidgetStatistics } from '@widgets/widget-statistics/widget-statistics'
 import { requestStats, type StatsPayload, type Rank, type StatsRatingQuery } from '@requests/stats'
 import { lastMatch, player } from '@requests/matchResult'
-import { formatNumberWithFixedDecimals } from '@/utils/number-format'
 import './stats-page.scss'
 
 /** Без `rating` и для `country` API по умолчанию отдаёт только страну — параметр не дублируем. */
@@ -203,12 +202,6 @@ export function StatsPage() {
     return null
   }
 
-  const dailyAvgKillsAdr =
-    `${formatNumberWithFixedDecimals(state.daily.averageKills, 0)} / ${formatNumberWithFixedDecimals(state.daily.averageAdr, 0)}`
-  const monthlyAvgKillsAdr =
-    `${formatNumberWithFixedDecimals(state.monthly.averageKills, 0)} / ${formatNumberWithFixedDecimals(state.monthly.averageAdr, 0)}`
-  const monthlyKdKr = `${formatNumberWithFixedDecimals(state.monthly.kd, 2)} / ${formatNumberWithFixedDecimals(state.monthly.krRatio, 2)}`
-
   const common: ComponentProps<typeof WidgetStatistics>['common'] = {
     level: state.common.level,
     elo: state.common.elo,
@@ -216,18 +209,21 @@ export function StatsPage() {
     rank: state.common.rank,
   }
 
-  const daily = {
-    todayWins: state.daily.wins,
-    todayLosses: state.daily.losses,
-    avgKillsAdr: dailyAvgKillsAdr,
+  const daily: ComponentProps<typeof WidgetStatistics>['daily'] = {
+    wins: state.daily.wins,
+    losses: state.daily.losses,
+    avg: state.daily.averageKills,
+    adr: state.daily.averageAdr,
     kd: state.daily.kd,
   }
 
-  const monthly = {
+  const monthly: ComponentProps<typeof WidgetStatistics>['monthly'] = {
     winRatePercent: state.monthly.winRate,
-    last30MatchResults: state.monthly.matchResults,
-    avgKillsAdr: monthlyAvgKillsAdr,
-    kdKr: monthlyKdKr,
+    results: state.monthly.matchResults,
+    avg: state.monthly.averageKills,
+    adr: state.monthly.averageAdr,
+    kd: state.monthly.kd,
+    kr: state.monthly.krRatio,
   }
 
   return (
@@ -236,7 +232,7 @@ export function StatsPage() {
         common={common}
         daily={daily}
         monthly={monthly}
-        backgroundOpacityPercent={backgroundOpacityParam}
+        backgroundOpacity={backgroundOpacityParam}
         borderRadius={borderRadiusParam}
         className='stats-page__widget'
       />

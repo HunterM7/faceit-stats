@@ -30,49 +30,58 @@ interface WidgetStatisticsProps {
   /** Статистика игрока за текущий игровой день. */
   daily: {
     /** Количество побед за сегодня. */
-    todayWins: number;
+    wins: number;
     /** Количество поражений за сегодня. */
-    todayLosses: number;
-    /** Средние kills/ADR за сегодня (подготовленная строка). */
-    avgKillsAdr: string;
-    /** Значение K/D за сегодня (подготовленная строка). */
+    losses: number;
+    /** Среднее количество убийств за матч. */
+    avg: number;
+    /** Среднее количество нанесенного урона за раунд. */
+    adr: number;
+    /** Соотношение убийств к смертям. */
     kd: number;
   };
   /** Статистика игрока за последние 30 матчей. */
   monthly: {
-    /** Win rate за последние 30 матчей, 0–100. */
+    /** Винрейт в процентах. */
     winRatePercent: number;
-    /** Победы по времени для графика: `true` — победа (слева старые матчи). */
-    last30MatchResults: boolean[];
-    /** Средние kills/ADR за последние 30 матчей (подготовленная строка). */
-    avgKillsAdr: string;
-    /** Сводное значение K/D / K/R за последние 30 матчей (подготовленная строка). */
-    kdKr: string;
+    /** Кортеж побед/поражений в хронологическом порядке (true — победа, false — поражение). */
+    results: boolean[];
+    /** Среднее количество убийств за матч. */
+    avg: number;
+    /** Среднее количество нанесенного урона за раунд. */
+    adr: number;
+    /** Соотношение убийств к смертям. */
+    kd: number;
+    /** Количество убийств за раунд. */
+    kr: number;
   };
   /** Дополнительный класс для стилизации компонента. */
   className?: string | undefined;
   /** Прозрачность фона карточки в процентах (0-100). */
-  backgroundOpacityPercent?: number | undefined;
+  backgroundOpacity?: number | undefined;
   /** Скругление углов карточки в px (0-18). */
   borderRadius?: number | undefined;
 }
 
 export function WidgetStatistics(props: WidgetStatisticsProps) {
-  const { common, daily, monthly, className, backgroundOpacityPercent = 96, borderRadius = 16 } = props
-  const normalizedOpacity = Math.min(100, Math.max(0, backgroundOpacityPercent)) / 100
+  const { common, daily, monthly, className, backgroundOpacity = 96, borderRadius = 16 } = props
+  const normalizedOpacity = Math.min(100, Math.max(0, backgroundOpacity)) / 100
   const normalizedBorderRadiusPx = Math.min(18, Math.max(0, Math.round(borderRadius)))
   const cardStyle = {
     '--widget-statistics-bg-opacity': normalizedOpacity,
     '--widget-statistics-radius': `${normalizedBorderRadiusPx}px`,
   } as CSSProperties
 
-  const rk = common.rank
-  const hasCountry = Boolean(rk.country)
-  const hasRegion = Boolean(rk.region)
+  const hasCountry = Boolean(common.rank.country)
+  const hasRegion = Boolean(common.rank.region)
   const hasBoth = hasCountry && hasRegion
 
   const [ rankView, setRankView ] = useState<'country' | 'region'>('country')
   const [ rankVisible, setRankVisible ] = useState(true)
+
+  const dailyAvgAdr = `${formatNumberWithFixedDecimals(daily.avg, 0)} / ${formatNumberWithFixedDecimals(daily.adr, 2)}`
+  const monthlyAvgAdr = `${formatNumberWithFixedDecimals(monthly.avg, 0)} / ${formatNumberWithFixedDecimals(monthly.adr, 0)}`
+  const monthlyKdKr = `${formatNumberWithFixedDecimals(monthly.kd, 2)} / ${formatNumberWithFixedDecimals(monthly.kr, 2)}`
 
   const getRankSlideClass = (target: 'country' | 'region') => {
     if (!hasBoth) {
@@ -89,8 +98,8 @@ export function WidgetStatistics(props: WidgetStatisticsProps) {
   const renderCountrySlide = (slideClass: string) => (
     <div className={classNames('widget-statistics__rank-slide', slideClass)} aria-hidden={hasBoth ? rankView !== 'country' : undefined}>
       <div className='widget-statistics__rank-row'>
-        <CountryFlagIcon countryCode={rk.country!.code} className='widget-statistics__country-flag-icon'/>
-        <span>#{rk.country!.rating}</span>
+        <CountryFlagIcon countryCode={common.rank.country!.code} className='widget-statistics__country-flag-icon'/>
+        <span>#{common.rank.country!.rating}</span>
       </div>
     </div>
   )
@@ -98,8 +107,8 @@ export function WidgetStatistics(props: WidgetStatisticsProps) {
   const renderRegionSlide = (slideClass: string) => (
     <div className={classNames('widget-statistics__rank-slide', slideClass)} aria-hidden={hasBoth ? rankView !== 'region' : undefined}>
       <div className='widget-statistics__rank-row widget-statistics__rank-row--region'>
-        <RegionFlagIcon regionCode={rk.region!.code} className='widget-statistics__region-flag-icon'/>
-        <span>#{rk.region!.rating}</span>
+        <RegionFlagIcon regionCode={common.rank.region!.code} className='widget-statistics__region-flag-icon'/>
+        <span>#{common.rank.region!.rating}</span>
       </div>
     </div>
   )
@@ -176,11 +185,11 @@ export function WidgetStatistics(props: WidgetStatisticsProps) {
           <div className='widget-statistics__grid'>
             <WidgetStatisticsLast30WinRate
               winRatePercent={monthly.winRatePercent}
-              matchResults={monthly.last30MatchResults}
+              matchResults={monthly.results}
               className='widget-statistics__metric'
             />
-            <WidgetStatisticsMetric value={monthly.avgKillsAdr} label='Avg. Kills / ADR' className='widget-statistics__metric'/>
-            <WidgetStatisticsMetric value={monthly.kdKr} label='K/D / K/R' className='widget-statistics__metric'/>
+            <WidgetStatisticsMetric value={monthlyAvgAdr} label='Avg. Kills / ADR' className='widget-statistics__metric'/>
+            <WidgetStatisticsMetric value={monthlyKdKr} label='K/D / K/R' className='widget-statistics__metric'/>
           </div>
         </div>
 
@@ -188,10 +197,10 @@ export function WidgetStatistics(props: WidgetStatisticsProps) {
           <div className='widget-statistics__subtitle'>STATS TODAY</div>
           <div className='widget-statistics__grid'>
             <div className='widget-statistics__match-results'>
-              <WidgetStatisticsMatchResults value={daily.todayWins} result={MatchResult.Win}/>
-              <WidgetStatisticsMatchResults value={daily.todayLosses} result={MatchResult.Lose}/>
+              <WidgetStatisticsMatchResults value={daily.wins} result={MatchResult.Win}/>
+              <WidgetStatisticsMatchResults value={daily.losses} result={MatchResult.Lose}/>
             </div>
-            <WidgetStatisticsMetric value={daily.avgKillsAdr} label='Avg. Kills / ADR' className='widget-statistics__metric'/>
+            <WidgetStatisticsMetric value={dailyAvgAdr} label='Avg. Kills / ADR' className='widget-statistics__metric'/>
             <WidgetStatisticsMetric value={formatNumberWithFixedDecimals(daily.kd, 2)} label='K/D' className='widget-statistics__metric'/>
           </div>
         </div>

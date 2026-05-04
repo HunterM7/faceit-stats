@@ -185,7 +185,7 @@ export function StatsWidgetPage() {
   const { showToast } = useToast()
 
   const [ nickname, setNickname ] = useState(() => nicknameStorage.get(''))
-  const [ backgroundOpacityPercent, setBackgroundOpacityPercent ] = useState(() => normalizeBackgroundOpacityPercent(
+  const [ backgroundOpacity, setBackgroundOpacity ] = useState(() => normalizeBackgroundOpacityPercent(
     backgroundOpacityStorage.get(BACKGROUND_OPACITY_STORAGE_DEFAULT),
   ))
   const [ borderRadius, setBorderRadius ] = useState(() => normalizeBorderRadiusPx(
@@ -248,13 +248,13 @@ export function StatsWidgetPage() {
 
   const handleBgOpacityPercentChange = (next: number) => {
     const clamped = Math.min(100, Math.max(0, Math.round(next)))
-    setBackgroundOpacityPercent(clamped)
+    setBackgroundOpacity(clamped)
     backgroundOpacityStorage.set(clamped)
     setIncludeBgInUrl(true)
   }
 
   const handleBackgroundOpacityReset = () => {
-    setBackgroundOpacityPercent(DEFAULT_WIDGET_BG_PERCENT)
+    setBackgroundOpacity(DEFAULT_WIDGET_BG_PERCENT)
     backgroundOpacityStorage.delete()
     setIncludeBgInUrl(false)
   }
@@ -277,7 +277,7 @@ export function StatsWidgetPage() {
     ratingModeStorage.set(next)
   }
 
-  const bgForUrl = includeBgInUrl ? backgroundOpacityPercent : undefined
+  const bgForUrl = includeBgInUrl ? backgroundOpacity : undefined
   const radiusForUrl = includeRadiusInUrl ? borderRadius : undefined
   const ratingForUrl = ratingMode === 'country' ? undefined : ratingMode
 
@@ -345,7 +345,7 @@ export function StatsWidgetPage() {
               autoComplete='nickname'
             />
             <StatsWidgetPageBgOpacityField
-              value={backgroundOpacityPercent}
+              value={backgroundOpacity}
               onChange={handleBgOpacityPercentChange}
               onReset={handleBackgroundOpacityReset}
               isResetDisabled={!includeBgInUrl}
@@ -367,7 +367,7 @@ export function StatsWidgetPage() {
             <StatsWidgetPagePreview
               preview={previewState}
               ratingMode={ratingMode}
-              backgroundOpacityPercent={backgroundOpacityPercent}
+              backgroundOpacity={backgroundOpacity}
               borderRadius={borderRadius}
             />
           </article>
