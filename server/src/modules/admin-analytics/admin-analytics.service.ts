@@ -2,11 +2,14 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Collection, MongoClient } from 'mongodb';
 import { StatsService } from '../../stats/stats.service';
 import {
+  type AdminErrorOrigin,
   type AdminEvent,
+  type AdminErrorsResponse,
   type AdminEventSource,
   type AdminNicknameStat,
   type AdminOverviewResponse,
   type AdminPeriod,
+  type AdminRequestMeta,
   type AdminScope,
 } from './admin-analytics.types';
 
@@ -17,6 +20,10 @@ type TrackRequestPayload = {
   durationMs: number;
   nicknames: string[];
   preview: boolean;
+  errorMessage?: string;
+  errorOrigin?: AdminErrorOrigin;
+  serverResponse?: string;
+  request?: AdminRequestMeta;
 };
 
 @Injectable()
@@ -58,6 +65,10 @@ export class AdminAnalyticsService {
         durationMs: payload.durationMs,
         nicknames: normalizedNicknames,
         preview: payload.preview,
+        errorMessage: payload.errorMessage?.trim() || undefined,
+        errorOrigin: payload.errorOrigin,
+        serverResponse: payload.serverResponse?.trim() || undefined,
+        request: payload.request,
       });
     } catch (error) {
       this.isRuntimeDisabled = true;
@@ -133,6 +144,56 @@ export class AdminAnalyticsService {
         topNicknames: [],
         chart: [],
         latestEvents: [],
+        storage: 'disabled',
+      };
+    }
+  }
+
+  async getErrors(period: AdminPeriod, scope: AdminScope): Promise<AdminErrorsResponse> {
+    if (this.isRuntimeDisabled) {
+      return {
+        period,
+        scope,
+        totalErrors: 0,
+        latestErrors: [],
+        storage: 'disabled',
+      };
+    }
+
+    try {
+      const collection = await this.getCollection();
+      if (!collection) {
+        return {
+          period,
+          scope,
+          totalErrors: 0,
+          latestErrors: [],
+          storage: 'disabled',
+        };
+      }
+
+      const periodStartDate = this.getPeriodStartDate(period, new Date());
+      const errorsQuery = this.getErrorQuery(periodStartDate, scope);
+      const [ totalErrors, latestErrors ] = await Promise.all([
+        collection.countDocuments(errorsQuery),
+        this.getLatestErrors(collection, periodStartDate, scope),
+      ]);
+
+      return {
+        period,
+        scope,
+        totalErrors,
+        latestErrors,
+        storage: 'mongo',
+      };
+    } catch (error) {
+      this.isRuntimeDisabled = true;
+      this.logger.error(`Mongo аналитика отключена после ошибки чтения ошибок: ${(error as Error).message}`);
+      return {
+        period,
+        scope,
+        totalErrors: 0,
+        latestErrors: [],
         storage: 'disabled',
       };
     }
@@ -276,6 +337,35 @@ export class AdminAnalyticsService {
       durationMs: row.durationMs,
       nicknames: row.nicknames,
       preview: row.preview === true,
+      errorMessage: row.errorMessage,
+      errorOrigin: row.errorOrigin,
+      serverResponse: row.serverResponse,
+      request: row.request,
+    }));
+  }
+
+  private async getLatestErrors(
+    collection: Collection<AdminEventDocument>,
+    periodStartDate: Date | null,
+    scope: AdminScope,
+  ): Promise<AdminEvent[]> {
+    const query = this.getErrorQuery(periodStartDate, scope);
+    const rows = await collection.find(query)
+      .sort({ createdAt: -1 })
+      .limit(100)
+      .toArray();
+    return rows.map((row) => ({
+      timestamp: row.createdAt.toISOString(),
+      route: row.route,
+      source: this.toAdminEventSource(row.source),
+      statusCode: row.statusCode,
+      durationMs: row.durationMs,
+      nicknames: row.nicknames,
+      preview: row.preview === true,
+      errorMessage: row.errorMessage,
+      errorOrigin: row.errorOrigin,
+      serverResponse: row.serverResponse,
+      request: row.request,
     }));
   }
 
@@ -379,6 +469,13 @@ export class AdminAnalyticsService {
     };
   }
 
+  private getErrorQuery(periodStartDate: Date | null, scope: AdminScope): Record<string, unknown> {
+    return {
+      ...this.getScopeBaseQuery(periodStartDate, scope),
+      statusCode: { $gte: 400 },
+    };
+  }
+
   private async getCollection(): Promise<Collection<AdminEventDocument> | null> {
     if (!this.mongoUri || this.isRuntimeDisabled) {
       return null;
@@ -414,4 +511,8 @@ type AdminEventDocument = {
   durationMs: number;
   nicknames: string[];
   preview?: boolean;
+  errorMessage?: string;
+  errorOrigin?: AdminErrorOrigin;
+  serverResponse?: string;
+  request?: AdminRequestMeta;
 };

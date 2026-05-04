@@ -15,6 +15,13 @@ export class AdminAnalyticsController {
     return this.analyticsService.getOverview(period, scope);
   }
 
+  @Get('errors')
+  async getErrors(@Query('period') periodRaw?: string, @Query('scope') scopeRaw?: string) {
+    const period = this.parsePeriod(periodRaw);
+    const scope = this.parseScope(scopeRaw);
+    return this.analyticsService.getErrors(period, scope);
+  }
+
   private parsePeriod(raw?: string): AdminPeriod {
     const period = raw?.trim() || 'day';
     if (period === 'day' || period === 'week' || period === 'month' || period === 'all') {

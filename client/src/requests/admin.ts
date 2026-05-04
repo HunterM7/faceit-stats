@@ -5,6 +5,15 @@ export type AdminScope = 'overall' | 'stats_widget' | 'overlay_widget'
 
 export type AdminEventSource = 'stats_widget' | 'overlay_widget' | null
 
+export type AdminRequestMeta = {
+  method: string;
+  path: string;
+  query: Record<string, string | string[]>;
+  params: Record<string, string>;
+}
+
+export type AdminErrorOrigin = 'faceit' | 'internal' | 'unknown'
+
 export class AdminUnauthorizedError extends Error {
   constructor(message = 'Требуется авторизация для доступа к админке.') {
     super(message)
@@ -29,6 +38,30 @@ export type AdminOverviewPayload = {
     durationMs: number;
     nicknames: string[];
     preview: boolean;
+    errorMessage?: string;
+    errorOrigin?: AdminErrorOrigin;
+    serverResponse?: string;
+    request?: AdminRequestMeta;
+  }>;
+  storage: 'mongo' | 'disabled';
+}
+
+export type AdminErrorsPayload = {
+  period: AdminPeriod;
+  scope: AdminScope;
+  totalErrors: number;
+  latestErrors: Array<{
+    timestamp: string;
+    route: string;
+    source: AdminEventSource;
+    statusCode: number;
+    durationMs: number;
+    nicknames: string[];
+    preview: boolean;
+    errorMessage?: string;
+    errorOrigin?: AdminErrorOrigin;
+    serverResponse?: string;
+    request?: AdminRequestMeta;
   }>;
   storage: 'mongo' | 'disabled';
 }
@@ -67,4 +100,23 @@ export async function requestAdminOverview(period: AdminPeriod, scope: AdminScop
     throw new Error(await parseErrorMessage(response))
   }
   return (await response.json()) as AdminOverviewPayload
+}
+
+export async function requestAdminErrors(period: AdminPeriod, scope: AdminScope, authToken?: string): Promise<AdminErrorsPayload> {
+  const endpoint = buildApiUrl('/api/admin/errors')
+  const params = new URLSearchParams({
+    period,
+    scope,
+  })
+  const response = await fetch(`${endpoint}?${params.toString()}`, {
+    cache: 'no-store',
+    headers: authToken ? { Authorization: `Basic ${authToken}` } : undefined,
+  })
+  if (response.status === 401) {
+    throw new AdminUnauthorizedError()
+  }
+  if (!response.ok) {
+    throw new Error(await parseErrorMessage(response))
+  }
+  return (await response.json()) as AdminErrorsPayload
 }

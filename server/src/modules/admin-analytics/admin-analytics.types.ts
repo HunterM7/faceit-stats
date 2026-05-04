@@ -15,6 +15,15 @@ export type AdminChartItem = {
 
 export type AdminEventSource = 'stats_widget' | 'overlay_widget' | null;
 
+export type AdminRequestMeta = {
+  method: string;
+  path: string;
+  query: Record<string, string | string[]>;
+  params: Record<string, string>;
+};
+
+export type AdminErrorOrigin = 'faceit' | 'internal' | 'unknown';
+
 export type AdminEvent = {
   timestamp: string;
   route: string;
@@ -23,6 +32,10 @@ export type AdminEvent = {
   durationMs: number;
   nicknames: string[];
   preview: boolean;
+  errorMessage?: string;
+  errorOrigin?: AdminErrorOrigin;
+  serverResponse?: string;
+  request?: AdminRequestMeta;
 };
 
 export type AdminOverviewResponse = {
@@ -38,5 +51,13 @@ export type AdminOverviewResponse = {
   topNicknames: AdminNicknameStat[];
   chart: AdminChartItem[];
   latestEvents: AdminEvent[];
+  storage: 'mongo' | 'disabled';
+};
+
+export type AdminErrorsResponse = {
+  period: AdminPeriod;
+  scope: AdminScope;
+  totalErrors: number;
+  latestErrors: AdminEvent[];
   storage: 'mongo' | 'disabled';
 };

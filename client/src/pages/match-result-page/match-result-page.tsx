@@ -11,7 +11,6 @@ export function MatchResultPage() {
   const testShowMs = 3000
   const [ visible, setVisible ] = useState(false)
   const [ result, setResult ] = useState<'WIN' | 'LOSS'>('WIN')
-  const [ errorMessage, setErrorMessage ] = useState<string | null>(null)
   const [ level, setLevel ] = useState<number | null>(null)
   const [ elo, setElo ] = useState<number | null>(null)
   const [ eloDelta, setEloDelta ] = useState<number | null>(null)
@@ -50,7 +49,6 @@ export function MatchResultPage() {
         setLevel(10)
         setEloDelta(signedDelta)
         setElo((prev) => Math.max(0, (prev ?? 2100) + signedDelta))
-        setErrorMessage(null)
         setVisible(true)
 
         hideTimer = window.setTimeout(() => {
@@ -95,11 +93,12 @@ export function MatchResultPage() {
     const pollLastMatch = async () => {
       try {
         if (!playerId) {
-          setErrorMessage('Не удалось определить playerId для запроса последнего матча.')
+          return
+        }
+        if (cancelled) {
           return
         }
         const matchData = await lastMatch(playerId, analyticsSource)
-        setErrorMessage(null)
         if (!matchData?.matchId) {
           return
         }
@@ -133,10 +132,6 @@ export function MatchResultPage() {
         showMatchResult(matchData.result === 'LOSS' ? 'LOSS' : 'WIN', nextLevel, nextElo, computedDelta)
       } catch (error) {
         console.error('[lastMatch request failed]', error)
-        setErrorMessage(
-          'Связь с сервером временно потерялась. Проверьте интернет и FACEIT-ник (регистр букв важен), затем обновите страницу.',
-        )
-        setVisible(false)
       }
     }
 
@@ -146,7 +141,6 @@ export function MatchResultPage() {
         if (cancelled) return
         playerId = typeof playerPayload.playerId === 'string' ? playerPayload.playerId : null
         if (!playerId) {
-          setErrorMessage('Не удалось получить playerId игрока.')
           return
         }
         lastKnownElo =
@@ -159,14 +153,9 @@ export function MatchResultPage() {
         if (matchData.matchId) {
           lastMatchId = matchData.matchId
         }
-        setErrorMessage(null)
-
         pollTimer = window.setInterval(() => void pollLastMatch(), pollMs)
       } catch (error) {
         console.error('[bootstrap lastMatch flow failed]', error)
-        setErrorMessage(
-          'Связь с сервером временно потерялась. Проверьте интернет и FACEIT-ник (регистр букв важен), затем обновите страницу.',
-        )
       }
     }
 
@@ -187,10 +176,10 @@ export function MatchResultPage() {
 
   return (
     <div className='match-result-page'>
-      {missingNicknameMessage || errorMessage ? (
+      {missingNicknameMessage ? (
         <div className='match-result-page__error-screen'>
           <div className='match-result-page__error-title'>Упс, не нашли такого игрока</div>
-          <div className='match-result-page__error-message'>{missingNicknameMessage || errorMessage}</div>
+          <div className='match-result-page__error-message'>{missingNicknameMessage}</div>
         </div>
       ) : null}
       <div

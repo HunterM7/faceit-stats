@@ -1,0 +1,32 @@
+.admin-errors-page__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.admin-errors-page__item {
+  border: 1px solid rgb(255 255 255 / 12%);
+  border-radius: 12px;
+  padding: 12px;
+  background: rgb(255 255 255 / 3%);
+}
+
+.admin-errors-page__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.admin-errors-page__meta {
+  margin: 0;
+  padding: 10px;
+  border-radius: 8px;
+  background: rgb(0 0 0 / 30%);
+  color: #ffb4b4;
+  overflow-x: auto;
+  font-size: 12px;
+  line-height: 1.4;
+}

@@ -292,6 +292,7 @@ export function AdminPage() {
                   <span className='admin-page__event-cell'>
                     {event.route} · {event.statusCode} · {event.durationMs}ms
                     {event.preview ? ' · preview' : ''}
+                    {event.errorMessage ? ` · ${event.errorMessage}` : ''}
                   </span>
                 </li>
               ))}
@@ -302,6 +303,7 @@ export function AdminPage() {
         <footer className='admin-page__footer'>
           <Link to='/' className='admin-page__link'>На главную</Link>
           <Link to='/widgets/stats' className='admin-page__link'>К странице Stats Widget</Link>
+          <Link to={`/admin/errors?scope=${scope}`} className='admin-page__link'>К странице ошибок</Link>
         </footer>
       </section>
     </main>
