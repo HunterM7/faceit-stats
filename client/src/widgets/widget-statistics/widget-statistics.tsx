@@ -15,46 +15,40 @@ import './widget-statistics.scss'
 const CARD_SWITCH_MS = 5000
 const CARD_FADE_MS = 700
 
-interface CommonStatistic {
-  /** Текущий уровень FACEIT игрока. */
-  level: number;
-  /** Текущее значение ELO игрока. */
-  elo: number;
-  /** Текущее значение K/D игрока. */
-  kd: number;
-  /** Ранг игрока. */
-  rank: Rank;
-}
-
-interface DailyStatistic {
-  /** Количество побед за сегодня. */
-  todayWins: number;
-  /** Количество поражений за сегодня. */
-  todayLosses: number;
-  /** Средние kills/ADR за сегодня (подготовленная строка). */
-  avgKillsAdr: string;
-  /** Значение K/D за сегодня (подготовленная строка). */
-  kd: number;
-}
-
-interface MonthlyStatistic {
-  /** Win rate за последние 30 матчей, 0–100. */
-  winRatePercent: number;
-  /** Победы по времени для графика: `true` — победа (слева старые матчи). */
-  last30MatchResults: boolean[];
-  /** Средние kills/ADR за последние 30 матчей (подготовленная строка). */
-  avgKillsAdr: string;
-  /** Сводное значение K/D / K/R за последние 30 матчей (подготовленная строка). */
-  kdKr: string;
-}
-
-type WidgetStatisticsProps = {
+interface WidgetStatisticsProps {
   /** Общая статистика игрока. */
-  common: CommonStatistic;
+  common: {
+    /** Текущий уровень FACEIT игрока. */
+    level: number;
+    /** Текущее значение ELO игрока. */
+    elo: number;
+    /** Текущее значение K/D игрока. */
+    kd: number;
+    /** Ранг игрока. */
+    rank: Rank;
+  };
   /** Статистика игрока за текущий игровой день. */
-  daily: DailyStatistic;
+  daily: {
+    /** Количество побед за сегодня. */
+    todayWins: number;
+    /** Количество поражений за сегодня. */
+    todayLosses: number;
+    /** Средние kills/ADR за сегодня (подготовленная строка). */
+    avgKillsAdr: string;
+    /** Значение K/D за сегодня (подготовленная строка). */
+    kd: number;
+  };
   /** Статистика игрока за последние 30 матчей. */
-  monthly: MonthlyStatistic;
+  monthly: {
+    /** Win rate за последние 30 матчей, 0–100. */
+    winRatePercent: number;
+    /** Победы по времени для графика: `true` — победа (слева старые матчи). */
+    last30MatchResults: boolean[];
+    /** Средние kills/ADR за последние 30 матчей (подготовленная строка). */
+    avgKillsAdr: string;
+    /** Сводное значение K/D / K/R за последние 30 матчей (подготовленная строка). */
+    kdKr: string;
+  };
   /** Дополнительный класс для стилизации компонента. */
   className?: string | undefined;
   /** Прозрачность фона карточки в процентах (0-100). */
