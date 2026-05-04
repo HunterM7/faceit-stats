@@ -7,7 +7,7 @@ import { CountryFlagIcon } from '@components/country-flag-icon/country-flag-icon
 import { RegionFlagIcon } from '@components/region-flag-icon/region-flag-icon'
 import { WidgetStatisticsLast30WinRate } from './widget-statistics-last30-win-rate/widget-statistics-last30-win-rate'
 import { WidgetStatisticsMetric } from './widget-statistics-metric/widget-statistics-metric'
-import { MatchResult, WidgetStatisticsMatchResults } from './widget-statistics-match-results/widget-statistics-match-results'
+import { WidgetStatisticsDailyPanel } from './widget-statistics-daily-panel/widget-statistics-daily-panel'
 import { WidgetStatisticsValue } from './widget-statistics-value/widget-statistics-value'
 import type { Rank } from '@requests/stats'
 import './widget-statistics.scss'
@@ -79,7 +79,6 @@ export function WidgetStatistics(props: WidgetStatisticsProps) {
   const [ rankView, setRankView ] = useState<'country' | 'region'>('country')
   const [ rankVisible, setRankVisible ] = useState(true)
 
-  const dailyAvgAdr = `${formatNumberWithFixedDecimals(daily.avg, 0)} / ${formatNumberWithFixedDecimals(daily.adr, 2)}`
   const monthlyAvgAdr = `${formatNumberWithFixedDecimals(monthly.avg, 0)} / ${formatNumberWithFixedDecimals(monthly.adr, 0)}`
   const monthlyKdKr = `${formatNumberWithFixedDecimals(monthly.kd, 2)} / ${formatNumberWithFixedDecimals(monthly.kr, 2)}`
 
@@ -188,22 +187,23 @@ export function WidgetStatistics(props: WidgetStatisticsProps) {
               matchResults={monthly.results}
               className='widget-statistics__metric'
             />
-            <WidgetStatisticsMetric value={monthlyAvgAdr} label='Avg. Kills / ADR' className='widget-statistics__metric'/>
+            <WidgetStatisticsMetric
+              value={monthlyAvgAdr}
+              label='Avg. Kills / ADR'
+              className='widget-statistics__metric'
+            />
             <WidgetStatisticsMetric value={monthlyKdKr} label='K/D / K/R' className='widget-statistics__metric'/>
           </div>
         </div>
 
-        <div className={`widget-statistics__panel widget-statistics__panel--today ${getPanelStateClass('today')}`}>
-          <div className='widget-statistics__subtitle'>STATS TODAY</div>
-          <div className='widget-statistics__grid'>
-            <div className='widget-statistics__match-results'>
-              <WidgetStatisticsMatchResults value={daily.wins} result={MatchResult.Win}/>
-              <WidgetStatisticsMatchResults value={daily.losses} result={MatchResult.Lose}/>
-            </div>
-            <WidgetStatisticsMetric value={dailyAvgAdr} label='Avg. Kills / ADR' className='widget-statistics__metric'/>
-            <WidgetStatisticsMetric value={formatNumberWithFixedDecimals(daily.kd, 2)} label='K/D' className='widget-statistics__metric'/>
-          </div>
-        </div>
+        <WidgetStatisticsDailyPanel
+          wins={daily.wins}
+          losses={daily.losses}
+          avg={daily.avg}
+          adr={daily.adr}
+          kd={daily.kd}
+          className={classNames('widget-statistics__panel', getPanelStateClass('today'))}
+        />
       </div>
     </div>
   )
