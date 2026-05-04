@@ -22,7 +22,7 @@ interface Props {
 export function WidgetStatisticsDailyPanel(props: Props) {
   const { wins, losses, avg, adr, kd, className } = props
 
-  const avgAdr = `${formatNumberWithFixedDecimals(avg, 0)} / ${formatNumberWithFixedDecimals(adr, 2)}`
+  const avgAdr = `${formatNumberWithFixedDecimals(avg, 0)} / ${formatNumberWithFixedDecimals(adr, 0)}`
 
   return (
     <div className={classNames('widget-statistics-daily-panel', className)}>
