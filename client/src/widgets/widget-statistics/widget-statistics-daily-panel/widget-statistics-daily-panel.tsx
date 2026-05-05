@@ -32,7 +32,7 @@ export function WidgetStatisticsDailyPanel(props: Props) {
           <WidgetStatisticsMatchResults value={wins} result={MatchResult.Win}/>
           <WidgetStatisticsMatchResults value={losses} result={MatchResult.Lose}/>
         </div>
-        <WidgetStatisticsMetric className='widget-statistics-daily-panel__metric' value={avgAdr} label='Avg. Kills / ADR'/>
+        <WidgetStatisticsMetric className='widget-statistics-daily-panel__metric' value={avgAdr} label='AVG / ADR'/>
         <WidgetStatisticsMetric className='widget-statistics-daily-panel__metric' value={formatNumberWithFixedDecimals(kd, 2)} label='K/D'/>
       </div>
     </div>

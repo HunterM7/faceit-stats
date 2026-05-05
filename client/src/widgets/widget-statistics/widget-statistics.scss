@@ -116,31 +116,4 @@
       transition: none;
     }
   }
-
-  &__subtitle {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.65px;
-    color: rgba(230, 235, 245, 0.62);
-    text-transform: uppercase;
-    margin-bottom: 7px;
-    text-align: center;
-  }
-
-  &__grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px;
-  }
-
-  &__match-results {
-    display: flex;
-    gap: 8px;
-  }
-
-  &__metric {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
 }

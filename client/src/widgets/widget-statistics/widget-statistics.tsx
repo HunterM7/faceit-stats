@@ -5,9 +5,8 @@ import { formatNumberWithFixedDecimals } from '@/utils/number-format'
 import { SkillLevelIcon } from '@/components/skill-level-icon/skill-level-icon'
 import { CountryFlagIcon } from '@components/country-flag-icon/country-flag-icon'
 import { RegionFlagIcon } from '@components/region-flag-icon/region-flag-icon'
-import { WidgetStatisticsLast30WinRate } from './widget-statistics-last30-win-rate/widget-statistics-last30-win-rate'
-import { WidgetStatisticsMetric } from './widget-statistics-metric/widget-statistics-metric'
 import { WidgetStatisticsDailyPanel } from './widget-statistics-daily-panel/widget-statistics-daily-panel'
+import { WidgetStatisticsMonthlyPanel } from './widget-statistics-monthly-panel/widget-statistics-monthly-panel'
 import { WidgetStatisticsValue } from './widget-statistics-value/widget-statistics-value'
 import type { Rank } from '@requests/stats'
 import './widget-statistics.scss'
@@ -79,9 +78,6 @@ export function WidgetStatistics(props: WidgetStatisticsProps) {
   const [ rankView, setRankView ] = useState<'country' | 'region'>('country')
   const [ rankVisible, setRankVisible ] = useState(true)
 
-  const monthlyAvgAdr = `${formatNumberWithFixedDecimals(monthly.avg, 0)} / ${formatNumberWithFixedDecimals(monthly.adr, 0)}`
-  const monthlyKdKr = `${formatNumberWithFixedDecimals(monthly.kd, 2)} / ${formatNumberWithFixedDecimals(monthly.kr, 2)}`
-
   const getRankSlideClass = (target: 'country' | 'region') => {
     if (!hasBoth) {
       const isActiveSingle =
@@ -113,10 +109,10 @@ export function WidgetStatistics(props: WidgetStatisticsProps) {
   )
 
   // Для показа определенной панели
-  // const panel: 'last30' | 'today' = 'today'
+  // const panel: 'today' | 'monthly' = 'today'
   // const isPanelVisible = true
 
-  const [ panel, setPanel ] = useState<'last30' | 'today'>('last30')
+  const [ panel, setPanel ] = useState<'today' | 'monthly'>('today')
   const [ isPanelVisible, setIsPanelVisible ] = useState(true)
 
   useEffect(() => {
@@ -128,7 +124,7 @@ export function WidgetStatistics(props: WidgetStatisticsProps) {
       }
       fadeTimer = window.setTimeout(() => {
         fadeTimer = null
-        setPanel((prev) => (prev === 'last30' ? 'today' : 'last30'))
+        setPanel((prev) => (prev === 'monthly' ? 'today' : 'monthly'))
         setIsPanelVisible(true)
         if (hasBoth) {
           setRankView((prev) => (prev === 'country' ? 'region' : 'country'))
@@ -143,7 +139,7 @@ export function WidgetStatistics(props: WidgetStatisticsProps) {
     }
   }, [ hasBoth ])
 
-  const getPanelStateClass = (target: 'last30' | 'today') => {
+  const getPanelStateClass = (target: 'monthly' | 'today') => {
     if (panel !== target) return 'widget-statistics__panel--hidden'
     return isPanelVisible ? 'widget-statistics__panel--active' : 'widget-statistics__panel--hiding'
   }
@@ -179,29 +175,12 @@ export function WidgetStatistics(props: WidgetStatisticsProps) {
       <div className='widget-statistics__divider'/>
 
       <div className='widget-statistics__panels'>
-        <div className={`widget-statistics__panel widget-statistics__panel--last30 ${getPanelStateClass('last30')}`}>
-          <div className='widget-statistics__subtitle'>LAST 30 MATCHES</div>
-          <div className='widget-statistics__grid'>
-            <WidgetStatisticsLast30WinRate
-              winRatePercent={monthly.winRatePercent}
-              matchResults={monthly.results}
-              className='widget-statistics__metric'
-            />
-            <WidgetStatisticsMetric
-              value={monthlyAvgAdr}
-              label='Avg. Kills / ADR'
-              className='widget-statistics__metric'
-            />
-            <WidgetStatisticsMetric value={monthlyKdKr} label='K/D / K/R' className='widget-statistics__metric'/>
-          </div>
-        </div>
-
+        <WidgetStatisticsMonthlyPanel
+          winRatePercent={monthly.winRatePercent} results={monthly.results} avg={monthly.avg} adr={monthly.adr} kd={monthly.kd} kr={monthly.kr}
+          className={classNames('widget-statistics__panel', getPanelStateClass('monthly'))}
+        />
         <WidgetStatisticsDailyPanel
-          wins={daily.wins}
-          losses={daily.losses}
-          avg={daily.avg}
-          adr={daily.adr}
-          kd={daily.kd}
+          wins={daily.wins} losses={daily.losses} avg={daily.avg} adr={daily.adr} kd={daily.kd}
           className={classNames('widget-statistics__panel', getPanelStateClass('today'))}
         />
       </div>
