@@ -5,24 +5,27 @@ import { WidgetStatisticsLast30WinRate } from '../widget-statistics-last30-win-r
 import './widget-statistics-monthly-panel.scss'
 
 interface Props {
-  /** Винрейт в процентах. */
-  winRatePercent: number;
-  /** Кортеж побед/поражений в хронологическом порядке (true — победа, false — поражение). */
-  results: boolean[];
-  /** Среднее количество убийств за матч. */
-  avg: number;
-  /** Среднее количество нанесенного урона за раунд. */
-  adr: number;
-  /** Соотношение убийств к смертям. */
-  kd: number;
-  /** Количество убийств за раунд. */
-  kr: number;
+  /** Статистика игрока за последние 30 матчей. */
+  data: {
+    /** Винрейт в процентах. */
+    winRatePercent: number;
+    /** Кортеж побед/поражений в хронологическом порядке (true — победа, false — поражение). */
+    results: boolean[];
+    /** Среднее количество убийств за матч. */
+    avg: number;
+    /** Среднее количество нанесенного урона за раунд. */
+    adr: number;
+    /** Соотношение убийств к смертям. */
+    kd: number;
+    /** Количество убийств за раунд. */
+    kr: number;
+  };
   /** Дополнительный класс для стилизации компонента. */
   className?: string | undefined;
 }
 
 export function WidgetStatisticsMonthlyPanel(props: Props) {
-  const { winRatePercent, results, avg, adr, kd, kr, className } = props
+  const { data: { winRatePercent, results, avg, adr, kd, kr }, className } = props
 
   const avgAdr = `${formatNumberWithFixedDecimals(avg, 0)} / ${formatNumberWithFixedDecimals(adr, 0)}`
   const kdKr = `${formatNumberWithFixedDecimals(kd, 2)} / ${formatNumberWithFixedDecimals(kr, 2)}`

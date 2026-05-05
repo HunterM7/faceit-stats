@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react'
+import type { ComponentProps, CSSProperties } from 'react'
 import { useEffect, useState } from 'react'
 import { classNames } from '@/utils/classNames'
 import { formatNumberWithFixedDecimals } from '@/utils/number-format'
@@ -27,33 +27,9 @@ interface WidgetStatisticsProps {
     rank: Rank;
   };
   /** Статистика игрока за текущий игровой день. */
-  daily: {
-    /** Количество побед за сегодня. */
-    wins: number;
-    /** Количество поражений за сегодня. */
-    losses: number;
-    /** Среднее количество убийств за матч. */
-    avg: number;
-    /** Среднее количество нанесенного урона за раунд. */
-    adr: number;
-    /** Соотношение убийств к смертям. */
-    kd: number;
-  };
+  daily: ComponentProps<typeof WidgetStatisticsDailyPanel>['data'];
   /** Статистика игрока за последние 30 матчей. */
-  monthly: {
-    /** Винрейт в процентах. */
-    winRatePercent: number;
-    /** Кортеж побед/поражений в хронологическом порядке (true — победа, false — поражение). */
-    results: boolean[];
-    /** Среднее количество убийств за матч. */
-    avg: number;
-    /** Среднее количество нанесенного урона за раунд. */
-    adr: number;
-    /** Соотношение убийств к смертям. */
-    kd: number;
-    /** Количество убийств за раунд. */
-    kr: number;
-  };
+  monthly: ComponentProps<typeof WidgetStatisticsMonthlyPanel>['data'];
   /** Дополнительный класс для стилизации компонента. */
   className?: string | undefined;
   /** Прозрачность фона карточки в процентах (0-100). */
@@ -175,14 +151,8 @@ export function WidgetStatistics(props: WidgetStatisticsProps) {
       <div className='widget-statistics__divider'/>
 
       <div className='widget-statistics__panels'>
-        <WidgetStatisticsMonthlyPanel
-          winRatePercent={monthly.winRatePercent} results={monthly.results} avg={monthly.avg} adr={monthly.adr} kd={monthly.kd} kr={monthly.kr}
-          className={classNames('widget-statistics__panel', getPanelStateClass('monthly'))}
-        />
-        <WidgetStatisticsDailyPanel
-          wins={daily.wins} losses={daily.losses} avg={daily.avg} adr={daily.adr} kd={daily.kd}
-          className={classNames('widget-statistics__panel', getPanelStateClass('today'))}
-        />
+        <WidgetStatisticsMonthlyPanel data={monthly} className={classNames('widget-statistics__panel', getPanelStateClass('monthly'))}/>
+        <WidgetStatisticsDailyPanel data={daily} className={classNames('widget-statistics__panel', getPanelStateClass('today'))}/>
       </div>
     </div>
   )

@@ -5,22 +5,25 @@ import { MatchResult, WidgetStatisticsMatchResults } from '../widget-statistics-
 import './widget-statistics-daily-panel.scss'
 
 interface Props {
-  /** Количество побед за сегодня. */
-  wins: number;
-  /** Количество поражений за сегодня. */
-  losses: number;
-  /** Среднее количество убийств за матч. */
-  avg: number;
-  /** Среднее количество нанесенного урона за раунд. */
-  adr: number;
-  /** Соотношение убийств к смертям. */
-  kd: number;
+  /** Статистика игрока за текущий игровой день. */
+  data: {
+    /** Количество побед за сегодня. */
+    wins: number;
+    /** Количество поражений за сегодня. */
+    losses: number;
+    /** Среднее количество убийств за матч. */
+    avg: number;
+    /** Среднее количество нанесенного урона за раунд. */
+    adr: number;
+    /** Соотношение убийств к смертям. */
+    kd: number;
+  };
   /** Дополнительный класс для стилизации компонента. */
   className?: string | undefined;
 }
 
 export function WidgetStatisticsDailyPanel(props: Props) {
-  const { wins, losses, avg, adr, kd, className } = props
+  const { data: { wins, losses, avg, adr, kd }, className } = props
 
   const avgAdr = `${formatNumberWithFixedDecimals(avg, 0)} / ${formatNumberWithFixedDecimals(adr, 0)}`
 
