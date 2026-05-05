@@ -217,7 +217,7 @@ export function StatsPage() {
     kd: state.daily.kd,
   }
 
-  const monthly: ComponentProps<typeof WidgetStatistics>['monthly'] = {
+  const recentMatches: ComponentProps<typeof WidgetStatistics>['recentMatches'] = {
     winRatePercent: state.monthly.winRate,
     results: state.monthly.matchResults,
     avg: state.monthly.averageKills,
@@ -231,7 +231,7 @@ export function StatsPage() {
       <WidgetStatistics
         common={common}
         daily={daily}
-        monthly={monthly}
+        recentMatches={recentMatches}
         backgroundOpacity={backgroundOpacityParam}
         borderRadius={borderRadiusParam}
         className='stats-page__widget'

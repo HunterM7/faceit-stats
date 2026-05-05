@@ -6,7 +6,7 @@ import { SkillLevelIcon } from '@/components/skill-level-icon/skill-level-icon'
 import { CountryFlagIcon } from '@components/country-flag-icon/country-flag-icon'
 import { RegionFlagIcon } from '@components/region-flag-icon/region-flag-icon'
 import { WidgetStatisticsDailyPanel } from './widget-statistics-daily-panel/widget-statistics-daily-panel'
-import { WidgetStatisticsMonthlyPanel } from './widget-statistics-monthly-panel/widget-statistics-monthly-panel'
+import { WidgetStatisticsRecentMatchesPanel } from './widget-statistics-recent-matches-panel/widget-statistics-recent-matches-panel'
 import { WidgetStatisticsValue } from './widget-statistics-value/widget-statistics-value'
 import type { Rank } from '@requests/stats'
 import './widget-statistics.scss'
@@ -29,7 +29,7 @@ interface WidgetStatisticsProps {
   /** Статистика игрока за текущий игровой день. */
   daily: ComponentProps<typeof WidgetStatisticsDailyPanel>['data'];
   /** Статистика игрока за последние 30 матчей. */
-  monthly: ComponentProps<typeof WidgetStatisticsMonthlyPanel>['data'];
+  recentMatches: ComponentProps<typeof WidgetStatisticsRecentMatchesPanel>['data'];
   /** Дополнительный класс для стилизации компонента. */
   className?: string | undefined;
   /** Прозрачность фона карточки в процентах (0-100). */
@@ -39,7 +39,7 @@ interface WidgetStatisticsProps {
 }
 
 export function WidgetStatistics(props: WidgetStatisticsProps) {
-  const { common, daily, monthly, className, backgroundOpacity = 96, borderRadius = 16 } = props
+  const { common, daily, recentMatches, className, backgroundOpacity = 96, borderRadius = 16 } = props
   const normalizedOpacity = Math.min(100, Math.max(0, backgroundOpacity)) / 100
   const normalizedBorderRadiusPx = Math.min(18, Math.max(0, Math.round(borderRadius)))
   const cardStyle = {
@@ -85,10 +85,10 @@ export function WidgetStatistics(props: WidgetStatisticsProps) {
   )
 
   // Для показа определенной панели
-  // const panel: 'today' | 'monthly' = 'today'
+  // const panel: 'today' | 'recentMatches' = 'today'
   // const isPanelVisible = true
 
-  const [ panel, setPanel ] = useState<'today' | 'monthly'>('today')
+  const [ panel, setPanel ] = useState<'today' | 'recentMatches'>('today')
   const [ isPanelVisible, setIsPanelVisible ] = useState(true)
 
   useEffect(() => {
@@ -100,7 +100,7 @@ export function WidgetStatistics(props: WidgetStatisticsProps) {
       }
       fadeTimer = window.setTimeout(() => {
         fadeTimer = null
-        setPanel((prev) => (prev === 'monthly' ? 'today' : 'monthly'))
+        setPanel((prev) => (prev === 'recentMatches' ? 'today' : 'recentMatches'))
         setIsPanelVisible(true)
         if (hasBoth) {
           setRankView((prev) => (prev === 'country' ? 'region' : 'country'))
@@ -115,7 +115,7 @@ export function WidgetStatistics(props: WidgetStatisticsProps) {
     }
   }, [ hasBoth ])
 
-  const getPanelStateClass = (target: 'monthly' | 'today') => {
+  const getPanelStateClass = (target: 'recentMatches' | 'today') => {
     if (panel !== target) return 'widget-statistics__panel--hidden'
     return isPanelVisible ? 'widget-statistics__panel--active' : 'widget-statistics__panel--hiding'
   }
@@ -152,7 +152,7 @@ export function WidgetStatistics(props: WidgetStatisticsProps) {
 
       <div className='widget-statistics__panels'>
         <WidgetStatisticsDailyPanel data={daily} className={classNames('widget-statistics__panel', getPanelStateClass('today'))}/>
-        <WidgetStatisticsMonthlyPanel data={monthly} className={classNames('widget-statistics__panel', getPanelStateClass('monthly'))}/>
+        <WidgetStatisticsRecentMatchesPanel data={recentMatches} className={classNames('widget-statistics__panel', getPanelStateClass('recentMatches'))}/>
       </div>
     </div>
   )

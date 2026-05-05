@@ -2,7 +2,7 @@ import { classNames } from '@/utils/classNames'
 import { formatNumberWithFixedDecimals } from '@/utils/number-format'
 import { WidgetStatisticsMetric } from '../widget-statistics-metric/widget-statistics-metric'
 import { WidgetStatisticsLast30WinRate } from '../widget-statistics-last30-win-rate/widget-statistics-last30-win-rate'
-import './widget-statistics-monthly-panel.scss'
+import './widget-statistics-recent-matches-panel.scss'
 
 interface Props {
   /** Статистика игрока за последние 30 матчей. */
@@ -24,19 +24,19 @@ interface Props {
   className?: string | undefined;
 }
 
-export function WidgetStatisticsMonthlyPanel(props: Props) {
+export function WidgetStatisticsRecentMatchesPanel(props: Props) {
   const { data: { winRatePercent, results, avg, adr, kd, kr }, className } = props
 
   const avgAdr = `${formatNumberWithFixedDecimals(avg, 0)} / ${formatNumberWithFixedDecimals(adr, 0)}`
   const kdKr = `${formatNumberWithFixedDecimals(kd, 2)} / ${formatNumberWithFixedDecimals(kr, 2)}`
 
   return (
-    <div className={classNames('widget-statistics-monthly-panel', className)}>
-      <div className='widget-statistics-monthly-panel__title'>LAST 30 MATCHES</div>
-      <div className='widget-statistics-monthly-panel__grid'>
-        <WidgetStatisticsLast30WinRate winRatePercent={winRatePercent} matchResults={results} className='widget-statistics-monthly-panel__metric'/>
-        <WidgetStatisticsMetric value={avgAdr} label='AVG / ADR' className='widget-statistics-monthly-panel__metric'/>
-        <WidgetStatisticsMetric value={kdKr} label='K/D / K/R' className='widget-statistics-monthly-panel__metric'/>
+    <div className={classNames('widget-statistics-recent-matches-panel', className)}>
+      <div className='widget-statistics-recent-matches-panel__title'>LAST 30 MATCHES</div>
+      <div className='widget-statistics-recent-matches-panel__grid'>
+        <WidgetStatisticsLast30WinRate winRatePercent={winRatePercent} matchResults={results} className='widget-statistics-recent-matches-panel__metric'/>
+        <WidgetStatisticsMetric value={avgAdr} label='AVG / ADR' className='widget-statistics-recent-matches-panel__metric'/>
+        <WidgetStatisticsMetric value={kdKr} label='K/D / K/R' className='widget-statistics-recent-matches-panel__metric'/>
       </div>
     </div>
   )
