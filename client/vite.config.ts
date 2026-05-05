@@ -10,6 +10,9 @@ export default defineConfig(({ command }) => ({
     react(),
     ...(command === 'serve' ? [
       viteChecker({
+        typescript: {
+          tsconfigPath: './tsconfig.app.json',
+        },
         eslint: {
           lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
         },
