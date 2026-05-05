@@ -18,7 +18,7 @@ function filterRankForRatingMode(rank: Rank, mode: StatsRatingQuery): Rank {
   return rank.region ? { region: rank.region } : {}
 }
 
-function mapStatsPayloadToWidgetProps(stats: StatsPayload, ratingMode: StatsRatingQuery): ComponentProps<typeof WidgetStatistics> {
+function mapStatsPayloadToWidgetProps(stats: StatsPayload, ratingMode: StatsRatingQuery): Pick<ComponentProps<typeof WidgetStatistics>, 'common' | 'daily' | 'recentMatches'> {
   return {
     common: {
       level: stats.common.skillLevel,
@@ -33,7 +33,7 @@ function mapStatsPayloadToWidgetProps(stats: StatsPayload, ratingMode: StatsRati
       adr: stats.daily.averageAdr,
       kd: stats.daily.kd,
     },
-    monthly: {
+    recentMatches: {
       winRatePercent: stats.last30.winRate,
       results: stats.last30.matchResults ?? [],
       avg: stats.last30.averageKills,
