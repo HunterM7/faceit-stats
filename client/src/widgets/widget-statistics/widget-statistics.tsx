@@ -151,8 +151,8 @@ export function WidgetStatistics(props: WidgetStatisticsProps) {
       <div className='widget-statistics__divider'/>
 
       <div className='widget-statistics__panels'>
-        <WidgetStatisticsMonthlyPanel data={monthly} className={classNames('widget-statistics__panel', getPanelStateClass('monthly'))}/>
         <WidgetStatisticsDailyPanel data={daily} className={classNames('widget-statistics__panel', getPanelStateClass('today'))}/>
+        <WidgetStatisticsMonthlyPanel data={monthly} className={classNames('widget-statistics__panel', getPanelStateClass('monthly'))}/>
       </div>
     </div>
   )
