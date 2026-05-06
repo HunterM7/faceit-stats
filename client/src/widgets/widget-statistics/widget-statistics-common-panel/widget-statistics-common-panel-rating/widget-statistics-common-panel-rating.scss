@@ -1,0 +1,13 @@
+.widget-statistics-common-panel-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  &__icon {
+    height: 14px;
+    width: auto;
+    border-radius: 2px;
+    object-fit: contain;
+    flex-shrink: 0;
+  }
+}
