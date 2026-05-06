@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useSearchParams } from 'react-router-dom'
 import { lastMatch, player } from '@/requests/matchResult'
-import './match-result-page.scss'
+import './widget-overlay.scss'
 
-export function MatchResultPage() {
+export function WidgetOverlay() {
   const analyticsSource = 'overlay_widget'
   const pollMs = 5000
   const durationMs = 7000
@@ -175,22 +175,22 @@ export function MatchResultPage() {
   }
 
   return (
-    <div className='match-result-page'>
+    <div className='widget-overlay'>
       {missingNicknameMessage ? (
-        <div className='match-result-page__error-screen'>
-          <div className='match-result-page__error-title'>Упс, не нашли такого игрока</div>
-          <div className='match-result-page__error-message'>{missingNicknameMessage}</div>
+        <div className='widget-overlay__error-screen'>
+          <div className='widget-overlay__error-title'>Упс, не нашли такого игрока</div>
+          <div className='widget-overlay__error-message'>{missingNicknameMessage}</div>
         </div>
       ) : null}
       <div
-        className={`match-result-page__card ${isMatchResultVisible ? 'match-result-page__card--show' : 'match-result-page__card--hidden'} ${result === 'LOSS' ? 'match-result-page__card--loss' : 'match-result-page__card--win'}`}
+        className={`widget-overlay__card ${isMatchResultVisible ? 'widget-overlay__card--show' : 'widget-overlay__card--hidden'} ${result === 'LOSS' ? 'widget-overlay__card--loss' : 'widget-overlay__card--win'}`}
       >
-        <div className='match-result-page__badge'>FACEIT</div>
-        <div className='match-result-page__result'>{result === 'LOSS' ? 'DEFEAT' : 'VICTORY'}</div>
-        <div className='match-result-page__meta'>
+        <div className='widget-overlay__badge'>FACEIT</div>
+        <div className='widget-overlay__result'>{result === 'LOSS' ? 'DEFEAT' : 'VICTORY'}</div>
+        <div className='widget-overlay__meta'>
           <span>LVL {level ?? '--'}</span>
           <span>ELO {elo ?? '--'}</span>
-          <span className={(eloDelta ?? 0) >= 0 ? 'match-result-page__meta-delta--positive' : 'match-result-page__meta-delta--negative'}>
+          <span className={(eloDelta ?? 0) >= 0 ? 'widget-overlay__meta-delta--positive' : 'widget-overlay__meta-delta--negative'}>
             {eloDeltaText}
           </span>
         </div>
