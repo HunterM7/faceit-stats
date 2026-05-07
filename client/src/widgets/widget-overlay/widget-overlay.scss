@@ -93,6 +93,14 @@
     border-radius: 999px;
     background: rgba(5, 8, 14, 0.86);
     box-shadow: 0 0 30px rgba(0, 0, 0, 0.45);
+
+    &--pulse-up {
+      animation: widget-overlay-level-up 420ms ease-in-out;
+    }
+
+    &--pulse-down {
+      animation: widget-overlay-level-down 420ms ease-in-out;
+    }
   }
 
   &__level-icon-ring {
@@ -254,5 +262,29 @@
   }
   100% {
     transform: scale(var(--particle-pulse-scale));
+  }
+}
+
+@keyframes widget-overlay-level-up {
+  0% {
+    transform: scale(1);
+  }
+  55% {
+    transform: scale(1.085);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes widget-overlay-level-down {
+  0% {
+    transform: scale(1);
+  }
+  55% {
+    transform: scale(0.915);
+  }
+  100% {
+    transform: scale(1);
   }
 }

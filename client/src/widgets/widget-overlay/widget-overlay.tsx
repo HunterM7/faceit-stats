@@ -15,10 +15,45 @@ interface OverlayParticle {
   pulseScale: number;
 }
 
+interface OverlayTestMatch {
+  before: {
+    level: number;
+    elo: number;
+  };
+  after: {
+    level: number;
+    elo: number;
+  };
+  result: 'WIN' | 'LOSS';
+}
+
 const GRID_COLUMNS: number = 24
 const GRID_ROWS: number = 14
 const GRID_SPREAD_X_VW: number = 48
 const GRID_SPREAD_Y_VH: number = 46
+
+const TEST_MATCH_FLOW: OverlayTestMatch[] = [
+  { before: { level: 7, elo: 1528 }, after: { level: 8, elo: 1553 }, result: 'WIN' },
+  { before: { level: 8, elo: 1553 }, after: { level: 7, elo: 1529 }, result: 'LOSS' },
+  { before: { level: 7, elo: 1529 }, after: { level: 8, elo: 1552 }, result: 'WIN' },
+  { before: { level: 8, elo: 1552 }, after: { level: 7, elo: 1530 }, result: 'LOSS' },
+  { before: { level: 7, elo: 1530 }, after: { level: 8, elo: 1560 }, result: 'WIN' },
+  { before: { level: 8, elo: 1560 }, after: { level: 8, elo: 1531 }, result: 'LOSS' },
+  { before: { level: 8, elo: 1531 }, after: { level: 7, elo: 1510 }, result: 'LOSS' },
+  { before: { level: 7, elo: 1510 }, after: { level: 8, elo: 1538 }, result: 'WIN' },
+  { before: { level: 8, elo: 1538 }, after: { level: 7, elo: 1511 }, result: 'LOSS' },
+  { before: { level: 7, elo: 1511 }, after: { level: 8, elo: 1537 }, result: 'WIN' },
+  { before: { level: 8, elo: 1537 }, after: { level: 7, elo: 1512 }, result: 'LOSS' },
+  { before: { level: 7, elo: 1512 }, after: { level: 8, elo: 1536 }, result: 'WIN' },
+  { before: { level: 8, elo: 1536 }, after: { level: 7, elo: 1513 }, result: 'LOSS' },
+  { before: { level: 7, elo: 1513 }, after: { level: 8, elo: 1535 }, result: 'WIN' },
+  { before: { level: 8, elo: 1535 }, after: { level: 7, elo: 1505 }, result: 'LOSS' },
+  { before: { level: 7, elo: 1505 }, after: { level: 8, elo: 1534 }, result: 'WIN' },
+  { before: { level: 8, elo: 1534 }, after: { level: 7, elo: 1506 }, result: 'LOSS' },
+  { before: { level: 7, elo: 1506 }, after: { level: 8, elo: 1533 }, result: 'WIN' },
+  { before: { level: 8, elo: 1533 }, after: { level: 7, elo: 1507 }, result: 'LOSS' },
+  { before: { level: 7, elo: 1507 }, after: { level: 7, elo: 1528 }, result: 'WIN' },
+]
 
 const getRandom = (min: number, max: number) => Math.random() * (max - min) + min
 
@@ -73,9 +108,12 @@ export function WidgetOverlay() {
   const [ deltaDisplay, setDeltaDisplay ] = useState<number | null>(null)
   const [ isDeltaVisible, setIsDeltaVisible ] = useState(false)
   const [ burstSeed, setBurstSeed ] = useState(0)
+  const [ levelPulseDirection, setLevelPulseDirection ] = useState<'up' | 'down' | null>(null)
+  const [ levelPulseKey, setLevelPulseKey ] = useState(0)
   const eloAnimationFrameRef = useRef<number | null>(null)
   const eloAnimationDelayTimeoutRef = useRef<number | null>(null)
   const currentEloRef = useRef<number | null>(null)
+  const currentLevelRef = useRef<number | null>(null)
   const location = useLocation()
   const [ searchParams, setSearchParams ] = useSearchParams()
   const rawNickname = searchParams.get('nickname')
@@ -86,7 +124,9 @@ export function WidgetOverlay() {
     ? 'Похоже, что ты не указал свой FACEIT-ник. Добавь его в адресной строке после nickname='
     : null
 
-  const animateEloCounters = (nextElo: number | null, nextDelta: number | null) => {
+  const animateEloCounters = (nextElo: number | null, nextDelta: number | null, nextLevel: number | null) => {
+    const beforeLevel = currentLevelRef.current
+
     if (eloAnimationFrameRef.current !== null) {
       window.cancelAnimationFrame(eloAnimationFrameRef.current)
       eloAnimationFrameRef.current = null
@@ -100,6 +140,8 @@ export function WidgetOverlay() {
       setEloDisplay(nextElo)
       setDeltaDisplay(nextDelta)
       setIsDeltaVisible(typeof nextDelta === 'number')
+      setLevel(nextLevel ?? beforeLevel)
+      setLevelPulseDirection(null)
       return
     }
 
@@ -112,6 +154,7 @@ export function WidgetOverlay() {
     setEloDisplay(from)
     setDeltaDisplay(nextDelta)
     setIsDeltaVisible(false)
+    setLevel(beforeLevel)
 
     const animate = (startTime: number, now: number) => {
       const progress = Math.min(1, (now - startTime) / durationMs)
@@ -132,6 +175,13 @@ export function WidgetOverlay() {
     eloAnimationDelayTimeoutRef.current = window.setTimeout(() => {
       setIsDeltaVisible(true)
       window.setTimeout(() => {
+        if (typeof beforeLevel === 'number' && typeof nextLevel === 'number' && nextLevel !== beforeLevel) {
+          setLevelPulseDirection(nextLevel > beforeLevel ? 'up' : 'down')
+          setLevelPulseKey((prev) => prev + 1)
+        } else {
+          setLevelPulseDirection(null)
+        }
+        setLevel(nextLevel ?? beforeLevel)
         const animationStart = performance.now()
         eloAnimationFrameRef.current = window.requestAnimationFrame((frameNow) => animate(animationStart, frameNow))
       }, deltaLeadInMs)
@@ -154,17 +204,23 @@ export function WidgetOverlay() {
     if (isTestMode) {
       let showTimer: number | null = null
       let hideTimer: number | null = null
+      let flowIndex = 0
 
       const schedule = () => {
-        const nextResult: 'WIN' | 'LOSS' = Math.random() >= 0.5 ? 'WIN' : 'LOSS'
-        const delta = 20 + Math.floor(Math.random() * 11)
-        const signedDelta = nextResult === 'WIN' ? delta : -delta
+        const match = TEST_MATCH_FLOW[flowIndex % TEST_MATCH_FLOW.length]
+        flowIndex += 1
+        const signedDelta = match.after.elo - match.before.elo
+        const nextElo = match.after.elo
 
-        setResult(nextResult)
-        setLevel(10)
-        const nextElo = Math.max(0, (currentEloRef.current ?? 2100) + signedDelta)
+        // Эмулируем реальный матч: сначала есть состояние ДО матча,
+        // затем в виджете проигрывается переход к состоянию ПОСЛЕ.
+        currentEloRef.current = match.before.elo
+
+        setResult(match.result)
+        currentLevelRef.current = match.before.level
         currentEloRef.current = nextElo
-        animateEloCounters(nextElo, signedDelta)
+        animateEloCounters(nextElo, signedDelta, match.after.level)
+        currentLevelRef.current = match.after.level
         setBurstSeed(Date.now())
         setVisible(true)
 
@@ -199,11 +255,12 @@ export function WidgetOverlay() {
       nextEloDelta: number | null,
     ) => {
       setResult(nextResult)
-      setLevel(nextLevel)
+      const beforeLevel = currentLevelRef.current
+      currentLevelRef.current = nextLevel ?? beforeLevel
       if (typeof nextElo === 'number') {
         currentEloRef.current = nextElo
       }
-      animateEloCounters(nextElo, nextEloDelta)
+      animateEloCounters(nextElo, nextEloDelta, nextLevel)
       setBurstSeed(Date.now())
       setVisible(true)
       if (hideTimer) window.clearTimeout(hideTimer)
@@ -265,9 +322,11 @@ export function WidgetOverlay() {
         }
         lastKnownElo =
           typeof playerPayload.currentElo === 'number' ? playerPayload.currentElo : null
-        setLevel(typeof playerPayload.currentSkillLevel === 'number' ? playerPayload.currentSkillLevel : null)
+        const initialLevel = typeof playerPayload.currentSkillLevel === 'number' ? playerPayload.currentSkillLevel : null
+        setLevel(initialLevel)
+        currentLevelRef.current = initialLevel
         currentEloRef.current = lastKnownElo
-        animateEloCounters(lastKnownElo, null)
+        animateEloCounters(lastKnownElo, null, initialLevel)
 
         const matchData = await lastMatch(playerId, analyticsSource)
         if (cancelled) return
@@ -354,8 +413,15 @@ export function WidgetOverlay() {
           })}
         </div>
 
-        <div className={`widget-overlay__notice ${result === 'LOSS' ? 'widget-overlay__notice--loss' : 'widget-overlay__notice--win'}`}>
-          <div className='widget-overlay__level-icon' aria-hidden='true'>
+        <div
+          key={burstSeed}
+          className={`widget-overlay__notice ${result === 'LOSS' ? 'widget-overlay__notice--loss' : 'widget-overlay__notice--win'}`}
+        >
+          <div
+            key={levelPulseKey}
+            className={`widget-overlay__level-icon ${levelPulseDirection === 'up' ? 'widget-overlay__level-icon--pulse-up' : ''} ${levelPulseDirection === 'down' ? 'widget-overlay__level-icon--pulse-down' : ''}`}
+            aria-hidden='true'
+          >
             <span className={`widget-overlay__level-icon-ring ${result === 'LOSS' ? 'widget-overlay__level-icon-ring--loss' : 'widget-overlay__level-icon-ring--win'}`}/>
             <span className={`widget-overlay__level-icon-core ${result === 'LOSS' ? 'widget-overlay__level-icon-core--loss' : 'widget-overlay__level-icon-core--win'}`}>
               {level ?? '--'}
