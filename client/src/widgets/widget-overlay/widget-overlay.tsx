@@ -4,20 +4,19 @@ import { WidgetOverlayParticles } from './widget-overlay-particles/widget-overla
 import './widget-overlay.scss'
 import { classNames } from '@/utils/classNames';
 
-/** Текущие ELO / уровень / исход после матча; родитель подставляет актуальные значения с API. */
-export interface WidgetOverlayMatch {
+/** Актуальный матч. */
+export interface MatchResult {
+  /** Текущий ELO игрока. */
   elo: number;
+  /** Текущий уровень игрока. */
   level: number | null;
+  /** Исход матча. */
   result: 'WIN' | 'LOSS';
 }
 
 export interface WidgetOverlayProps {
-  /**
-   * Первое значение после сброса — только выставить цифры без оверлея.
-   * Дальше при смене `elo` относительно предыдущего принятого снимка — анимация.
-   */
-  match: WidgetOverlayMatch | null;
-  errorMessage?: string | null;
+  /** Актуальный матч. */
+  match: MatchResult | null;
 }
 
 type EloOverlayTick =
@@ -32,7 +31,7 @@ type EloOverlayTick =
   }
 
 export function WidgetOverlay(props: WidgetOverlayProps) {
-  const { match, errorMessage = null } = props
+  const { match } = props
   const previewMs = 2000
   const deltaLeadInMs = 1000
   const counterDurationMs = 1400
@@ -120,7 +119,7 @@ export function WidgetOverlay(props: WidgetOverlayProps) {
       }
     }
 
-    const applyQuietSnapshot = (next: WidgetOverlayMatch) => {
+    const applyQuietSnapshot = (next: MatchResult) => {
       lastEloRef.current = next.elo
       lastLevelRef.current = next.level
       lastResultRef.current = next.result
@@ -136,12 +135,6 @@ export function WidgetOverlay(props: WidgetOverlayProps) {
     let cancelled = false
     const frameId = window.requestAnimationFrame(() => {
       if (cancelled) {
-        return
-      }
-
-      if (errorMessage) {
-        clearHideTimer()
-        setVisible(false)
         return
       }
 
@@ -203,7 +196,7 @@ export function WidgetOverlay(props: WidgetOverlayProps) {
       window.cancelAnimationFrame(frameId)
       clearHideTimer()
     }
-  }, [ errorMessage, hideAfterAnimationMs, match, runEloOverlaySequence ])
+  }, [ hideAfterAnimationMs, match, runEloOverlaySequence ])
 
   useEffect(() => {
     return () => {
@@ -222,7 +215,6 @@ export function WidgetOverlay(props: WidgetOverlayProps) {
     }
   }, [])
 
-  const isMatchResultVisible = visible && !errorMessage
   let eloDeltaText = '--'
   if (typeof deltaDisplay === 'number') {
     const absDelta = Math.abs(deltaDisplay)
@@ -231,14 +223,7 @@ export function WidgetOverlay(props: WidgetOverlayProps) {
 
   return (
     <div className='widget-overlay'>
-      {errorMessage ? (
-        <div className='widget-overlay__error-screen'>
-          <div className='widget-overlay__error-title'>Упс, не нашли такого игрока</div>
-          <div className='widget-overlay__error-message'>{errorMessage}</div>
-        </div>
-      ) : null}
-
-      <div className={`widget-overlay__stage ${isMatchResultVisible ? 'widget-overlay__stage--show' : 'widget-overlay__stage--hidden'}`}>
+      <div className={`widget-overlay__stage ${visible ? 'widget-overlay__stage--show' : 'widget-overlay__stage--hidden'}`}>
         <WidgetOverlayParticles burstKey={burstSeed} result={result}/>
         <div
           key={burstSeed}

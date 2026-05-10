@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useSearchParams } from 'react-router-dom'
 import { lastMatch, player } from '@/requests/matchResult'
-import { WidgetOverlay, type WidgetOverlayMatch } from '@widgets/widget-overlay/widget-overlay'
+import { WidgetOverlay, type MatchResult } from '@widgets/widget-overlay/widget-overlay'
+import './overlay-page.scss'
 
 interface OverlayTestMatch {
   before: {
@@ -54,6 +55,10 @@ const counterDurationMs = 1400
 const zeroHoldMs = 1000
 const hideAfterAnimationMs = previewMs + deltaLeadInMs + counterDurationMs + zeroHoldMs
 
+function captureErrorMessage(error: unknown, fallback: string): string {
+  return error instanceof Error ? error.message : fallback
+}
+
 export function OverlayPage() {
   const location = useLocation()
   const [ searchParams, setSearchParams ] = useSearchParams()
@@ -65,7 +70,8 @@ export function OverlayPage() {
     ? 'Похоже, что ты не указал свой FACEIT-ник. Добавь его в адресной строке после nickname='
     : null
 
-  const [ overlayMatch, setOverlayMatch ] = useState<WidgetOverlayMatch | null>(null)
+  const [ overlayMatch, setOverlayMatch ] = useState<MatchResult | null>(null)
+  const [ overlayLoadError, setOverlayLoadError ] = useState<string | null>(null)
 
   useEffect(() => {
     const nextParams = new URLSearchParams()
@@ -101,7 +107,11 @@ export function OverlayPage() {
       }
 
       showTimer = window.setTimeout(schedule, 0)
+      const resetLoadErrorRaf = window.requestAnimationFrame(() => {
+        setOverlayLoadError(null)
+      })
       return () => {
+        window.cancelAnimationFrame(resetLoadErrorRaf)
         if (showTimer) window.clearTimeout(showTimer)
         if (hideTimer) window.clearTimeout(hideTimer)
         setOverlayMatch(null)
@@ -113,6 +123,7 @@ export function OverlayPage() {
       const frameId = window.requestAnimationFrame(() => {
         if (!cancelledLocal) {
           setOverlayMatch(null)
+          setOverlayLoadError(null)
         }
       })
       return () => {
@@ -128,7 +139,13 @@ export function OverlayPage() {
     let pollTimer: number | null = null
     let cancelled = false
 
-    const publishMatch = (payload: WidgetOverlayMatch) => {
+    const resetLoadErrorRaf = window.requestAnimationFrame(() => {
+      if (!cancelled) {
+        setOverlayLoadError(null)
+      }
+    })
+
+    const publishMatch = (payload: MatchResult) => {
       setOverlayMatch(payload)
     }
 
@@ -210,7 +227,9 @@ export function OverlayPage() {
           result: overlayResultFromApi(matchData.result),
         })
       } catch (error) {
-        console.error('[lastMatch request failed]', error)
+        if (!cancelled) {
+          setOverlayLoadError(captureErrorMessage(error, 'Не удалось обновить данные игрока.'))
+        }
       }
     }
 
@@ -220,6 +239,7 @@ export function OverlayPage() {
         if (cancelled) return
         playerId = typeof playerPayload.playerId === 'string' ? playerPayload.playerId : null
         if (!playerId) {
+          setOverlayLoadError('Игрок не найден. Проверьте никнейм FACEIT.')
           return
         }
         lastKnownElo =
@@ -242,7 +262,9 @@ export function OverlayPage() {
 
         pollTimer = window.setInterval(() => void pollLastMatch(), pollMs)
       } catch (error) {
-        console.error('[bootstrap lastMatch flow failed]', error)
+        if (!cancelled) {
+          setOverlayLoadError(captureErrorMessage(error, 'Не удалось загрузить игрока.'))
+        }
       }
     }
 
@@ -250,6 +272,7 @@ export function OverlayPage() {
 
     return () => {
       cancelled = true
+      window.cancelAnimationFrame(resetLoadErrorRaf)
       if (pollTimer) window.clearInterval(pollTimer)
       window.requestAnimationFrame(() => {
         setOverlayMatch(null)
@@ -265,7 +288,18 @@ export function OverlayPage() {
     setSearchParams,
   ])
 
+  const blockingMessage = missingNicknameMessage ?? overlayLoadError
+
   return (
-    <WidgetOverlay match={overlayMatch} errorMessage={missingNicknameMessage}/>
+    <div className='overlay-page'>
+      {blockingMessage ? (
+        <div className='overlay-page__error-screen'>
+          <div className='overlay-page__error-title'>Упс, не нашли такого игрока</div>
+          <div className='overlay-page__error-message'>{blockingMessage}</div>
+        </div>
+      ) : (
+        <WidgetOverlay match={overlayMatch}/>
+      )}
+    </div>
   )
 }
