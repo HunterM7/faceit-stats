@@ -1,0 +1,80 @@
+.widget-overlay-particles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  filter: drop-shadow(0 0 14px rgba(255, 255, 255, 0.42));
+
+  &--win {
+    color: #ff6f3e;
+  }
+
+  &--loss {
+    color: #ff4f6b;
+  }
+
+  &__particle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    opacity: 0;
+    transform: translate(calc(-50% + var(--particle-x)), calc(-50% + var(--particle-y)))
+      scale(0.72);
+    animation-name: widget-overlay-particles-particle-burst;
+    animation-duration: var(--particle-duration);
+    animation-delay: var(--particle-delay);
+    animation-fill-mode: forwards;
+    animation-timing-function: cubic-bezier(0.14, 0.76, 0.22, 1);
+  }
+
+  &__icon {
+    width: 100%;
+    height: 100%;
+    display: block;
+    transform-origin: 50% 50%;
+    animation-name: widget-overlay-particles-particle-pulse;
+    animation-duration: var(--particle-pulse-duration);
+    animation-delay: var(--particle-pulse-delay);
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+  }
+}
+
+@keyframes widget-overlay-particles-particle-burst {
+  0% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--particle-x)), calc(-50% + var(--particle-y)))
+      scale(0.62);
+  }
+  28% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--particle-x)), calc(-50% + var(--particle-y)))
+      scale(0.72);
+  }
+  48% {
+    opacity: 1;
+    transform: translate(calc(-50% + var(--particle-x)), calc(-50% + var(--particle-y)))
+      scale(calc(var(--particle-scale) * 1.45));
+  }
+  70% {
+    opacity: 1;
+    transform: translate(calc(-50% + var(--particle-x)), calc(-50% + var(--particle-y)))
+      scale(calc(var(--particle-scale) * 1.12));
+  }
+  100% {
+    opacity: 1;
+    transform: translate(calc(-50% + var(--particle-x)), calc(-50% + var(--particle-y)))
+      scale(var(--particle-scale));
+  }
+}
+
+@keyframes widget-overlay-particles-particle-pulse {
+  0% {
+    transform: scale(0.94);
+  }
+  100% {
+    transform: scale(var(--particle-pulse-scale));
+  }
+}
