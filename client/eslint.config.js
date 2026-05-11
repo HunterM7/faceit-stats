@@ -149,6 +149,8 @@ export default tseslint.config([
       'promise/no-return-in-finally': ['error'],
 
       '@typescript-eslint/no-var-requires': ['error'],
+      'no-unused-private-class-members': 'off',
+      '@typescript-eslint/no-unused-private-class-members': 'error',
       '@typescript-eslint/no-explicit-any': ['error'],
       '@stylistic/member-delimiter-style': [
         'error',

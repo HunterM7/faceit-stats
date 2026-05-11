@@ -119,6 +119,8 @@ export default tseslint.config(
       'promise/no-return-in-finally': ['error'],
 
       '@typescript-eslint/no-var-requires': ['error'],
+      'no-unused-private-class-members': 'off',
+      '@typescript-eslint/no-unused-private-class-members': 'error',
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-floating-promises': 'warn',
       '@typescript-eslint/no-unsafe-argument': 'warn',
