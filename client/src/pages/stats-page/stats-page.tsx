@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ComponentProps } from 'react'
 import { useLocation, useSearchParams } from 'react-router-dom'
 import { WidgetStatistics } from '@widgets/widget-statistics/widget-statistics'
-import { requestStats, type StatsPayload, type Rank, type StatsRatingQuery } from '@requests/stats'
+import { requestStats, type StatsPayload, type StatsRatingQuery } from '@requests/stats'
 import { lastMatch, player } from '@requests/matchResult'
 import './stats-page.scss'
 
@@ -14,27 +14,9 @@ function ratingParamForRequest(rating: StatsRatingQuery | undefined): StatsRatin
 }
 
 type StatsState = {
-  common: {
-    level: number;
-    elo: number;
-    kd: number;
-    rank: Rank;
-  };
-  daily: {
-    wins: number;
-    losses: number;
-    avg: number;
-    adr: number;
-    kd: number;
-  };
-  monthly: {
-    winRatePercent: number;
-    matchResults: boolean[];
-    avg: number;
-    adr: number;
-    kd: number;
-    kr: number;
-  };
+  common: ComponentProps<typeof WidgetStatistics>['common'];
+  daily: ComponentProps<typeof WidgetStatistics>['daily'];
+  monthly: ComponentProps<typeof WidgetStatistics>['recentMatches'];
 }
 
 export function StatsPage() {
@@ -202,21 +184,12 @@ export function StatsPage() {
     return null
   }
 
-  const recentMatches: ComponentProps<typeof WidgetStatistics>['recentMatches'] = {
-    winRatePercent: state.monthly.winRatePercent,
-    matchResults: state.monthly.matchResults,
-    avg: state.monthly.avg,
-    adr: state.monthly.adr,
-    kd: state.monthly.kd,
-    kr: state.monthly.kr,
-  }
-
   return (
     <div className='stats-page'>
       <WidgetStatistics
         common={state.common}
         daily={state.daily}
-        recentMatches={recentMatches}
+        recentMatches={state.monthly}
         backgroundOpacity={backgroundOpacityParam}
         borderRadius={borderRadiusParam}
         className='stats-page__widget'
