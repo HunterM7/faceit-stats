@@ -122,7 +122,7 @@ export class StatsService {
         losses: today.losses,
         avg: today.avg,
         adr: today.adr,
-        kd: today.avgKD,
+        kd: today.kd,
       },
       last30: {
         wins: last30.wins,
@@ -130,8 +130,8 @@ export class StatsService {
         winRatePercent: last30.winRatePercent,
         avg: last30.avg,
         adr: last30.adr,
-        kd: last30.avgKD,
-        kr: last30.avgKR || fallback.kr || 0,
+        kd: last30.kd,
+        kr: last30.kr || fallback.kr || 0,
         matchResults: last30MatchResults,
       },
       latestMatchId: latest?.match_id || null,
@@ -313,8 +313,8 @@ export class StatsService {
     losses: number;
     winRatePercent: number;
     avg: number;
-    avgKD: number;
-    avgKR: number;
+    kd: number;
+    kr: number;
     adr: number;
   } {
     if (items.length === 0) {
@@ -323,8 +323,8 @@ export class StatsService {
         losses: 0,
         winRatePercent: 0,
         avg: 0,
-        avgKD: 0,
-        avgKR: 0,
+        kd: 0,
+        kr: 0,
         adr: 0,
       };
     }
@@ -355,8 +355,8 @@ export class StatsService {
       losses: summary.losses,
       winRatePercent: Math.floor((summary.wins / totalMatches) * 100),
       avg: Math.round(summary.kills / totalMatches),
-      avgKD: this.roundFixed(summary.kills / summary.deaths),
-      avgKR: this.roundFixed(summary.kills / summary.rounds),
+      kd: this.roundFixed(summary.kills / summary.deaths),
+      kr: this.roundFixed(summary.kills / summary.rounds),
       adr: this.roundFixed(summary.damage / summary.rounds),
     };
   }
