@@ -10,7 +10,7 @@ interface Props {
   /** Общая статистика игрока. */
   data: {
     /** Текущий уровень FACEIT игрока. */
-    level: number;
+    skillLevel: number;
     /** Текущее значение ELO игрока. */
     elo: number;
     /** Текущее значение K/D игрока. */
@@ -25,7 +25,7 @@ interface Props {
 }
 
 export function WidgetStatisticsCommonPanel(props: Props) {
-  const { data: { level, elo, kd, rank }, rankView, rankVisible } = props
+  const { data: { skillLevel, elo, kd, rank }, rankView, rankVisible } = props
 
   const switchable = rank.country && rank.region
 
@@ -44,7 +44,7 @@ export function WidgetStatisticsCommonPanel(props: Props) {
   return (
     <div className='widget-statistics-common-panel'>
       <div className='widget-statistics-common-panel__level-badge'>
-        <SkillLevelIcon level={level} className='widget-statistics-common-panel__level-icon'/>
+        <SkillLevelIcon skillLevel={skillLevel} className='widget-statistics-common-panel__level-icon'/>
         <WidgetStatisticsValue label='ELO'>{elo}</WidgetStatisticsValue>
       </div>
 

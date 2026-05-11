@@ -6,37 +6,37 @@ import './overlay-page.scss'
 
 interface OverlayTestMatch {
   before: {
-    level: number;
+    skillLevel: number;
     elo: number;
   };
   after: {
-    level: number;
+    skillLevel: number;
     elo: number;
   };
   result: 'WIN' | 'LOSS';
 }
 
 const TEST_MATCH_FLOW: OverlayTestMatch[] = [
-  { before: { level: 7, elo: 1528 }, after: { level: 8, elo: 1553 }, result: 'WIN' },
-  { before: { level: 8, elo: 1553 }, after: { level: 7, elo: 1529 }, result: 'LOSS' },
-  { before: { level: 7, elo: 1529 }, after: { level: 8, elo: 1552 }, result: 'WIN' },
-  { before: { level: 8, elo: 1552 }, after: { level: 7, elo: 1530 }, result: 'LOSS' },
-  { before: { level: 7, elo: 1530 }, after: { level: 8, elo: 1560 }, result: 'WIN' },
-  { before: { level: 8, elo: 1560 }, after: { level: 8, elo: 1531 }, result: 'LOSS' },
-  { before: { level: 8, elo: 1531 }, after: { level: 7, elo: 1510 }, result: 'LOSS' },
-  { before: { level: 7, elo: 1510 }, after: { level: 8, elo: 1538 }, result: 'WIN' },
-  { before: { level: 8, elo: 1538 }, after: { level: 7, elo: 1511 }, result: 'LOSS' },
-  { before: { level: 7, elo: 1511 }, after: { level: 8, elo: 1537 }, result: 'WIN' },
-  { before: { level: 8, elo: 1537 }, after: { level: 7, elo: 1512 }, result: 'LOSS' },
-  { before: { level: 7, elo: 1512 }, after: { level: 8, elo: 1536 }, result: 'WIN' },
-  { before: { level: 8, elo: 1536 }, after: { level: 7, elo: 1513 }, result: 'LOSS' },
-  { before: { level: 7, elo: 1513 }, after: { level: 8, elo: 1535 }, result: 'WIN' },
-  { before: { level: 8, elo: 1535 }, after: { level: 7, elo: 1505 }, result: 'LOSS' },
-  { before: { level: 7, elo: 1505 }, after: { level: 8, elo: 1534 }, result: 'WIN' },
-  { before: { level: 8, elo: 1534 }, after: { level: 7, elo: 1506 }, result: 'LOSS' },
-  { before: { level: 7, elo: 1506 }, after: { level: 8, elo: 1533 }, result: 'WIN' },
-  { before: { level: 8, elo: 1533 }, after: { level: 7, elo: 1507 }, result: 'LOSS' },
-  { before: { level: 7, elo: 1507 }, after: { level: 7, elo: 1528 }, result: 'WIN' },
+  { before: { skillLevel: 7, elo: 1528 }, after: { skillLevel: 8, elo: 1553 }, result: 'WIN' },
+  { before: { skillLevel: 8, elo: 1553 }, after: { skillLevel: 7, elo: 1529 }, result: 'LOSS' },
+  { before: { skillLevel: 7, elo: 1529 }, after: { skillLevel: 8, elo: 1552 }, result: 'WIN' },
+  { before: { skillLevel: 8, elo: 1552 }, after: { skillLevel: 7, elo: 1530 }, result: 'LOSS' },
+  { before: { skillLevel: 7, elo: 1530 }, after: { skillLevel: 8, elo: 1560 }, result: 'WIN' },
+  { before: { skillLevel: 8, elo: 1560 }, after: { skillLevel: 8, elo: 1531 }, result: 'LOSS' },
+  { before: { skillLevel: 8, elo: 1531 }, after: { skillLevel: 7, elo: 1510 }, result: 'LOSS' },
+  { before: { skillLevel: 7, elo: 1510 }, after: { skillLevel: 8, elo: 1538 }, result: 'WIN' },
+  { before: { skillLevel: 8, elo: 1538 }, after: { skillLevel: 7, elo: 1511 }, result: 'LOSS' },
+  { before: { skillLevel: 7, elo: 1511 }, after: { skillLevel: 8, elo: 1537 }, result: 'WIN' },
+  { before: { skillLevel: 8, elo: 1537 }, after: { skillLevel: 7, elo: 1512 }, result: 'LOSS' },
+  { before: { skillLevel: 7, elo: 1512 }, after: { skillLevel: 8, elo: 1536 }, result: 'WIN' },
+  { before: { skillLevel: 8, elo: 1536 }, after: { skillLevel: 7, elo: 1513 }, result: 'LOSS' },
+  { before: { skillLevel: 7, elo: 1513 }, after: { skillLevel: 8, elo: 1535 }, result: 'WIN' },
+  { before: { skillLevel: 8, elo: 1535 }, after: { skillLevel: 7, elo: 1505 }, result: 'LOSS' },
+  { before: { skillLevel: 7, elo: 1505 }, after: { skillLevel: 8, elo: 1534 }, result: 'WIN' },
+  { before: { skillLevel: 8, elo: 1534 }, after: { skillLevel: 7, elo: 1506 }, result: 'LOSS' },
+  { before: { skillLevel: 7, elo: 1506 }, after: { skillLevel: 8, elo: 1533 }, result: 'WIN' },
+  { before: { skillLevel: 8, elo: 1533 }, after: { skillLevel: 7, elo: 1507 }, result: 'LOSS' },
+  { before: { skillLevel: 7, elo: 1507 }, after: { skillLevel: 7, elo: 1528 }, result: 'WIN' },
 ]
 
 function overlayResultFromApi(result: string | undefined): 'WIN' | 'LOSS' {
@@ -96,7 +96,7 @@ export function OverlayPage() {
 
         setOverlayMatch({
           elo: flowMatch.after.elo,
-          level: flowMatch.after.level,
+          skillLevel: flowMatch.after.skillLevel,
           result: flowMatch.result,
         })
 
@@ -223,7 +223,7 @@ export function OverlayPage() {
 
         publishMatch({
           elo: nextEloForOverlay,
-          level: nextLevelForOverlay,
+          skillLevel: nextLevelForOverlay,
           result: overlayResultFromApi(matchData.result),
         })
       } catch (error) {
@@ -255,7 +255,7 @@ export function OverlayPage() {
         if (matchData.matchId && typeof lastKnownElo === 'number') {
           publishMatch({
             elo: lastKnownElo,
-            level: initialLevel,
+            skillLevel: initialLevel,
             result: overlayResultFromApi(matchData.result),
           })
         }

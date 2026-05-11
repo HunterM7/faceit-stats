@@ -9,7 +9,7 @@ export interface MatchResult {
   /** Текущий ELO игрока. */
   elo: number;
   /** Текущий уровень игрока. */
-  level: number | null;
+  skillLevel: number | null;
   /** Исход матча. */
   result: 'WIN' | 'LOSS';
 }
@@ -20,7 +20,7 @@ export interface WidgetOverlayProps {
 }
 
 type EloOverlayTick =
-  | { kind: 'static'; elo: number | null; delta: number | null; level: number | null }
+  | { kind: 'static'; elo: number | null; delta: number | null; skillLevel: number | null }
   | {
     kind: 'tween';
     fromElo: number;
@@ -40,7 +40,7 @@ export function WidgetOverlay(props: WidgetOverlayProps) {
 
   const [ visible, setVisible ] = useState(false)
   const [ result, setResult ] = useState<'WIN' | 'LOSS'>('WIN')
-  const [ level, setLevel ] = useState<number | null>(null)
+  const [ skillLevel, setSkillLevel ] = useState<number | null>(null)
   const [ eloDisplay, setEloDisplay ] = useState<number | null>(null)
   const [ deltaDisplay, setDeltaDisplay ] = useState<number | null>(null)
   const [ isDeltaVisible, setIsDeltaVisible ] = useState(false)
@@ -72,7 +72,7 @@ export function WidgetOverlay(props: WidgetOverlayProps) {
       setEloDisplay(tick.elo)
       setDeltaDisplay(tick.delta)
       setIsDeltaVisible(typeof tick.delta === 'number')
-      setLevel(tick.level)
+      setSkillLevel(tick.skillLevel)
       return
     }
 
@@ -83,7 +83,7 @@ export function WidgetOverlay(props: WidgetOverlayProps) {
     setEloDisplay(fromElo)
     setDeltaDisplay(delta)
     setIsDeltaVisible(false)
-    setLevel(fromLevel)
+    setSkillLevel(fromLevel)
 
     const step = (startTime: number, now: number) => {
       const progress = Math.min(1, (now - startTime) / durationMs)
@@ -103,7 +103,7 @@ export function WidgetOverlay(props: WidgetOverlayProps) {
       setIsDeltaVisible(true)
       eloAnimationStartTimeoutRef.current = window.setTimeout(() => {
         eloAnimationStartTimeoutRef.current = null
-        setLevel(toLevel ?? fromLevel)
+        setSkillLevel(toLevel ?? fromLevel)
         const animationStart = performance.now()
         eloAnimationFrameRef.current = window.requestAnimationFrame((frameNow) => step(animationStart, frameNow))
       }, deltaLeadInMs)
@@ -121,14 +121,14 @@ export function WidgetOverlay(props: WidgetOverlayProps) {
 
     const applyQuietSnapshot = (next: MatchResult) => {
       lastEloRef.current = next.elo
-      lastLevelRef.current = next.level
+      lastLevelRef.current = next.skillLevel
       lastResultRef.current = next.result
       setResult(next.result)
       runEloOverlaySequence({
         kind: 'static',
         elo: next.elo,
         delta: null,
-        level: next.level,
+        skillLevel: next.skillLevel,
       })
     }
 
@@ -150,7 +150,7 @@ export function WidgetOverlay(props: WidgetOverlayProps) {
       if (
         lastEloRef.current !== null
         && match.elo === lastEloRef.current
-        && match.level === lastLevelRef.current
+        && match.skillLevel === lastLevelRef.current
         && match.result === lastResultRef.current
       ) {
         return
@@ -170,7 +170,7 @@ export function WidgetOverlay(props: WidgetOverlayProps) {
       const fromElo = lastEloRef.current
       const fromLevel = lastLevelRef.current
       lastEloRef.current = match.elo
-      lastLevelRef.current = match.level
+      lastLevelRef.current = match.skillLevel
       lastResultRef.current = match.result
 
       const signedDelta = match.elo - fromElo
@@ -181,7 +181,7 @@ export function WidgetOverlay(props: WidgetOverlayProps) {
         toElo: match.elo,
         delta: signedDelta,
         fromLevel,
-        toLevel: match.level,
+        toLevel: match.skillLevel,
       })
       setBurstSeed(Date.now())
       setVisible(true)
@@ -229,7 +229,7 @@ export function WidgetOverlay(props: WidgetOverlayProps) {
           key={burstSeed}
           className={classNames('widget-overlay__notice', result == 'LOSS' ? 'widget-overlay__notice--loss' : 'widget-overlay__notice--win')}
         >
-          <WidgetOverlayLevelIcon level={level} result={result}/>
+          <WidgetOverlayLevelIcon skillLevel={skillLevel} result={result}/>
           <div className='widget-overlay__elo'>{eloDisplay ?? '--'} ELO</div>
           <div className={`${result === 'LOSS' ? 'widget-overlay__delta widget-overlay__delta--negative' : 'widget-overlay__delta widget-overlay__delta--positive'} ${isDeltaVisible ? 'widget-overlay__delta--show' : 'widget-overlay__delta--hidden'}`}>
             {eloDeltaText} ELO

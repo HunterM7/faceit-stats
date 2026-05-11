@@ -21,7 +21,7 @@ function filterRankForRatingMode(rank: Rank, mode: StatsRatingQuery): Rank {
 function mapStatsPayloadToWidgetProps(stats: StatsPayload, ratingMode: StatsRatingQuery): Pick<ComponentProps<typeof WidgetStatistics>, 'common' | 'daily' | 'recentMatches'> {
   return {
     common: {
-      level: stats.common.skillLevel,
+      skillLevel: stats.common.skillLevel,
       elo: stats.common.faceitElo,
       kd: stats.common.kd,
       rank: filterRankForRatingMode(stats.common.rank, ratingMode),
