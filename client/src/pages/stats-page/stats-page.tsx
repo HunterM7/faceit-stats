@@ -204,7 +204,7 @@ export function StatsPage() {
 
   const recentMatches: ComponentProps<typeof WidgetStatistics>['recentMatches'] = {
     winRatePercent: state.monthly.winRatePercent,
-    results: state.monthly.matchResults,
+    matchResults: state.monthly.matchResults,
     avg: state.monthly.avg,
     adr: state.monthly.adr,
     kd: state.monthly.kd,

@@ -10,7 +10,7 @@ interface Props {
     /** Винрейт в процентах. */
     winRatePercent: number;
     /** Кортеж побед/поражений в хронологическом порядке (true — победа, false — поражение). */
-    results: boolean[];
+    matchResults: boolean[];
     /** Среднее количество убийств за матч. */
     avg: number;
     /** Среднее количество нанесенного урона за раунд. */
@@ -25,7 +25,7 @@ interface Props {
 }
 
 export function WidgetStatisticsRecentMatchesPanel(props: Props) {
-  const { data: { winRatePercent, results, avg, adr, kd, kr }, className } = props
+  const { data: { winRatePercent, matchResults, avg, adr, kd, kr }, className } = props
 
   const avgAdr = `${formatNumberWithFixedDecimals(avg, 0)} / ${formatNumberWithFixedDecimals(adr, 0)}`
   const kdKr = `${formatNumberWithFixedDecimals(kd, 2)} / ${formatNumberWithFixedDecimals(kr, 2)}`
@@ -34,7 +34,7 @@ export function WidgetStatisticsRecentMatchesPanel(props: Props) {
     <div className={classNames('widget-statistics-recent-matches-panel', className)}>
       <div className='widget-statistics-recent-matches-panel__title'>LAST 30 MATCHES</div>
       <div className='widget-statistics-recent-matches-panel__grid'>
-        <WidgetStatisticsLast30WinRate winRatePercent={winRatePercent} matchResults={results} className='widget-statistics-recent-matches-panel__metric'/>
+        <WidgetStatisticsLast30WinRate winRatePercent={winRatePercent} matchResults={matchResults} className='widget-statistics-recent-matches-panel__metric'/>
         <WidgetStatisticsMetric value={avgAdr} label='AVG / ADR' className='widget-statistics-recent-matches-panel__metric'/>
         <WidgetStatisticsMetric value={kdKr} label='K/D / K/R' className='widget-statistics-recent-matches-panel__metric'/>
       </div>
