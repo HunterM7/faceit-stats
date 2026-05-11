@@ -506,7 +506,7 @@ export class AdminAnalyticsService {
 type AdminEventDocument = {
   createdAt: Date;
   route: string;
-  source?: 'stats_widget' | 'overlay_widget' | string | null;
+  source?: AdminEventSource;
   statusCode: number;
   durationMs: number;
   nicknames: string[];
