@@ -1,7 +1,7 @@
 import path from 'node:path';
 
 /** Идентификатор игры CS2 на FACEIT. */
-export const CS2_FACEIT_GAME_ID = 'cs2';
+export const CS2_FACEIT_GAME_ID = 'cs2' as const;
 
 export const configuration = () => ({
   app: {

@@ -16,8 +16,8 @@ export class AppConfigService {
     return raw.replace(/\/+$/, '');
   }
 
-  get gameId(): string {
-    return this.config.get<string>('faceit.gameId', CS2_FACEIT_GAME_ID);
+  get gameId() {
+    return this.config.get<typeof CS2_FACEIT_GAME_ID>('faceit.gameId', CS2_FACEIT_GAME_ID);
   }
 
   get faceitApiKey(): string {

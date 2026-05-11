@@ -1,10 +1,14 @@
 /** Типы ответов FACEIT Data API v4 для `FaceitService`. */
 
 export interface PlayerGameData {
+  /** Количество эло очков игрока. */
   faceit_elo?: number;
+  /** Уровень мастерства игрока. */
   skill_level?: number;
-  /** Регион матчмейкинга для игры (например `EU`), нужен для Rankings API. */
+  /** Регион матчмейкинга для игры (например `EU`, `SA` и тд). */
   region?: string;
+  /** Идентификатор игрока steamID64. */
+  game_player_id: string;
 }
 
 /** Ответ `GET /rankings/games/.../regions/.../players/...`. */
@@ -25,10 +29,38 @@ export interface PlayerGlobalRankingResponse {
 }
 
 export interface PlayerResponse {
-  player_id?: string;
-  nickname?: string;
+  /** Идентификатор игрока. */
+  player_id: string;
+  /** Никнейм игрока. */
+  nickname: string;
+  /** Страна игрока. */
   country?: string;
-  games?: Record<string, PlayerGameData>;
+  /** Аватар игрока. */
+  avatar: string;
+  /** Обложка профиля игрока. */
+  cover_image: string;
+  /** Игры игрока. */
+  games?: Record<'csgo' | 'cs2', PlayerGameData>;
+  /** Идентификаторы друзей игрока. */
+  friends_ids: string[];
+  /** Идентификатор игрока steamID64. */
+  steam_id_64: string;
+  /** Никнейм игрока steam. */
+  steam_nickname: string;
+  /** Типы членства игрока. */
+  memberships: Array<'premium' | 'super_match_token'>;
+  /** URL профиля игрока на FACEIT (пример `https://www.faceit.com/{lang}/players/skywhywalker`). */
+  faceit_url: string;
+  /** Тип членства игрока. */
+  membership_type: string;
+  /** Неизвестный ключ. */
+  cover_featured_image: string;
+  /** Нарушения и санкции аккаунта (штрафы, предупреждения FACEIT и т.п.). */
+  infractions: object;
+  /** Верифицирован ли аккаунт. */
+  verified: boolean;
+  /** Дата активации аккаунта: ISO 8601 в UTC (пример `2021-08-20T15:04:48.286Z`). */
+  activated_at: string;
 }
 
 export interface MatchPlayer {

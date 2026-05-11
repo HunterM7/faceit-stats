@@ -25,10 +25,8 @@ export class FaceitService {
     });
   }
 
-  async getPlayerByNickname(nickname: string, game?: string): Promise<PlayerResponse> {
-    const response = await this.http.get<PlayerResponse>('/players', {
-      params: game ? { nickname, game } : { nickname },
-    });
+  async getPlayerByNickname(nickname: string): Promise<PlayerResponse> {
+    const response = await this.http.get<PlayerResponse>('/players', { params: { nickname, game: this.config.gameId } });
     return response.data;
   }
 

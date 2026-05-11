@@ -42,7 +42,6 @@ export interface StatsRankBlock {
 export interface StatsResponse {
   nickname: string;
   playerId: string;
-  gameId: string;
   common: {
     elo: number;
     skillLevel: number;

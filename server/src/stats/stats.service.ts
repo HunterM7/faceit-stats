@@ -2,15 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { AppConfigService } from '../config/app-config.service';
 import { FaceitService } from '../faceit/faceit.service';
 import {
-  type InternalMatchStatsItem,
-  type LastMatchResponse,
-  type MatchHistoryItem,
-  type MatchResult,
-  type PlayerGlobalRankingResponse,
-  type PlayerSnapshotResponse,
-  type StatsRankBlock,
-  type StatsRatingQuery,
-  type StatsResponse,
+  type InternalMatchStatsItem, type LastMatchResponse, type MatchHistoryItem, type MatchResult,
+  type PlayerGlobalRankingResponse, type PlayerSnapshotResponse, type StatsRankBlock, type StatsRatingQuery, type StatsResponse,
 } from './stats.types';
 
 type ParsedInternalMatch = {
@@ -46,16 +39,15 @@ export class StatsService {
       throw new Error('Никнейм пустой');
     }
 
-    const player = await this.faceit.getPlayerByNickname(nickname, this.config.gameId);
+    const player = await this.faceit.getPlayerByNickname(nickname);
     const playerId = player.player_id;
     if (!playerId) {
       throw new Error('Игрок FACEIT не найден по никнейму');
     }
 
     const gameId = this.config.gameId;
-    const gameStatsFromPlayer = player.games?.[gameId] || {};
-    const regionRaw = gameStatsFromPlayer.region;
-    const region = typeof regionRaw === 'string' && regionRaw.trim() ? regionRaw.trim() : null;
+    const gameStatsFromPlayer = player.games?.[gameId];
+    const region = gameStatsFromPlayer?.region?.trim() ?? null;
     const countryLower = player.country?.trim() ? player.country.trim().toLowerCase() : null;
 
     const ratingFilter: StatsRatingQuery =
@@ -80,7 +72,7 @@ export class StatsService {
     ]);
     const items = history?.items || [];
     const latest = items[0] || null;
-    const gameStats = player?.games?.[gameId] || {};
+    const gameStats = player.games?.[this.config.gameId];
     const internalItems = (internalStats?.items || [])
       .map((item) => this.parseInternalMatch(item))
       .filter((item): item is ParsedInternalMatch => item !== null);
@@ -90,9 +82,6 @@ export class StatsService {
     const today = this.aggregateInternalMatches(
       internalItems.filter((item) => item.finishedAtMs !== null && item.finishedAtMs > todayStartMs),
     );
-    const elo = typeof gameStats.faceit_elo === 'number' ? gameStats.faceit_elo : 0;
-    const skillLevel = typeof gameStats.skill_level === 'number' ? gameStats.skill_level : 0;
-    const commonKdRatio = this.pickNumber(gameStatsRaw?.lifetime ?? {}, [ 'Average K/D Ratio', 'K/D Ratio' ]) ?? 0;
     const rankCountryPos = this.parseGlobalRankingPosition(rankingCountry, playerId);
     const rankRegionPos = this.parseGlobalRankingPosition(rankingRegion, playerId);
     const rank = this.buildRankBlock({
@@ -107,11 +96,10 @@ export class StatsService {
     return {
       nickname: player.nickname || nickname,
       playerId,
-      gameId,
       common: {
-        elo,
-        skillLevel,
-        kd: commonKdRatio,
+        elo: gameStats?.faceit_elo ?? 0,
+        skillLevel: gameStats?.skill_level ?? 0,
+        kd: Number(gameStatsRaw.lifetime?.['Average K/D Ratio']),
         rank,
       },
       daily: {
@@ -155,9 +143,9 @@ export class StatsService {
       this.faceit.getPlayerHistory(normalizedPlayerId, 1),
     ]);
     const latest = history?.items?.[0] || null;
-    const gameStats = player?.games?.[this.config.gameId] || {};
-    const currentElo = typeof gameStats.faceit_elo === 'number' ? gameStats.faceit_elo : null;
-    const currentSkillLevel = typeof gameStats.skill_level === 'number' ? gameStats.skill_level : null;
+    const gameStats = player?.games?.[this.config.gameId];
+    const currentElo = gameStats?.faceit_elo ?? null;
+    const currentSkillLevel = gameStats?.skill_level ?? null;
 
     return {
       matchId: latest?.match_id || null,
@@ -181,10 +169,10 @@ export class StatsService {
       throw new Error('Никнейм пустой');
     }
 
-    const player = await this.faceit.getPlayerByNickname(nickname, this.config.gameId);
-    const gameStats = player?.games?.[this.config.gameId] || {};
-    const currentElo = typeof gameStats.faceit_elo === 'number' ? gameStats.faceit_elo : null;
-    const currentSkillLevel = typeof gameStats.skill_level === 'number' ? gameStats.skill_level : null;
+    const player = await this.faceit.getPlayerByNickname(nickname);
+    const gameStats = player?.games?.[this.config.gameId];
+    const currentElo = gameStats?.faceit_elo ?? null;
+    const currentSkillLevel = gameStats?.skill_level ?? null;
 
     return {
       playerId: player.player_id || null,
@@ -194,19 +182,6 @@ export class StatsService {
       currentSkillLevel,
       updatedAt: new Date().toISOString(),
     };
-  }
-
-  private pickNumber(source: Record<string, unknown>, keys: string[]): number | null {
-    for (const key of keys) {
-      const raw = source[key];
-      if (typeof raw === 'number' && Number.isFinite(raw)) return raw;
-      if (typeof raw === 'string') {
-        const normalized = raw.replace(',', '.').replace('%', '').trim();
-        const value = Number(normalized);
-        if (Number.isFinite(value)) return value;
-      }
-    }
-    return null;
   }
 
   private parseInternalMatch(item: InternalMatchStatsItem): ParsedInternalMatch | null {
