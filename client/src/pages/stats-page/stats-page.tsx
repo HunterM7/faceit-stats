@@ -28,7 +28,7 @@ type StatsState = {
     kd: number;
   };
   monthly: {
-    winRate: number;
+    winRatePercent: number;
     matchResults: boolean[];
     avg: number;
     adr: number;
@@ -86,7 +86,7 @@ export function StatsPage() {
       kd: stats.daily.kd,
     },
     monthly: {
-      winRate: stats.last30.winRate,
+      winRatePercent: stats.last30.winRatePercent,
       matchResults: stats.last30.matchResults ?? [],
       avg: stats.last30.avg,
       adr: stats.last30.adr,
@@ -203,7 +203,7 @@ export function StatsPage() {
   }
 
   const recentMatches: ComponentProps<typeof WidgetStatistics>['recentMatches'] = {
-    winRatePercent: state.monthly.winRate,
+    winRatePercent: state.monthly.winRatePercent,
     results: state.monthly.matchResults,
     avg: state.monthly.avg,
     adr: state.monthly.adr,

@@ -127,7 +127,7 @@ export class StatsService {
       last30: {
         wins: last30.wins,
         losses: last30.losses,
-        winRate: last30.winRate,
+        winRatePercent: last30.winRatePercent,
         avg: last30.avg,
         adr: last30.adr,
         kd: last30.avgKD,
@@ -310,7 +310,7 @@ export class StatsService {
   private aggregateInternalMatches(items: ParsedInternalMatch[]): {
     wins: number;
     losses: number;
-    winRate: number;
+    winRatePercent: number;
     avg: number;
     avgKD: number;
     avgKR: number;
@@ -320,7 +320,7 @@ export class StatsService {
       return {
         wins: 0,
         losses: 0,
-        winRate: 0,
+        winRatePercent: 0,
         avg: 0,
         avgKD: 0,
         avgKR: 0,
@@ -352,7 +352,7 @@ export class StatsService {
     return {
       wins: summary.wins,
       losses: summary.losses,
-      winRate: Math.floor((summary.wins / totalMatches) * 100),
+      winRatePercent: Math.floor((summary.wins / totalMatches) * 100),
       avg: Math.round(summary.kills / totalMatches),
       avgKD: this.roundFixed(summary.kills / summary.deaths),
       avgKR: this.roundFixed(summary.kills / summary.rounds),

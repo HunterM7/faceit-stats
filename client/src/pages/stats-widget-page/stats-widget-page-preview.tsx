@@ -34,7 +34,7 @@ function mapStatsPayloadToWidgetProps(stats: StatsPayload, ratingMode: StatsRati
       kd: stats.daily.kd,
     },
     recentMatches: {
-      winRatePercent: stats.last30.winRate,
+      winRatePercent: stats.last30.winRatePercent,
       results: stats.last30.matchResults ?? [],
       avg: stats.last30.avg,
       adr: stats.last30.adr,
