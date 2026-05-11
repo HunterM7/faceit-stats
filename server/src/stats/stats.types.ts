@@ -86,7 +86,7 @@ export interface StatsResponse {
   playerId: string;
   gameId: string;
   common: {
-    faceitElo: number;
+    elo: number;
     skillLevel: number;
     kd: number;
     /** Лидерборд FACEIT: по умолчанию (`?rating` нет или `country`) только страна; `both` — страна и регион. */

@@ -92,7 +92,7 @@ export class StatsService {
     const today = this.aggregateInternalMatches(
       internalItems.filter((item) => item.finishedAtMs !== null && item.finishedAtMs > todayStartMs),
     );
-    const faceitElo = typeof gameStats.faceit_elo === 'number' ? gameStats.faceit_elo : 0;
+    const elo = typeof gameStats.faceit_elo === 'number' ? gameStats.faceit_elo : 0;
     const skillLevel = typeof gameStats.skill_level === 'number' ? gameStats.skill_level : 0;
     const commonKdRatio = this.pickNumber(lifetime, [ 'Average K/D Ratio', 'K/D Ratio' ]) ?? 0;
     const rankCountryPos = this.parseGlobalRankingPosition(rankingCountry, playerId);
@@ -111,7 +111,7 @@ export class StatsService {
       playerId,
       gameId,
       common: {
-        faceitElo,
+        elo,
         skillLevel,
         kd: commonKdRatio,
         rank,

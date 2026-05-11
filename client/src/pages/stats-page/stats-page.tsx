@@ -56,7 +56,7 @@ export function StatsPage() {
   const mapStatsToState = (stats: StatsPayload): StatsState => ({
     common: {
       skillLevel: stats.common.skillLevel,
-      elo: stats.common.faceitElo,
+      elo: stats.common.elo,
       kd: stats.common.kd,
       rank: stats.common.rank,
     },

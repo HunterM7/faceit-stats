@@ -44,7 +44,7 @@ export type StatsPayload = {
   nickname: string;
   playerId?: string | null;
   common: {
-    faceitElo: number;
+    elo: number;
     skillLevel: number;
     kd: number;
     /** Рейтинг игрока в регионе и стране. */

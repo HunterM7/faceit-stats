@@ -22,7 +22,7 @@ function mapStatsPayloadToWidgetProps(stats: StatsPayload, ratingMode: StatsRati
   return {
     common: {
       skillLevel: stats.common.skillLevel,
-      elo: stats.common.faceitElo,
+      elo: stats.common.elo,
       kd: stats.common.kd,
       rank: filterRankForRatingMode(stats.common.rank, ratingMode),
     },
