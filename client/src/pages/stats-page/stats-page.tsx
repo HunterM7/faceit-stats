@@ -87,7 +87,7 @@ export function StatsPage() {
     },
     monthly: {
       winRatePercent: stats.last30.winRatePercent,
-      matchResults: stats.last30.matchResults ?? [],
+      matchResults: stats.last30.matchResults,
       avg: stats.last30.avg,
       adr: stats.last30.adr,
       kd: stats.last30.kd,
