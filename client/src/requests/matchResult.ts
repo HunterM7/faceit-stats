@@ -2,18 +2,12 @@ import { buildApiUrl } from '@config/api';
 import { type WidgetSource } from './stats';
 
 export type LastMatchPayload = {
-  matchId?: string | null;
-  status?: string | null;
-  result?: 'WIN' | 'LOSS' | 'UNKNOWN';
-  currentElo?: number | null;
-  currentSkillLevel?: number | null;
-  finishedAt?: string | null;
-  updatedAt?: string;
-  raw?: {
-    player?: unknown;
-    history?: unknown;
-    latestMatch?: unknown;
-  };
+  /** Идентификатор последнего матча игрока. */
+  matchId: string;
+  /** Результат последнего матча игрока. */
+  result: 'WIN' | 'LOSS';
+  /** Время окончания последнего матча игрока. */
+  finishedAt: string;
 };
 
 export type ApiErrorPayload = {

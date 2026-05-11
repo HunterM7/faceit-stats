@@ -40,7 +40,7 @@ export interface PlayerResponse {
   /** Обложка профиля игрока. */
   cover_image: string;
   /** Игры игрока. */
-  games?: Record<'csgo' | 'cs2', PlayerGameData>;
+  games?: Record<'dota2' | 'pubg' | 'csdz' | 'csgo' | 'cs2', PlayerGameData>;
   /** Идентификаторы друзей игрока. */
   friends_ids: string[];
   /** Идентификатор игрока steamID64. */
@@ -48,7 +48,7 @@ export interface PlayerResponse {
   /** Никнейм игрока steam. */
   steam_nickname: string;
   /** Типы членства игрока. */
-  memberships: Array<'premium' | 'super_match_token'>;
+  memberships: Array<'premium' | 'esea' | 'super_match_token'>;
   /** URL профиля игрока на FACEIT (пример `https://www.faceit.com/{lang}/players/skywhywalker`). */
   faceit_url: string;
   /** Тип членства игрока. */
@@ -73,16 +73,16 @@ export interface MatchTeam {
 }
 
 export interface MatchHistoryItem {
-  match_id?: string;
+  match_id: string;
   game_id?: string;
   status?: string;
-  finished_at?: number;
-  started_at?: number;
-  results?: {
-    winner?: string;
-    score?: Record<string, number>;
+  finished_at: number;
+  started_at: number;
+  results: {
+    winner: 'faction1' | 'faction2';
+    score: Record<'faction1' | 'faction2', number>;
   };
-  teams?: Record<string, MatchTeam>;
+  teams: Record<'faction1' | 'faction2', MatchTeam>;
 }
 
 export interface MatchHistoryResponse {

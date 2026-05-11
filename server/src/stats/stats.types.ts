@@ -1,12 +1,6 @@
-import type {
-  InternalMatchStatsResponse,
-  MatchHistoryItem,
-  MatchHistoryResponse,
-  PlayerGameStatsResponse,
-  PlayerResponse,
-} from '../faceit/faceit.types';
+import type { InternalMatchStatsResponse, MatchHistoryResponse, PlayerGameStatsResponse, PlayerResponse } from '../faceit/faceit.types';
 
-export type MatchResult = 'WIN' | 'LOSS' | 'UNKNOWN';
+export type MatchResult = 'WIN' | 'LOSS';
 
 /** Реэкспорт DTO FACEIT (раньше жили в этом файле). */
 export type {
@@ -79,18 +73,20 @@ export interface StatsResponse {
   };
 }
 
+/**
+ * Ответ `/api/lastMatch`: один запрос к истории матчей игрока.
+ * Elo/уровень не подгружаются — клиент при смене `matchId` дергает `/api/player` или полные статы.
+ */
 export interface LastMatchResponse {
-  matchId: string | null;
-  status: string | null;
+  /** Идентификатор последнего матча игрока. */
+  matchId: string;
+  /** Результат последнего матча игрока. */
   result: MatchResult;
-  currentElo: number | null;
-  currentSkillLevel: number | null;
+  /** Время окончания последнего матча игрока. */
   finishedAt: string | null;
-  updatedAt: string;
+  /** Сырые данные истории. */
   raw: {
-    player: PlayerResponse | Record<string, never>;
     history: MatchHistoryResponse | Record<string, never>;
-    latestMatch: MatchHistoryItem | null;
   };
 }
 

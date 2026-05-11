@@ -141,7 +141,7 @@ export function StatsPage() {
         }
 
         const matchData = await lastMatch(playerId, analyticsSource)
-        const currentMatchId = matchData.matchId ?? null
+        const currentMatchId = matchData.matchId
 
         if (!latestMatchIdRef.current) {
           latestMatchIdRef.current = currentMatchId

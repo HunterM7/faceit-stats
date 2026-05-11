@@ -133,33 +133,18 @@ export class StatsService {
   }
 
   async getLastMatchByPlayerId(playerId: string): Promise<LastMatchResponse> {
-    const normalizedPlayerId = playerId.trim();
-    if (!normalizedPlayerId) {
-      throw new Error('playerId пустой');
+    const history = await this.faceit.getPlayerHistory(playerId, 1);
+    const latest = history.items?.[0];
+
+    if (!latest) {
+      throw new Error('LAST_MATCH_EMPTY');
     }
 
-    const [ player, history ] = await Promise.all([
-      this.faceit.getPlayer(normalizedPlayerId),
-      this.faceit.getPlayerHistory(normalizedPlayerId, 1),
-    ]);
-    const latest = history?.items?.[0] || null;
-    const gameStats = player?.games?.[this.config.gameId];
-    const currentElo = gameStats?.faceit_elo ?? null;
-    const currentSkillLevel = gameStats?.skill_level ?? null;
-
     return {
-      matchId: latest?.match_id || null,
-      status: latest?.status || null,
-      result: this.resolveResultForPlayer(latest, normalizedPlayerId),
-      currentElo,
-      currentSkillLevel,
-      finishedAt: latest?.finished_at ? new Date(latest.finished_at * 1000).toISOString() : null,
-      updatedAt: new Date().toISOString(),
-      raw: {
-        player,
-        history,
-        latestMatch: latest,
-      },
+      matchId: latest.match_id,
+      result: this.resolveResultForPlayer(latest, playerId),
+      finishedAt: new Date(latest.finished_at * 1000).toISOString(),
+      raw: { history },
     };
   }
 
@@ -294,23 +279,14 @@ export class StatsService {
     return Math.round((value + Number.EPSILON) * 100) / 100;
   }
 
-  private resolveResultForPlayer(match: MatchHistoryItem | null, playerId: string): MatchResult {
-    if (!match) return 'UNKNOWN';
-    const winnerFactionId = match.results?.winner;
-    if (!winnerFactionId) return 'UNKNOWN';
+  private resolveResultForPlayer(match: MatchHistoryItem, playerId: string): MatchResult {
+    const winnerFactionId = match.results.winner;
 
-    const teams = match.teams || {};
-    let playerFactionId: string | null = null;
-    for (const [ factionId, team ] of Object.entries(teams)) {
-      const hasPlayer = Array.isArray(team.players) && team.players.some((p) => p.player_id === playerId);
-      if (hasPlayer) {
-        playerFactionId = factionId;
-        break;
-      }
-    }
+    const found = Object.entries(match.teams).find(
+      ([ , team ]) => Array.isArray(team.players) && team.players.some((p) => p.player_id === playerId),
+    );
 
-    if (!playerFactionId) return 'UNKNOWN';
-    return playerFactionId === winnerFactionId ? 'WIN' : 'LOSS';
+    return found?.[0] === winnerFactionId ? 'WIN' : 'LOSS';
   }
 
   private buildRankBlock(args: {

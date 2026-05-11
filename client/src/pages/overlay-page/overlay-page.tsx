@@ -158,15 +158,6 @@ export function OverlayPage() {
           return
         }
         const matchData = await lastMatch(playerId, analyticsSource)
-        if (!matchData?.matchId) {
-          return
-        }
-        if (matchData.status?.toUpperCase() !== 'FINISHED') {
-          return
-        }
-        if (matchData.result === 'UNKNOWN' || !matchData.result) {
-          return
-        }
 
         if (!lastMatchId) {
           lastMatchId = matchData.matchId
