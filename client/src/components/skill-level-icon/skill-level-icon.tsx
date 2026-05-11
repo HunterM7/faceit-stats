@@ -1,5 +1,5 @@
-import './skill-level-icon.scss'
-import { classNames } from '@utils/classNames'
+import './skill-level-icon.scss';
+import { classNames } from '@utils/classNames';
 
 interface Props {
   /** Уровень навыка игрока (1-20). */
@@ -12,5 +12,5 @@ interface Props {
 export function SkillLevelIcon(props: Props) {
   const { skillLevel, className } = props;
 
-  return <span className={classNames('skill-level-icon', `skill-level-icon--${skillLevel}`, className)}/>
+  return <span className={classNames('skill-level-icon', `skill-level-icon--${skillLevel}`, className)}/>;
 }

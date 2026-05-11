@@ -1,129 +1,133 @@
-import { useEffect, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
-import { Button, ButtonVariant } from '@/ui/button/button'
-import { Input } from '@/ui/input/input'
-import { BarChart, type BarChartGroup } from '@/components/bar-chart/bar-chart'
-import { useToast } from '@components/toast-provider/use-toast'
+import { useEffect, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { Button, ButtonVariant } from '@/ui/button/button';
+import { Input } from '@/ui/input/input';
+import { BarChart, type BarChartGroup } from '@/components/bar-chart/bar-chart';
+import { useToast } from '@components/toast-provider/use-toast';
 import {
   AdminUnauthorizedError,
   requestAdminOverview,
   type AdminOverviewPayload,
   type AdminPeriod,
   type AdminScope,
-} from '@requests/admin'
-import './admin-page.scss'
+} from '@requests/admin';
+import './admin-page.scss';
 
 const ADMIN_PERIOD_OPTIONS: Array<{ id: AdminPeriod; label: string }> = [
   { id: 'day', label: 'День' },
   { id: 'week', label: 'Неделя' },
   { id: 'month', label: 'Месяц' },
   { id: 'all', label: 'Всё время' },
-]
+];
 
 const ADMIN_SCOPE_OPTIONS: Array<{ id: AdminScope; label: string }> = [
   { id: 'overall', label: 'Общая статистика' },
   { id: 'stats_widget', label: 'Виджет статистики' },
   { id: 'overlay_widget', label: 'Виджет оверлея' },
-]
+];
 
 const SCOPE_DESCRIPTION_MAP: Record<AdminScope, string> = {
   overall: 'Мониторинг по всем API-обращениям сервиса.',
   stats_widget: 'Использование страницы виджета статистики и связанных API.',
   overlay_widget: 'Использование страницы оверлея матча и связанных API.',
-}
+};
 
 export function AdminPage() {
-  const { showToast } = useToast()
-  const [ searchParams ] = useSearchParams()
-  const [ period, setPeriod ] = useState<AdminPeriod>('day')
-  const scopeParam = searchParams.get('scope')
+  const { showToast } = useToast();
+  const [ searchParams ] = useSearchParams();
+  const [ period, setPeriod ] = useState<AdminPeriod>('day');
+  const scopeParam = searchParams.get('scope');
   const scope: AdminScope =
     scopeParam === 'stats_widget' || scopeParam === 'overlay_widget' || scopeParam === 'overall'
       ? scopeParam
-      : 'overall'
-  const [ overview, setOverview ] = useState<AdminOverviewPayload | null>(null)
-  const [ authToken, setAuthToken ] = useState<string>(() => window.sessionStorage.getItem('admin-auth-token') || '')
-  const [ isAuthorized, setIsAuthorized ] = useState(false)
-  const [ login, setLogin ] = useState('')
-  const [ password, setPassword ] = useState('')
+      : 'overall';
+  const [ overview, setOverview ] = useState<AdminOverviewPayload | null>(null);
+  const [ authToken, setAuthToken ] = useState<string>(() => window.sessionStorage.getItem('admin-auth-token') || '');
+  const [ isAuthorized, setIsAuthorized ] = useState(false);
+  const [ login, setLogin ] = useState('');
+  const [ password, setPassword ] = useState('');
 
   useEffect(() => {
     if (!authToken) {
-      return () => undefined
+      return () => undefined;
     }
 
-    let cancelled = false
+    let cancelled = false;
     const load = async () => {
       try {
-        const next = await requestAdminOverview(period, scope, authToken)
-        if (cancelled) return
-        setOverview(next)
-        setIsAuthorized(true)
+        const next = await requestAdminOverview(period, scope, authToken);
+        if (cancelled) {
+          return;
+        }
+        setOverview(next);
+        setIsAuthorized(true);
       } catch (error) {
-        if (cancelled) return
+        if (cancelled) {
+          return;
+        }
         if (error instanceof AdminUnauthorizedError) {
-          setAuthToken('')
-          setIsAuthorized(false)
-          window.sessionStorage.removeItem('admin-auth-token')
+          setAuthToken('');
+          setIsAuthorized(false);
+          window.sessionStorage.removeItem('admin-auth-token');
           showToast({
             title: 'Вход отклонен',
             message: 'Неверный логин или пароль. Попробуй снова.',
             variant: 'error',
-          })
-          return
+          });
+          return;
         }
         showToast({
           title: 'Не удалось загрузить админку',
           message: (error as Error).message || 'Попробуй обновить страницу позже.',
           variant: 'error',
-        })
+        });
       }
-    }
-    void load()
+    };
+    void load();
     return () => {
-      cancelled = true
-    }
-  }, [ authToken, period, scope, showToast ])
+      cancelled = true;
+    };
+  }, [ authToken, period, scope, showToast ]);
 
   const submitAuth = () => {
-    const normalizedLogin = login.trim()
+    const normalizedLogin = login.trim();
     if (!normalizedLogin || !password) {
       showToast({
         title: 'Нужны данные для входа',
         message: 'Заполни логин и пароль.',
         variant: 'warning',
-      })
-      return
+      });
+      return;
     }
 
-    const token = encodeBasicAuthToken(normalizedLogin, password)
+    const token = encodeBasicAuthToken(normalizedLogin, password);
     if (!token) {
       showToast({
         title: 'Ошибка кодирования',
         message: 'Не удалось подготовить данные авторизации. Проверь логин и пароль.',
         variant: 'error',
-      })
-      return
+      });
+      return;
     }
-    window.sessionStorage.setItem('admin-auth-token', token)
-    setAuthToken(token)
-    setIsAuthorized(false)
-    setPassword('')
-  }
+    window.sessionStorage.setItem('admin-auth-token', token);
+    setAuthToken(token);
+    setIsAuthorized(false);
+    setPassword('');
+  };
 
   const logout = () => {
-    window.sessionStorage.removeItem('admin-auth-token')
-    setAuthToken('')
-    setIsAuthorized(false)
-    setOverview(null)
-    setLogin('')
-    setPassword('')
+    window.sessionStorage.removeItem('admin-auth-token');
+    setAuthToken('');
+    setIsAuthorized(false);
+    setOverview(null);
+    setLogin('');
+    setPassword('');
     showToast({
       title: 'Вы вышли из админки',
       variant: 'info',
       durationMs: 2200,
-    })
-  }
+    });
+  };
 
   const fallbackOverview: AdminOverviewPayload = {
     period,
@@ -136,10 +140,10 @@ export function AdminPage() {
     chart: [],
     latestEvents: [],
     storage: 'disabled',
-  }
-  const data = overview ?? fallbackOverview
-  const scopeDescription = SCOPE_DESCRIPTION_MAP[scope]
-  const chartGroups = getChartGroups(period, data.chart)
+  };
+  const data = overview ?? fallbackOverview;
+  const scopeDescription = SCOPE_DESCRIPTION_MAP[scope];
+  const chartGroups = getChartGroups(period, data.chart);
 
   if (!authToken) {
     return (
@@ -174,7 +178,7 @@ export function AdminPage() {
           </section>
         </div>
       </main>
-    )
+    );
   }
 
   if (!isAuthorized) {
@@ -188,7 +192,7 @@ export function AdminPage() {
           <p className='admin-page__empty'>Проверяем доступ...</p>
         </section>
       </main>
-    )
+    );
   }
 
   return (
@@ -307,20 +311,20 @@ export function AdminPage() {
         </footer>
       </section>
     </main>
-  )
+  );
 }
 
 function encodeBasicAuthToken(login: string, password: string): string | null {
   try {
-    const value = `${login}:${password}`
-    const bytes = new TextEncoder().encode(value)
-    let binary = ''
+    const value = `${login}:${password}`;
+    const bytes = new TextEncoder().encode(value);
+    let binary = '';
     for (const byte of bytes) {
-      binary += String.fromCharCode(byte)
+      binary += String.fromCharCode(byte);
     }
-    return window.btoa(binary)
+    return window.btoa(binary);
   } catch {
-    return null
+    return null;
   }
 }
 
@@ -329,7 +333,7 @@ function getChartGroups(
   chart: AdminOverviewPayload['chart'],
 ): BarChartGroup[] {
   if (chart.length === 0) {
-    return []
+    return [];
   }
 
   if (period === 'week') {
@@ -337,41 +341,41 @@ function getChartGroups(
       label: formatWeekdayShortRu(item.dateKey),
       value: item.count,
       hint: formatDateKey(item.dateKey),
-    }))
+    }));
     return [
       {
         items,
       },
-    ]
+    ];
   }
 
   if (period === 'all') {
     const items = chart.map((item) => ({
       label: item.label,
       value: item.count,
-    }))
+    }));
     return [
       {
         items,
       },
-    ]
+    ];
   }
 
   if (period === 'month') {
     const monthGroups = chart.reduce<Array<{ monthKey: string; items: AdminOverviewPayload['chart'] }>>((acc, item) => {
-      const monthKey = item.dateKey.slice(0, 7)
-      const last = acc[acc.length - 1]
+      const monthKey = item.dateKey.slice(0, 7);
+      const last = acc[acc.length - 1];
       if (!last || last.monthKey !== monthKey) {
         acc.push({
           monthKey,
           items: [ item ],
-        })
-        return acc
+        });
+        return acc;
       }
 
-      last.items.push(item)
-      return acc
-    }, [])
+      last.items.push(item);
+      return acc;
+    }, []);
     return monthGroups.slice(-2).map((group) => ({
       label: formatMonthSegmentLabel(group.monthKey),
       title: formatMonthKey(group.monthKey),
@@ -380,22 +384,22 @@ function getChartGroups(
         value: item.count,
         hint: formatDateKey(item.dateKey),
       })),
-    }))
+    }));
   }
 
   const dayGroups = chart.reduce<Array<{ dateKey: string; items: AdminOverviewPayload['chart'] }>>((acc, item) => {
-    const last = acc[acc.length - 1]
+    const last = acc[acc.length - 1];
     if (!last || last.dateKey !== item.dateKey) {
       acc.push({
         dateKey: item.dateKey,
         items: [ item ],
-      })
-      return acc
+      });
+      return acc;
     }
 
-    last.items.push(item)
-    return acc
-  }, [])
+    last.items.push(item);
+    return acc;
+  }, []);
   return dayGroups.map((group) => ({
     label: formatDaySegmentLabel(group.dateKey),
     title: formatDateKey(group.dateKey),
@@ -404,66 +408,66 @@ function getChartGroups(
       value: item.count,
       hint: formatDayHourHint(item.dateKey, item.label),
     })),
-  }))
+  }));
 }
 
 function formatDateKey(dateKey: string): string {
-  const [ year, month, day ] = dateKey.split('-')
-  return `${day}.${month}.${year}`
+  const [ year, month, day ] = dateKey.split('-');
+  return `${day}.${month}.${year}`;
 }
 
 function formatDayHourHint(dateKey: string, hourLabel: string): string {
-  const hour = Number.parseInt(hourLabel, 10)
-  const h = Number.isFinite(hour) ? Math.min(23, Math.max(0, hour)) : 0
-  const hh = String(h).padStart(2, '0')
-  return `${formatDateKey(dateKey)} · ${hh}:00 UTC`
+  const hour = Number.parseInt(hourLabel, 10);
+  const h = Number.isFinite(hour) ? Math.min(23, Math.max(0, hour)) : 0;
+  const hh = String(h).padStart(2, '0');
+  return `${formatDateKey(dateKey)} · ${hh}:00 UTC`;
 }
 
-const WEEKDAY_SHORT_RU = [ 'вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб' ] as const
+const WEEKDAY_SHORT_RU = [ 'вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб' ] as const;
 
 /** Короткое название дня недели по UTC (пн … вс). */
 function formatWeekdayShortRu(dateKey: string): string {
-  const d = new Date(`${dateKey}T12:00:00.000Z`)
-  return WEEKDAY_SHORT_RU[d.getUTCDay()]
+  const d = new Date(`${dateKey}T12:00:00.000Z`);
+  return WEEKDAY_SHORT_RU[d.getUTCDay()];
 }
 
 function formatMonthDayLabel(dateKey: string): string {
-  const [ , , day ] = dateKey.split('-')
-  return String(Number(day))
+  const [ , , day ] = dateKey.split('-');
+  return String(Number(day));
 }
 
 function formatDaySegmentLabel(dateKey: string): string {
-  const todayKey = getUtcDateKey(new Date())
-  const yesterdayKey = getUtcDateKey(getUtcDateWithOffset(new Date(), -1))
+  const todayKey = getUtcDateKey(new Date());
+  const yesterdayKey = getUtcDateKey(getUtcDateWithOffset(new Date(), -1));
   if (dateKey === todayKey) {
-    return 'сегодня'
+    return 'сегодня';
   }
   if (dateKey === yesterdayKey) {
-    return 'вчера'
+    return 'вчера';
   }
-  return formatDateKey(dateKey)
+  return formatDateKey(dateKey);
 }
 
 function getUtcDateKey(date: Date): string {
-  const year = String(date.getUTCFullYear())
-  const month = String(date.getUTCMonth() + 1).padStart(2, '0')
-  const day = String(date.getUTCDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
+  const year = String(date.getUTCFullYear());
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(date.getUTCDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 function getUtcDateWithOffset(date: Date, offsetDays: number): Date {
-  const next = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()))
-  next.setUTCDate(next.getUTCDate() + offsetDays)
-  return next
+  const next = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+  next.setUTCDate(next.getUTCDate() + offsetDays);
+  return next;
 }
 
 function formatMonthKey(monthKey: string): string {
-  const [ year, month ] = monthKey.split('-')
-  return `${month}.${year}`
+  const [ year, month ] = monthKey.split('-');
+  return `${month}.${year}`;
 }
 
 function formatMonthSegmentLabel(monthKey: string): string {
-  const [ year, month ] = monthKey.split('-')
-  const date = new Date(Date.UTC(Number(year), Number(month) - 1, 1))
-  return date.toLocaleString('ru-RU', { month: 'long', timeZone: 'UTC' })
+  const [ year, month ] = monthKey.split('-');
+  const date = new Date(Date.UTC(Number(year), Number(month) - 1, 1));
+  return date.toLocaleString('ru-RU', { month: 'long', timeZone: 'UTC' });
 }

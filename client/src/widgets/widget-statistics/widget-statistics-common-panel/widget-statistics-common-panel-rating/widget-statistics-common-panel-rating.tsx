@@ -1,7 +1,7 @@
-import { classNames } from '@/utils/classNames'
-import { CountryFlagIcon } from '@components/country-flag-icon/country-flag-icon'
-import { RegionFlagIcon } from '@components/region-flag-icon/region-flag-icon'
-import './widget-statistics-common-panel-rating.scss'
+import { classNames } from '@/utils/classNames';
+import { CountryFlagIcon } from '@components/country-flag-icon/country-flag-icon';
+import { RegionFlagIcon } from '@components/region-flag-icon/region-flag-icon';
+import './widget-statistics-common-panel-rating.scss';
 
 interface Props {
   /** Тип рейтинга: регион или страна. */
@@ -16,7 +16,7 @@ interface Props {
 
 /** Компонент отображения рейтинга игрока в выбранном регионе/стране. */
 export function WidgetStatisticsCommonPanelRating(props: Props) {
-  const { type, code, rating, className } = props
+  const { type, code, rating, className } = props;
 
   return (
     <div className={classNames('widget-statistics-common-panel-rating', className)}>
@@ -25,5 +25,5 @@ export function WidgetStatisticsCommonPanelRating(props: Props) {
         : <RegionFlagIcon regionCode={code} className='widget-statistics-common-panel-rating__icon'/>}
       {`#${rating}`}
     </div>
-  )
+  );
 }

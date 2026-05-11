@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { WidgetOverlayLevelIcon } from './widget-overlay-level-icon/widget-overlay-level-icon'
-import { WidgetOverlayParticles } from './widget-overlay-particles/widget-overlay-particles'
-import './widget-overlay.scss'
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { WidgetOverlayLevelIcon } from './widget-overlay-level-icon/widget-overlay-level-icon';
+import { WidgetOverlayParticles } from './widget-overlay-particles/widget-overlay-particles';
+import './widget-overlay.scss';
 import { classNames } from '@/utils/classNames';
 
 /** Актуальный матч. */
@@ -28,123 +28,123 @@ type EloOverlayTick =
     delta: number;
     fromLevel: number | null;
     toLevel: number | null;
-  }
+  };
 
 export function WidgetOverlay(props: WidgetOverlayProps) {
-  const { match } = props
-  const previewMs = 2000
-  const deltaLeadInMs = 1000
-  const counterDurationMs = 1400
-  const zeroHoldMs = 1000
-  const hideAfterAnimationMs = previewMs + deltaLeadInMs + counterDurationMs + zeroHoldMs
+  const { match } = props;
+  const previewMs = 2000;
+  const deltaLeadInMs = 1000;
+  const counterDurationMs = 1400;
+  const zeroHoldMs = 1000;
+  const hideAfterAnimationMs = previewMs + deltaLeadInMs + counterDurationMs + zeroHoldMs;
 
-  const [ visible, setVisible ] = useState(false)
-  const [ result, setResult ] = useState<'WIN' | 'LOSS'>('WIN')
-  const [ skillLevel, setSkillLevel ] = useState<number | null>(null)
-  const [ eloDisplay, setEloDisplay ] = useState<number | null>(null)
-  const [ deltaDisplay, setDeltaDisplay ] = useState<number | null>(null)
-  const [ isDeltaVisible, setIsDeltaVisible ] = useState(false)
-  const [ burstSeed, setBurstSeed ] = useState(0)
+  const [ visible, setVisible ] = useState(false);
+  const [ result, setResult ] = useState<'WIN' | 'LOSS'>('WIN');
+  const [ skillLevel, setSkillLevel ] = useState<number | null>(null);
+  const [ eloDisplay, setEloDisplay ] = useState<number | null>(null);
+  const [ deltaDisplay, setDeltaDisplay ] = useState<number | null>(null);
+  const [ isDeltaVisible, setIsDeltaVisible ] = useState(false);
+  const [ burstSeed, setBurstSeed ] = useState(0);
 
-  const eloAnimationFrameRef = useRef<number | null>(null)
-  const eloAnimationDelayTimeoutRef = useRef<number | null>(null)
-  const eloAnimationStartTimeoutRef = useRef<number | null>(null)
-  const hideOverlayTimerRef = useRef<number | null>(null)
-  const lastEloRef = useRef<number | null>(null)
-  const lastLevelRef = useRef<number | null>(null)
-  const lastResultRef = useRef<'WIN' | 'LOSS'>('WIN')
+  const eloAnimationFrameRef = useRef<number | null>(null);
+  const eloAnimationDelayTimeoutRef = useRef<number | null>(null);
+  const eloAnimationStartTimeoutRef = useRef<number | null>(null);
+  const hideOverlayTimerRef = useRef<number | null>(null);
+  const lastEloRef = useRef<number | null>(null);
+  const lastLevelRef = useRef<number | null>(null);
+  const lastResultRef = useRef<'WIN' | 'LOSS'>('WIN');
 
   const runEloOverlaySequence = useCallback((tick: EloOverlayTick) => {
     if (eloAnimationFrameRef.current !== null) {
-      window.cancelAnimationFrame(eloAnimationFrameRef.current)
-      eloAnimationFrameRef.current = null
+      window.cancelAnimationFrame(eloAnimationFrameRef.current);
+      eloAnimationFrameRef.current = null;
     }
     if (eloAnimationDelayTimeoutRef.current !== null) {
-      window.clearTimeout(eloAnimationDelayTimeoutRef.current)
-      eloAnimationDelayTimeoutRef.current = null
+      window.clearTimeout(eloAnimationDelayTimeoutRef.current);
+      eloAnimationDelayTimeoutRef.current = null;
     }
     if (eloAnimationStartTimeoutRef.current !== null) {
-      window.clearTimeout(eloAnimationStartTimeoutRef.current)
-      eloAnimationStartTimeoutRef.current = null
+      window.clearTimeout(eloAnimationStartTimeoutRef.current);
+      eloAnimationStartTimeoutRef.current = null;
     }
 
     if (tick.kind === 'static') {
-      setEloDisplay(tick.elo)
-      setDeltaDisplay(tick.delta)
-      setIsDeltaVisible(typeof tick.delta === 'number')
-      setSkillLevel(tick.skillLevel)
-      return
+      setEloDisplay(tick.elo);
+      setDeltaDisplay(tick.delta);
+      setIsDeltaVisible(typeof tick.delta === 'number');
+      setSkillLevel(tick.skillLevel);
+      return;
     }
 
-    const { fromElo, toElo, delta, fromLevel, toLevel } = tick
-    const diff = toElo - fromElo
-    const durationMs = counterDurationMs
+    const { fromElo, toElo, delta, fromLevel, toLevel } = tick;
+    const diff = toElo - fromElo;
+    const durationMs = counterDurationMs;
 
-    setEloDisplay(fromElo)
-    setDeltaDisplay(delta)
-    setIsDeltaVisible(false)
-    setSkillLevel(fromLevel)
+    setEloDisplay(fromElo);
+    setDeltaDisplay(delta);
+    setIsDeltaVisible(false);
+    setSkillLevel(fromLevel);
 
     const step = (startTime: number, now: number) => {
-      const progress = Math.min(1, (now - startTime) / durationMs)
-      const eased = 1 - ((1 - progress) ** 3)
-      setEloDisplay(Math.round(fromElo + (diff * eased)))
-      setDeltaDisplay(Math.round(delta * (1 - eased)))
+      const progress = Math.min(1, (now - startTime) / durationMs);
+      const eased = 1 - ((1 - progress) ** 3);
+      setEloDisplay(Math.round(fromElo + (diff * eased)));
+      setDeltaDisplay(Math.round(delta * (1 - eased)));
 
       if (progress < 1) {
-        eloAnimationFrameRef.current = window.requestAnimationFrame((frameNow) => step(startTime, frameNow))
+        eloAnimationFrameRef.current = window.requestAnimationFrame((frameNow) => step(startTime, frameNow));
       } else {
-        setDeltaDisplay(0)
-        eloAnimationFrameRef.current = null
+        setDeltaDisplay(0);
+        eloAnimationFrameRef.current = null;
       }
-    }
+    };
 
     eloAnimationDelayTimeoutRef.current = window.setTimeout(() => {
-      setIsDeltaVisible(true)
+      setIsDeltaVisible(true);
       eloAnimationStartTimeoutRef.current = window.setTimeout(() => {
-        eloAnimationStartTimeoutRef.current = null
-        setSkillLevel(toLevel ?? fromLevel)
-        const animationStart = performance.now()
-        eloAnimationFrameRef.current = window.requestAnimationFrame((frameNow) => step(animationStart, frameNow))
-      }, deltaLeadInMs)
-      eloAnimationDelayTimeoutRef.current = null
-    }, previewMs)
-  }, [ counterDurationMs, deltaLeadInMs, previewMs ])
+        eloAnimationStartTimeoutRef.current = null;
+        setSkillLevel(toLevel ?? fromLevel);
+        const animationStart = performance.now();
+        eloAnimationFrameRef.current = window.requestAnimationFrame((frameNow) => step(animationStart, frameNow));
+      }, deltaLeadInMs);
+      eloAnimationDelayTimeoutRef.current = null;
+    }, previewMs);
+  }, [ counterDurationMs, deltaLeadInMs, previewMs ]);
 
   useEffect(() => {
     const clearHideTimer = () => {
       if (hideOverlayTimerRef.current !== null) {
-        window.clearTimeout(hideOverlayTimerRef.current)
-        hideOverlayTimerRef.current = null
+        window.clearTimeout(hideOverlayTimerRef.current);
+        hideOverlayTimerRef.current = null;
       }
-    }
+    };
 
     const applyQuietSnapshot = (next: MatchResult) => {
-      lastEloRef.current = next.elo
-      lastLevelRef.current = next.skillLevel
-      lastResultRef.current = next.result
-      setResult(next.result)
+      lastEloRef.current = next.elo;
+      lastLevelRef.current = next.skillLevel;
+      lastResultRef.current = next.result;
+      setResult(next.result);
       runEloOverlaySequence({
         kind: 'static',
         elo: next.elo,
         delta: null,
         skillLevel: next.skillLevel,
-      })
-    }
+      });
+    };
 
-    let cancelled = false
+    let cancelled = false;
     const frameId = window.requestAnimationFrame(() => {
       if (cancelled) {
-        return
+        return;
       }
 
-      clearHideTimer()
+      clearHideTimer();
 
       if (!match) {
-        lastEloRef.current = null
-        lastLevelRef.current = null
-        setVisible(false)
-        return
+        lastEloRef.current = null;
+        lastLevelRef.current = null;
+        setVisible(false);
+        return;
       }
 
       if (
@@ -153,28 +153,28 @@ export function WidgetOverlay(props: WidgetOverlayProps) {
         && match.skillLevel === lastLevelRef.current
         && match.result === lastResultRef.current
       ) {
-        return
+        return;
       }
 
       if (lastEloRef.current === null) {
-        applyQuietSnapshot(match)
-        setVisible(false)
-        return
+        applyQuietSnapshot(match);
+        setVisible(false);
+        return;
       }
 
       if (match.elo === lastEloRef.current) {
-        applyQuietSnapshot(match)
-        return
+        applyQuietSnapshot(match);
+        return;
       }
 
-      const fromElo = lastEloRef.current
-      const fromLevel = lastLevelRef.current
-      lastEloRef.current = match.elo
-      lastLevelRef.current = match.skillLevel
-      lastResultRef.current = match.result
+      const fromElo = lastEloRef.current;
+      const fromLevel = lastLevelRef.current;
+      lastEloRef.current = match.elo;
+      lastLevelRef.current = match.skillLevel;
+      lastResultRef.current = match.result;
 
-      const signedDelta = match.elo - fromElo
-      setResult(match.result)
+      const signedDelta = match.elo - fromElo;
+      setResult(match.result);
       runEloOverlaySequence({
         kind: 'tween',
         fromElo,
@@ -182,43 +182,43 @@ export function WidgetOverlay(props: WidgetOverlayProps) {
         delta: signedDelta,
         fromLevel,
         toLevel: match.skillLevel,
-      })
-      setBurstSeed(Date.now())
-      setVisible(true)
+      });
+      setBurstSeed(Date.now());
+      setVisible(true);
       hideOverlayTimerRef.current = window.setTimeout(() => {
-        hideOverlayTimerRef.current = null
-        setVisible(false)
-      }, hideAfterAnimationMs)
-    })
+        hideOverlayTimerRef.current = null;
+        setVisible(false);
+      }, hideAfterAnimationMs);
+    });
 
     return () => {
-      cancelled = true
-      window.cancelAnimationFrame(frameId)
-      clearHideTimer()
-    }
-  }, [ hideAfterAnimationMs, match, runEloOverlaySequence ])
+      cancelled = true;
+      window.cancelAnimationFrame(frameId);
+      clearHideTimer();
+    };
+  }, [ hideAfterAnimationMs, match, runEloOverlaySequence ]);
 
   useEffect(() => {
     return () => {
       if (eloAnimationFrameRef.current !== null) {
-        window.cancelAnimationFrame(eloAnimationFrameRef.current)
+        window.cancelAnimationFrame(eloAnimationFrameRef.current);
       }
       if (eloAnimationDelayTimeoutRef.current !== null) {
-        window.clearTimeout(eloAnimationDelayTimeoutRef.current)
+        window.clearTimeout(eloAnimationDelayTimeoutRef.current);
       }
       if (eloAnimationStartTimeoutRef.current !== null) {
-        window.clearTimeout(eloAnimationStartTimeoutRef.current)
+        window.clearTimeout(eloAnimationStartTimeoutRef.current);
       }
       if (hideOverlayTimerRef.current !== null) {
-        window.clearTimeout(hideOverlayTimerRef.current)
+        window.clearTimeout(hideOverlayTimerRef.current);
       }
-    }
-  }, [])
+    };
+  }, []);
 
-  let eloDeltaText = '--'
+  let eloDeltaText = '--';
   if (typeof deltaDisplay === 'number') {
-    const absDelta = Math.abs(deltaDisplay)
-    eloDeltaText = result === 'LOSS' ? `-${absDelta}` : `+${absDelta}`
+    const absDelta = Math.abs(deltaDisplay);
+    eloDeltaText = result === 'LOSS' ? `-${absDelta}` : `+${absDelta}`;
   }
 
   return (
@@ -237,5 +237,5 @@ export function WidgetOverlay(props: WidgetOverlayProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }

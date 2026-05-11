@@ -1,19 +1,19 @@
-import { buildApiUrl } from '@config/api'
+import { buildApiUrl } from '@config/api';
 
-export type WidgetSource = 'stats_widget' | 'overlay_widget'
+export type WidgetSource = 'stats_widget' | 'overlay_widget';
 
 /**
  * `?rating=` для `/api/playerStatistics`.
  * Без параметра — на сервере по умолчанию только страна; `both` — страна и регион.
  */
-export type StatsRatingQuery = 'country' | 'region' | 'both'
+export type StatsRatingQuery = 'country' | 'region' | 'both';
 
 export type StatsRankSlice = {
   /** Код региона или страны (например `EU`, `NA`, `OCE`, `RU`, `US` и тд.). */
   code: string;
   /** Рейтинг игрока в данном регионе или стране. */
   rating: number;
-}
+};
 
 /** Рейтинг игрока в регионе и стране. */
 export type Rank = {
@@ -21,22 +21,22 @@ export type Rank = {
   region?: StatsRankSlice;
   /** Рейтинг игрока в стране. */
   country?: StatsRankSlice;
-}
+};
 
 function extractErrorMessage(raw: unknown, fallback: string): string {
   if (raw && typeof raw === 'object' && 'message' in raw && typeof (raw as { message?: unknown }).message === 'string') {
-    return (raw as { message: string }).message
+    return (raw as { message: string }).message;
   }
-  return fallback
+  return fallback;
 }
 
 async function parseErrorMessage(response: Response): Promise<string> {
-  const fallback = `Ошибка запроса: статус ${response.status}`
+  const fallback = `Ошибка запроса: статус ${response.status}`;
   try {
-    const body = (await response.json()) as unknown
-    return extractErrorMessage(body, fallback)
+    const body = (await response.json()) as unknown;
+    return extractErrorMessage(body, fallback);
   } catch {
-    return fallback
+    return fallback;
   }
 }
 
@@ -79,7 +79,7 @@ export type StatsPayload = {
     history?: unknown;
     internalStats?: unknown;
   };
-}
+};
 
 export type RequestStatsOptions = {
   /** Запрос с страницы превью виджета — не учитывается в основной аналитике. */
@@ -92,24 +92,24 @@ export async function requestStats(
   rating?: StatsRatingQuery,
   options?: RequestStatsOptions,
 ): Promise<StatsPayload> {
-  const endpoint = buildApiUrl('/api/playerStatistics')
-  const params = new URLSearchParams()
+  const endpoint = buildApiUrl('/api/playerStatistics');
+  const params = new URLSearchParams();
   if (nickname?.trim()) {
-    params.set('nickname', nickname.trim())
+    params.set('nickname', nickname.trim());
   }
   if (source) {
-    params.set('source', source)
+    params.set('source', source);
   }
   if (rating) {
-    params.set('rating', rating)
+    params.set('rating', rating);
   }
   if (options?.preview) {
-    params.set('preview', '1')
+    params.set('preview', '1');
   }
-  const query = params.toString() ? `?${params.toString()}` : ''
-  const response = await fetch(`${endpoint}${query}`, { cache: 'no-store' })
+  const query = params.toString() ? `?${params.toString()}` : '';
+  const response = await fetch(`${endpoint}${query}`, { cache: 'no-store' });
   if (!response.ok) {
-    throw new Error(await parseErrorMessage(response))
+    throw new Error(await parseErrorMessage(response));
   }
-  return (await response.json()) as StatsPayload
+  return (await response.json()) as StatsPayload;
 }

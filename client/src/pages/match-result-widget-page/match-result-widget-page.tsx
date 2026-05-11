@@ -1,63 +1,67 @@
-import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { AppHeader } from '@components/app-header/app-header'
-import { Button, ButtonVariant } from '../../ui/button/button'
-import { Input } from '../../ui/input/input'
-import { LinkButton } from '../../ui/link-button/link-button'
-import { useToast } from '@components/toast-provider/use-toast'
-import { buildUrl, type BoolSetting } from '@utils/widget-url'
-import { StorageLocal } from '@utils/app-local-storage'
-import './match-result-widget-page.scss'
+import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { AppHeader } from '@components/app-header/app-header';
+import { Button, ButtonVariant } from '../../ui/button/button';
+import { Input } from '../../ui/input/input';
+import { LinkButton } from '../../ui/link-button/link-button';
+import { useToast } from '@components/toast-provider/use-toast';
+import { buildUrl, type BoolSetting } from '@utils/widget-url';
+import { StorageLocal } from '@utils/app-local-storage';
+import './match-result-widget-page.scss';
 
 export function MatchResultWidgetPage() {
-  const nicknameStorage = StorageLocal().path('widgets.overlay.nickname')
-  const { showToast } = useToast()
+  const nicknameStorage = StorageLocal().path('widgets.overlay.nickname');
+  const { showToast } = useToast();
 
-  const [ nickname, setNickname ] = useState(() => nicknameStorage.get(''))
-  const [ hideRank, setHideRank ] = useState<BoolSetting>('false')
-  const [ hideChallenger, setHideChallenger ] = useState<BoolSetting>('false')
-  const [ transparent, setTransparent ] = useState<BoolSetting>('true')
-  const [ testMode, setTestMode ] = useState<BoolSetting>('false')
+  const [ nickname, setNickname ] = useState(() => nicknameStorage.get(''));
+  const [ hideRank, setHideRank ] = useState<BoolSetting>('false');
+  const [ hideChallenger, setHideChallenger ] = useState<BoolSetting>('false');
+  const [ transparent, setTransparent ] = useState<BoolSetting>('true');
+  const [ testMode, setTestMode ] = useState<BoolSetting>('false');
 
-  const canBuild = nickname.trim().length > 0
+  const canBuild = nickname.trim().length > 0;
 
   const handleNicknameChange = (value: string) => {
-    setNickname(value)
+    setNickname(value);
     if (value.trim().length === 0) {
-      nicknameStorage.delete()
-      return
+      nicknameStorage.delete();
+      return;
     }
-    nicknameStorage.set(value)
-  }
+    nicknameStorage.set(value);
+  };
 
   const widgetUrl = useMemo(() => {
-    if (!canBuild) return ''
+    if (!canBuild) {
+      return '';
+    }
     return buildUrl('/matchResult', {
       nickname: nickname.trim(),
       hideRank,
       hideChallenger,
       transparent,
       test: testMode,
-    })
-  }, [ canBuild, nickname, hideRank, hideChallenger, transparent, testMode ])
+    });
+  }, [ canBuild, nickname, hideRank, hideChallenger, transparent, testMode ]);
 
   const copy = async () => {
-    if (!widgetUrl) return
+    if (!widgetUrl) {
+      return;
+    }
     try {
-      await navigator.clipboard.writeText(widgetUrl)
+      await navigator.clipboard.writeText(widgetUrl);
       showToast({
         title: 'Скопировано',
         variant: 'success',
         durationMs: 2200,
-      })
+      });
     } catch {
       showToast({
         title: 'Не удалось скопировать',
         message: 'Разреши доступ к буферу обмена или скопируй ссылку вручную.',
         variant: 'error',
-      })
+      });
     }
-  }
+  };
 
   return (
     <main className='match-result-widget-page'>
@@ -181,5 +185,5 @@ export function MatchResultWidgetPage() {
         </div>
       </section>
     </main>
-  )
+  );
 }

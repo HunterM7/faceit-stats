@@ -1,23 +1,23 @@
-import { buildApiUrl } from '@config/api'
+import { buildApiUrl } from '@config/api';
 
-export type AdminPeriod = 'day' | 'week' | 'month' | 'all'
-export type AdminScope = 'overall' | 'stats_widget' | 'overlay_widget'
+export type AdminPeriod = 'day' | 'week' | 'month' | 'all';
+export type AdminScope = 'overall' | 'stats_widget' | 'overlay_widget';
 
-export type AdminEventSource = 'stats_widget' | 'overlay_widget' | null
+export type AdminEventSource = 'stats_widget' | 'overlay_widget' | null;
 
 export type AdminRequestMeta = {
   method: string;
   path: string;
   query: Record<string, string | string[]>;
   params: Record<string, string>;
-}
+};
 
-export type AdminErrorOrigin = 'faceit' | 'internal' | 'unknown'
+export type AdminErrorOrigin = 'faceit' | 'internal' | 'unknown';
 
 export class AdminUnauthorizedError extends Error {
   constructor(message = 'Требуется авторизация для доступа к админке.') {
-    super(message)
-    this.name = 'AdminUnauthorizedError'
+    super(message);
+    this.name = 'AdminUnauthorizedError';
   }
 }
 
@@ -44,7 +44,7 @@ export type AdminOverviewPayload = {
     request?: AdminRequestMeta;
   }>;
   storage: 'mongo' | 'disabled';
-}
+};
 
 export type AdminErrorsPayload = {
   period: AdminPeriod;
@@ -64,59 +64,59 @@ export type AdminErrorsPayload = {
     request?: AdminRequestMeta;
   }>;
   storage: 'mongo' | 'disabled';
-}
+};
 
 function extractErrorMessage(raw: unknown, fallback: string): string {
   if (raw && typeof raw === 'object' && 'message' in raw && typeof (raw as { message?: unknown }).message === 'string') {
-    return (raw as { message: string }).message
+    return (raw as { message: string }).message;
   }
-  return fallback
+  return fallback;
 }
 
 async function parseErrorMessage(response: Response): Promise<string> {
-  const fallback = `Ошибка запроса: статус ${response.status}`
+  const fallback = `Ошибка запроса: статус ${response.status}`;
   try {
-    const body = (await response.json()) as unknown
-    return extractErrorMessage(body, fallback)
+    const body = (await response.json()) as unknown;
+    return extractErrorMessage(body, fallback);
   } catch {
-    return fallback
+    return fallback;
   }
 }
 
 export async function requestAdminOverview(period: AdminPeriod, scope: AdminScope, authToken?: string): Promise<AdminOverviewPayload> {
-  const endpoint = buildApiUrl('/api/admin/overview')
+  const endpoint = buildApiUrl('/api/admin/overview');
   const params = new URLSearchParams({
     period,
     scope,
-  })
+  });
   const response = await fetch(`${endpoint}?${params.toString()}`, {
     cache: 'no-store',
     headers: authToken ? { Authorization: `Basic ${authToken}` } : undefined,
-  })
+  });
   if (response.status === 401) {
-    throw new AdminUnauthorizedError()
+    throw new AdminUnauthorizedError();
   }
   if (!response.ok) {
-    throw new Error(await parseErrorMessage(response))
+    throw new Error(await parseErrorMessage(response));
   }
-  return (await response.json()) as AdminOverviewPayload
+  return (await response.json()) as AdminOverviewPayload;
 }
 
 export async function requestAdminErrors(period: AdminPeriod, scope: AdminScope, authToken?: string): Promise<AdminErrorsPayload> {
-  const endpoint = buildApiUrl('/api/admin/errors')
+  const endpoint = buildApiUrl('/api/admin/errors');
   const params = new URLSearchParams({
     period,
     scope,
-  })
+  });
   const response = await fetch(`${endpoint}?${params.toString()}`, {
     cache: 'no-store',
     headers: authToken ? { Authorization: `Basic ${authToken}` } : undefined,
-  })
+  });
   if (response.status === 401) {
-    throw new AdminUnauthorizedError()
+    throw new AdminUnauthorizedError();
   }
   if (!response.ok) {
-    throw new Error(await parseErrorMessage(response))
+    throw new Error(await parseErrorMessage(response));
   }
-  return (await response.json()) as AdminErrorsPayload
+  return (await response.json()) as AdminErrorsPayload;
 }

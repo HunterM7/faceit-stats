@@ -1,10 +1,10 @@
-import { classNames } from '@/utils/classNames'
-import { formatNumberWithFixedDecimals } from '@/utils/number-format'
-import { SkillLevelIcon } from '@/components/skill-level-icon/skill-level-icon'
-import { WidgetStatisticsValue } from '../widget-statistics-value/widget-statistics-value'
-import { WidgetStatisticsCommonPanelRating } from './widget-statistics-common-panel-rating/widget-statistics-common-panel-rating'
-import type { Rank } from '@requests/stats'
-import './widget-statistics-common-panel.scss'
+import { classNames } from '@/utils/classNames';
+import { formatNumberWithFixedDecimals } from '@/utils/number-format';
+import { SkillLevelIcon } from '@/components/skill-level-icon/skill-level-icon';
+import { WidgetStatisticsValue } from '../widget-statistics-value/widget-statistics-value';
+import { WidgetStatisticsCommonPanelRating } from './widget-statistics-common-panel-rating/widget-statistics-common-panel-rating';
+import type { Rank } from '@requests/stats';
+import './widget-statistics-common-panel.scss';
 
 interface Props {
   /** Общая статистика игрока. */
@@ -25,21 +25,21 @@ interface Props {
 }
 
 export function WidgetStatisticsCommonPanel(props: Props) {
-  const { data: { skillLevel, elo, kd, rank }, rankView, rankVisible } = props
+  const { data: { skillLevel, elo, kd, rank }, rankView, rankVisible } = props;
 
-  const switchable = rank.country && rank.region
+  const switchable = rank.country && rank.region;
 
   const getRankSlideClass = (target: 'country' | 'region') => {
     if (!switchable) {
       return target == rankView
         ? 'widget-statistics-common-panel__rank-item--active'
-        : 'widget-statistics-common-panel__rank-item--hidden'
+        : 'widget-statistics-common-panel__rank-item--hidden';
     }
     if (rankView !== target) {
-      return 'widget-statistics-common-panel__rank-item--hidden'
+      return 'widget-statistics-common-panel__rank-item--hidden';
     }
-    return rankVisible ? 'widget-statistics-common-panel__rank-item--active' : 'widget-statistics-common-panel__rank-item--hidden'
-  }
+    return rankVisible ? 'widget-statistics-common-panel__rank-item--active' : 'widget-statistics-common-panel__rank-item--hidden';
+  };
 
   return (
     <div className='widget-statistics-common-panel'>
@@ -87,5 +87,5 @@ export function WidgetStatisticsCommonPanel(props: Props) {
         )}
       </WidgetStatisticsValue>
     </div>
-  )
+  );
 }

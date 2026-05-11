@@ -1,8 +1,8 @@
-import { classNames } from '@/utils/classNames'
-import { formatNumberWithFixedDecimals } from '@/utils/number-format'
-import { WidgetStatisticsMetric } from '../widget-statistics-metric/widget-statistics-metric'
-import { WidgetStatisticsLast30WinRate } from '../widget-statistics-last30-win-rate/widget-statistics-last30-win-rate'
-import './widget-statistics-recent-matches-panel.scss'
+import { classNames } from '@/utils/classNames';
+import { formatNumberWithFixedDecimals } from '@/utils/number-format';
+import { WidgetStatisticsMetric } from '../widget-statistics-metric/widget-statistics-metric';
+import { WidgetStatisticsLast30WinRate } from '../widget-statistics-last30-win-rate/widget-statistics-last30-win-rate';
+import './widget-statistics-recent-matches-panel.scss';
 
 interface Props {
   /** Статистика игрока за последние 30 матчей. */
@@ -25,10 +25,10 @@ interface Props {
 }
 
 export function WidgetStatisticsRecentMatchesPanel(props: Props) {
-  const { data: { winRatePercent, matchResults, avg, adr, kd, kr }, className } = props
+  const { data: { winRatePercent, matchResults, avg, adr, kd, kr }, className } = props;
 
-  const avgAdr = `${formatNumberWithFixedDecimals(avg, 0)} / ${formatNumberWithFixedDecimals(adr, 0)}`
-  const kdKr = `${formatNumberWithFixedDecimals(kd, 2)} / ${formatNumberWithFixedDecimals(kr, 2)}`
+  const avgAdr = `${formatNumberWithFixedDecimals(avg, 0)} / ${formatNumberWithFixedDecimals(adr, 0)}`;
+  const kdKr = `${formatNumberWithFixedDecimals(kd, 2)} / ${formatNumberWithFixedDecimals(kr, 2)}`;
 
   return (
     <div className={classNames('widget-statistics-recent-matches-panel', className)}>
@@ -39,5 +39,5 @@ export function WidgetStatisticsRecentMatchesPanel(props: Props) {
         <WidgetStatisticsMetric value={kdKr} label='K/D / K/R' className='widget-statistics-recent-matches-panel__metric'/>
       </div>
     </div>
-  )
+  );
 }

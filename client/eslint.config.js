@@ -104,6 +104,10 @@ export default tseslint.config([
       'no-whitespace-before-property': ['error'],
       // Пробел после if / for / while / switch / catch и т.д. перед ( или следующим токеном.
       'keyword-spacing': ['error', { before: true, after: true }],
+      // if / else / for / while / do — только с телом в фигурных скобках (не `if (x) return`).
+      curly: ['error', 'all'],
+      // Не больше одного statement на строку (запрещает `if (x) { return; }` в одну строку).
+      'max-statements-per-line': ['error', { max: 1 }],
       // Требует пробелы вокруг инфиксных операторов, включая присваивание (=).
       'space-infix-ops': ['error'],
       // Не больше 3 пустых строк подряд; в начале/конце файла — без лишних пропусков.
@@ -166,6 +170,7 @@ export default tseslint.config([
           multilineDetection: 'brackets',
         },
       ],
+      '@stylistic/semi': ['error', 'always'],
 
       'react/jsx-max-depth': ['error', { max: 5 }],
     },

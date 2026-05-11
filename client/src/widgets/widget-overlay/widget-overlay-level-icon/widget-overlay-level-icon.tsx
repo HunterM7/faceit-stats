@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
-import { classNames } from '@/utils/classNames'
-import './widget-overlay-level-icon.scss'
+import { useEffect, useRef, useState } from 'react';
+import { classNames } from '@/utils/classNames';
+import './widget-overlay-level-icon.scss';
 
 export interface WidgetOverlayLevelIconProps {
   /** Сырой уровень из API; `null`, если `currentSkillLevel` не пришёл — в разметке показываем `--`. */
@@ -9,21 +9,21 @@ export interface WidgetOverlayLevelIconProps {
 }
 
 export function WidgetOverlayLevelIcon(props: WidgetOverlayLevelIconProps) {
-  const { skillLevel, result } = props
+  const { skillLevel, result } = props;
 
-  const prevLevelRef = useRef<number | null>(null)
-  const [ pulseNonce, setPulseNonce ] = useState(0)
+  const prevLevelRef = useRef<number | null>(null);
+  const [ pulseNonce, setPulseNonce ] = useState(0);
 
   useEffect(() => {
-    const prev = prevLevelRef.current
-    prevLevelRef.current = skillLevel
+    const prev = prevLevelRef.current;
+    prevLevelRef.current = skillLevel;
 
     if (prev === null || skillLevel === null || prev === skillLevel) {
-      return
+      return;
     }
 
-    setPulseNonce((n) => n + 1)
-  }, [ skillLevel ])
+    setPulseNonce((n) => n + 1);
+  }, [ skillLevel ]);
 
   return (
     <div
@@ -49,5 +49,5 @@ export function WidgetOverlayLevelIcon(props: WidgetOverlayLevelIconProps) {
         {skillLevel ?? '--'}
       </span>
     </div>
-  )
+  );
 }

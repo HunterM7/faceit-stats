@@ -1,17 +1,17 @@
-import { useEffect, useState } from 'react'
-import { NavLink } from 'react-router-dom'
-import { classNames } from '@/utils/classNames'
-import './app-header.scss'
+import { useEffect, useState } from 'react';
+import { NavLink } from 'react-router-dom';
+import { classNames } from '@/utils/classNames';
+import './app-header.scss';
 
 export function AppHeader() {
-  const [ isScrolled, setIsScrolled ] = useState(false)
+  const [ isScrolled, setIsScrolled ] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setIsScrolled(window.scrollY > 12)
-    onScroll()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+    const onScroll = () => setIsScrolled(window.scrollY > 12);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   return (
     <header className={`app-header ${isScrolled ? 'app-header--scrolled' : ''}`}>
@@ -35,5 +35,5 @@ export function AppHeader() {
         </nav>
       </div>
     </header>
-  )
+  );
 }

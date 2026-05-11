@@ -1,9 +1,9 @@
-import { type PropsWithChildren } from 'react'
-import { classNames } from '@/utils/classNames'
-import { ButtonVariant } from './utils/interface'
-import './button.scss'
+import { type PropsWithChildren } from 'react';
+import { classNames } from '@/utils/classNames';
+import { ButtonVariant } from './utils/interface';
+import './button.scss';
 
-export { ButtonVariant }
+export { ButtonVariant };
 
 interface ButtonProps {
   /** Вид кнопки. */
@@ -18,6 +18,6 @@ interface ButtonProps {
 
 /** Компонент кнопки. */
 export function Button(props: PropsWithChildren<ButtonProps>) {
-  const { className, variant, disabled, ...rest } = props
-  return <button type='button' className={classNames('button', `button--${variant}`, className)} disabled={disabled} {...rest}/>
+  const { className, variant, disabled, ...rest } = props;
+  return <button type='button' className={classNames('button', `button--${variant}`, className)} disabled={disabled} {...rest}/>;
 }

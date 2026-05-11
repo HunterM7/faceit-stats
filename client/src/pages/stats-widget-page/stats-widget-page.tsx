@@ -1,61 +1,61 @@
-import { startTransition, useEffect, useMemo, useState } from 'react'
-import { requestStats, type StatsPayload, type StatsRatingQuery } from '@requests/stats'
-import { Link } from 'react-router-dom'
-import { AppHeader } from '@components/app-header/app-header'
-import { Button, ButtonVariant } from '../../ui/button/button'
-import { Input } from '../../ui/input/input'
-import { LinkButton } from '../../ui/link-button/link-button'
-import { useToast } from '@components/toast-provider/use-toast'
-import { buildUrl } from '@utils/widget-url'
-import { StorageLocal } from '@utils/app-local-storage'
-import { StatsWidgetPagePreview, type StatsWidgetPagePreviewState } from './stats-widget-page-preview'
-import './stats-widget-page.scss'
+import { startTransition, useEffect, useMemo, useState } from 'react';
+import { requestStats, type StatsPayload, type StatsRatingQuery } from '@requests/stats';
+import { Link } from 'react-router-dom';
+import { AppHeader } from '@components/app-header/app-header';
+import { Button, ButtonVariant } from '../../ui/button/button';
+import { Input } from '../../ui/input/input';
+import { LinkButton } from '../../ui/link-button/link-button';
+import { useToast } from '@components/toast-provider/use-toast';
+import { buildUrl } from '@utils/widget-url';
+import { StorageLocal } from '@utils/app-local-storage';
+import { StatsWidgetPagePreview, type StatsWidgetPagePreviewState } from './stats-widget-page-preview';
+import './stats-widget-page.scss';
 
-const DEFAULT_WIDGET_BG_PERCENT = 96
-const DEFAULT_WIDGET_BORDER_RADIUS_PX = 16
-const DEFAULT_RATING_MODE: StatsRatingQuery = 'country'
-const STATS_WIDGET_PREVIEW_SOURCE = 'stats_widget' as const
+const DEFAULT_WIDGET_BG_PERCENT = 96;
+const DEFAULT_WIDGET_BORDER_RADIUS_PX = 16;
+const DEFAULT_RATING_MODE: StatsRatingQuery = 'country';
+const STATS_WIDGET_PREVIEW_SOURCE = 'stats_widget' as const;
 
 function parseRatingMode(stored: unknown): StatsRatingQuery {
   if (stored === 'region' || stored === 'both') {
-    return stored
+    return stored;
   }
-  return 'country'
+  return 'country';
 }
 /** Дефолт для `get`: если ключа нет, `LocalStorage` вернёт `NaN`. */
-const BORDER_RADIUS_STORAGE_DEFAULT = Number.NaN
-const BACKGROUND_OPACITY_STORAGE_DEFAULT = Number.NaN
+const BORDER_RADIUS_STORAGE_DEFAULT = Number.NaN;
+const BACKGROUND_OPACITY_STORAGE_DEFAULT = Number.NaN;
 
 function normalizeBackgroundOpacityPercent(stored: unknown): number {
   if (typeof stored === 'string') {
-    const trimmed = stored.trim()
+    const trimmed = stored.trim();
     if (!trimmed.length || !/^\d+$/.test(trimmed)) {
-      return DEFAULT_WIDGET_BG_PERCENT
+      return DEFAULT_WIDGET_BG_PERCENT;
     }
-    stored = Number(trimmed)
+    stored = Number(trimmed);
   }
   if (typeof stored !== 'number' || Number.isNaN(stored) || !Number.isFinite(stored)) {
-    return DEFAULT_WIDGET_BG_PERCENT
+    return DEFAULT_WIDGET_BG_PERCENT;
   }
-  const rounded = Math.round(stored)
+  const rounded = Math.round(stored);
   if (rounded < 0 || rounded > 100) {
-    return DEFAULT_WIDGET_BG_PERCENT
+    return DEFAULT_WIDGET_BG_PERCENT;
   }
-  return rounded
+  return rounded;
 }
 
 function normalizeBorderRadiusPx(stored: unknown): number {
   const parsed = typeof stored === 'number'
     ? stored
-    : Number(String(stored).trim())
+    : Number(String(stored).trim());
   if (!Number.isFinite(parsed)) {
-    return DEFAULT_WIDGET_BORDER_RADIUS_PX
+    return DEFAULT_WIDGET_BORDER_RADIUS_PX;
   }
-  const rounded = Math.round(parsed)
+  const rounded = Math.round(parsed);
   if (rounded < 0 || rounded > 18) {
-    return DEFAULT_WIDGET_BORDER_RADIUS_PX
+    return DEFAULT_WIDGET_BORDER_RADIUS_PX;
   }
-  return rounded
+  return rounded;
 }
 
 type StatsWidgetPageBgOpacityFieldProps = {
@@ -63,10 +63,10 @@ type StatsWidgetPageBgOpacityFieldProps = {
   onChange: (next: number) => void;
   onReset: () => void;
   isResetDisabled: boolean;
-}
+};
 
 function StatsWidgetPageBgOpacityField(props: StatsWidgetPageBgOpacityFieldProps) {
-  const { value, onChange, onReset, isResetDisabled } = props
+  const { value, onChange, onReset, isResetDisabled } = props;
 
   return (
     <div className='stats-widget-page__bg-shell'>
@@ -99,7 +99,7 @@ function StatsWidgetPageBgOpacityField(props: StatsWidgetPageBgOpacityFieldProps
         aria-label='Прозрачность фона виджета, проценты от 0 до 100'
       />
     </div>
-  )
+  );
 }
 
 type StatsWidgetPageBorderRadiusFieldProps = {
@@ -107,10 +107,10 @@ type StatsWidgetPageBorderRadiusFieldProps = {
   onChange: (next: number) => void;
   onReset: () => void;
   isResetDisabled: boolean;
-}
+};
 
 function StatsWidgetPageBorderRadiusField(props: StatsWidgetPageBorderRadiusFieldProps) {
-  const { value, onChange, onReset, isResetDisabled } = props
+  const { value, onChange, onReset, isResetDisabled } = props;
 
   return (
     <div className='stats-widget-page__bg-shell stats-widget-page__bg-shell--stacked stats-widget-page__bg-shell--rating'>
@@ -143,17 +143,17 @@ function StatsWidgetPageBorderRadiusField(props: StatsWidgetPageBorderRadiusFiel
         aria-label='Скругление углов виджета в пикселях, от 0 до 18'
       />
     </div>
-  )
+  );
 }
 
 type StatsWidgetPageRatingFieldProps = {
   value: StatsRatingQuery;
   onChange: (next: StatsRatingQuery) => void;
-}
+};
 
 /** Настройка query-параметра `rating` (лидерборд FACEIT для блока RANK), оформление как у bg / radius. */
 function StatsWidgetPageRatingField(props: StatsWidgetPageRatingFieldProps) {
-  const { value, onChange } = props
+  const { value, onChange } = props;
 
   return (
     <div className='stats-widget-page__bg-shell stats-widget-page__bg-shell--stacked'>
@@ -173,113 +173,113 @@ function StatsWidgetPageRatingField(props: StatsWidgetPageRatingFieldProps) {
         <option value='both'>Страна и регион</option>
       </select>
     </div>
-  )
+  );
 }
 
 export function StatsWidgetPage() {
-  const nicknameStorage = StorageLocal().path('widgets.statistics.nickname')
-  const backgroundOpacityStorage = StorageLocal().path('widgets.statistics.backgroundOpacity')
-  const borderRadiusStorage = StorageLocal().path('widgets.statistics.borderRadius')
-  const ratingModeStorage = StorageLocal().path('widgets.statistics.ratingMode')
+  const nicknameStorage = StorageLocal().path('widgets.statistics.nickname');
+  const backgroundOpacityStorage = StorageLocal().path('widgets.statistics.backgroundOpacity');
+  const borderRadiusStorage = StorageLocal().path('widgets.statistics.borderRadius');
+  const ratingModeStorage = StorageLocal().path('widgets.statistics.ratingMode');
 
-  const { showToast } = useToast()
+  const { showToast } = useToast();
 
-  const [ nickname, setNickname ] = useState(() => nicknameStorage.get(''))
+  const [ nickname, setNickname ] = useState(() => nicknameStorage.get(''));
   const [ backgroundOpacity, setBackgroundOpacity ] = useState(() => normalizeBackgroundOpacityPercent(
     backgroundOpacityStorage.get(BACKGROUND_OPACITY_STORAGE_DEFAULT),
-  ))
+  ));
   const [ borderRadius, setBorderRadius ] = useState(() => normalizeBorderRadiusPx(
     borderRadiusStorage.get(BORDER_RADIUS_STORAGE_DEFAULT),
-  ))
+  ));
   const [ includeBgInUrl, setIncludeBgInUrl ] = useState(() => {
-    const stored = backgroundOpacityStorage.get(BACKGROUND_OPACITY_STORAGE_DEFAULT)
-    return !Number.isNaN(stored)
-  })
+    const stored = backgroundOpacityStorage.get(BACKGROUND_OPACITY_STORAGE_DEFAULT);
+    return !Number.isNaN(stored);
+  });
   const [ includeRadiusInUrl, setIncludeRadiusInUrl ] = useState(() => {
-    const stored = borderRadiusStorage.get(BORDER_RADIUS_STORAGE_DEFAULT)
-    return !Number.isNaN(stored)
-  })
+    const stored = borderRadiusStorage.get(BORDER_RADIUS_STORAGE_DEFAULT);
+    return !Number.isNaN(stored);
+  });
   const [ ratingMode, setRatingMode ] = useState<StatsRatingQuery>(() =>
     parseRatingMode(ratingModeStorage.get(DEFAULT_RATING_MODE)),
-  )
-  const [ previewState, setPreviewState ] = useState<StatsWidgetPagePreviewState>({ kind: 'empty' })
+  );
+  const [ previewState, setPreviewState ] = useState<StatsWidgetPagePreviewState>({ kind: 'empty' });
 
   useEffect(() => {
-    const trimmed = nickname.trim()
+    const trimmed = nickname.trim();
     if (!trimmed) {
       startTransition(() => {
-        setPreviewState({ kind: 'empty' })
-      })
-      return
+        setPreviewState({ kind: 'empty' });
+      });
+      return;
     }
-    let cancelled = false
+    let cancelled = false;
     startTransition(() => {
-      setPreviewState({ kind: 'loading', nickname: trimmed })
-    })
+      setPreviewState({ kind: 'loading', nickname: trimmed });
+    });
     void requestStats(trimmed, STATS_WIDGET_PREVIEW_SOURCE, 'both', { preview: true })
       .then((stats: StatsPayload) => {
         if (cancelled) {
-          return
+          return;
         }
-        setPreviewState({ kind: 'ready', nickname: trimmed, stats })
+        setPreviewState({ kind: 'ready', nickname: trimmed, stats });
       })
       .catch((error: unknown) => {
         if (cancelled) {
-          return
+          return;
         }
-        const message = error instanceof Error ? error.message : 'Не удалось загрузить данные'
-        setPreviewState({ kind: 'error', nickname: trimmed, message })
-      })
+        const message = error instanceof Error ? error.message : 'Не удалось загрузить данные';
+        setPreviewState({ kind: 'error', nickname: trimmed, message });
+      });
     return () => {
-      cancelled = true
-    }
-  }, [ nickname ])
+      cancelled = true;
+    };
+  }, [ nickname ]);
 
-  const canBuild = nickname.trim().length > 0
+  const canBuild = nickname.trim().length > 0;
 
   const handleNicknameChange = (value: string) => {
-    setNickname(value)
+    setNickname(value);
     if (!value.trim().length) {
-      nicknameStorage.delete()
-      return
+      nicknameStorage.delete();
+      return;
     }
-    nicknameStorage.set(value)
-  }
+    nicknameStorage.set(value);
+  };
 
   const handleBgOpacityPercentChange = (next: number) => {
-    const clamped = Math.min(100, Math.max(0, Math.round(next)))
-    setBackgroundOpacity(clamped)
-    backgroundOpacityStorage.set(clamped)
-    setIncludeBgInUrl(true)
-  }
+    const clamped = Math.min(100, Math.max(0, Math.round(next)));
+    setBackgroundOpacity(clamped);
+    backgroundOpacityStorage.set(clamped);
+    setIncludeBgInUrl(true);
+  };
 
   const handleBackgroundOpacityReset = () => {
-    setBackgroundOpacity(DEFAULT_WIDGET_BG_PERCENT)
-    backgroundOpacityStorage.delete()
-    setIncludeBgInUrl(false)
-  }
+    setBackgroundOpacity(DEFAULT_WIDGET_BG_PERCENT);
+    backgroundOpacityStorage.delete();
+    setIncludeBgInUrl(false);
+  };
 
   const handleBorderRadiusPxChange = (next: number) => {
-    const clamped = Math.min(18, Math.max(0, Math.round(next)))
-    setBorderRadius(clamped)
-    borderRadiusStorage.set(clamped)
-    setIncludeRadiusInUrl(true)
-  }
+    const clamped = Math.min(18, Math.max(0, Math.round(next)));
+    setBorderRadius(clamped);
+    borderRadiusStorage.set(clamped);
+    setIncludeRadiusInUrl(true);
+  };
 
   const handleBorderRadiusReset = () => {
-    setBorderRadius(DEFAULT_WIDGET_BORDER_RADIUS_PX)
-    borderRadiusStorage.delete()
-    setIncludeRadiusInUrl(false)
-  }
+    setBorderRadius(DEFAULT_WIDGET_BORDER_RADIUS_PX);
+    borderRadiusStorage.delete();
+    setIncludeRadiusInUrl(false);
+  };
 
   const handleRatingModeChange = (next: StatsRatingQuery) => {
-    setRatingMode(next)
-    ratingModeStorage.set(next)
-  }
+    setRatingMode(next);
+    ratingModeStorage.set(next);
+  };
 
-  const bgForUrl = includeBgInUrl ? backgroundOpacity : undefined
-  const radiusForUrl = includeRadiusInUrl ? borderRadius : undefined
-  const ratingForUrl = ratingMode === 'country' ? undefined : ratingMode
+  const bgForUrl = includeBgInUrl ? backgroundOpacity : undefined;
+  const radiusForUrl = includeRadiusInUrl ? borderRadius : undefined;
+  const ratingForUrl = ratingMode === 'country' ? undefined : ratingMode;
 
   const widgetUrl = useMemo(
     () => (canBuild
@@ -291,25 +291,27 @@ export function StatsWidgetPage() {
       })
       : ''),
     [ bgForUrl, canBuild, nickname, radiusForUrl, ratingForUrl ],
-  )
+  );
 
   const copy = async () => {
-    if (!widgetUrl) return
+    if (!widgetUrl) {
+      return;
+    }
     try {
-      await navigator.clipboard.writeText(widgetUrl)
+      await navigator.clipboard.writeText(widgetUrl);
       showToast({
         title: 'Скопировано',
         variant: 'success',
         durationMs: 2200,
-      })
+      });
     } catch {
       showToast({
         title: 'Не удалось скопировать',
         message: 'Разреши доступ к буферу обмена или скопируй ссылку вручную.',
         variant: 'error',
-      })
+      });
     }
-  }
+  };
 
   return (
     <main className='stats-widget-page'>
@@ -408,5 +410,5 @@ export function StatsWidgetPage() {
         </div>
       </section>
     </main>
-  )
+  );
 }

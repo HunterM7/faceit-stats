@@ -1,119 +1,123 @@
-import { useEffect, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
-import { Button, ButtonVariant } from '@/ui/button/button'
-import { Input } from '@/ui/input/input'
-import { useToast } from '@components/toast-provider/use-toast'
+import { useEffect, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { Button, ButtonVariant } from '@/ui/button/button';
+import { Input } from '@/ui/input/input';
+import { useToast } from '@components/toast-provider/use-toast';
 import {
   AdminUnauthorizedError,
   requestAdminErrors,
   type AdminErrorsPayload,
   type AdminPeriod,
   type AdminScope,
-} from '@requests/admin'
-import '../admin-page/admin-page.scss'
-import './admin-errors-page.scss'
+} from '@requests/admin';
+import '../admin-page/admin-page.scss';
+import './admin-errors-page.scss';
 
 const ADMIN_PERIOD_OPTIONS: Array<{ id: AdminPeriod; label: string }> = [
   { id: 'day', label: 'День' },
   { id: 'week', label: 'Неделя' },
   { id: 'month', label: 'Месяц' },
   { id: 'all', label: 'Всё время' },
-]
+];
 
 const ADMIN_SCOPE_OPTIONS: Array<{ id: AdminScope; label: string }> = [
   { id: 'overall', label: 'Все источники' },
   { id: 'stats_widget', label: 'Stats Widget' },
   { id: 'overlay_widget', label: 'Overlay Widget' },
-]
+];
 
 export function AdminErrorsPage() {
-  const { showToast } = useToast()
-  const [ searchParams ] = useSearchParams()
-  const scopeParam = searchParams.get('scope')
+  const { showToast } = useToast();
+  const [ searchParams ] = useSearchParams();
+  const scopeParam = searchParams.get('scope');
   const scope: AdminScope =
     scopeParam === 'stats_widget' || scopeParam === 'overlay_widget' || scopeParam === 'overall'
       ? scopeParam
-      : 'overall'
-  const [ period, setPeriod ] = useState<AdminPeriod>('day')
-  const [ errorsData, setErrorsData ] = useState<AdminErrorsPayload | null>(null)
-  const [ authToken, setAuthToken ] = useState<string>(() => window.sessionStorage.getItem('admin-auth-token') || '')
-  const [ isAuthorized, setIsAuthorized ] = useState(false)
-  const [ login, setLogin ] = useState('')
-  const [ password, setPassword ] = useState('')
+      : 'overall';
+  const [ period, setPeriod ] = useState<AdminPeriod>('day');
+  const [ errorsData, setErrorsData ] = useState<AdminErrorsPayload | null>(null);
+  const [ authToken, setAuthToken ] = useState<string>(() => window.sessionStorage.getItem('admin-auth-token') || '');
+  const [ isAuthorized, setIsAuthorized ] = useState(false);
+  const [ login, setLogin ] = useState('');
+  const [ password, setPassword ] = useState('');
 
   useEffect(() => {
     if (!authToken) {
-      return () => undefined
+      return () => undefined;
     }
 
-    let cancelled = false
+    let cancelled = false;
     const load = async () => {
       try {
-        const next = await requestAdminErrors(period, scope, authToken)
-        if (cancelled) return
-        setErrorsData(next)
-        setIsAuthorized(true)
+        const next = await requestAdminErrors(period, scope, authToken);
+        if (cancelled) {
+          return;
+        }
+        setErrorsData(next);
+        setIsAuthorized(true);
       } catch (error) {
-        if (cancelled) return
+        if (cancelled) {
+          return;
+        }
         if (error instanceof AdminUnauthorizedError) {
-          setAuthToken('')
-          setIsAuthorized(false)
-          window.sessionStorage.removeItem('admin-auth-token')
+          setAuthToken('');
+          setIsAuthorized(false);
+          window.sessionStorage.removeItem('admin-auth-token');
           showToast({
             title: 'Вход отклонен',
             message: 'Неверный логин или пароль. Попробуй снова.',
             variant: 'error',
-          })
-          return
+          });
+          return;
         }
         showToast({
           title: 'Не удалось загрузить ошибки',
           message: (error as Error).message || 'Попробуй обновить страницу позже.',
           variant: 'error',
-        })
+        });
       }
-    }
+    };
 
-    void load()
+    void load();
     return () => {
-      cancelled = true
-    }
-  }, [ authToken, period, scope, showToast ])
+      cancelled = true;
+    };
+  }, [ authToken, period, scope, showToast ]);
 
   const submitAuth = () => {
-    const normalizedLogin = login.trim()
+    const normalizedLogin = login.trim();
     if (!normalizedLogin || !password) {
       showToast({
         title: 'Нужны данные для входа',
         message: 'Заполни логин и пароль.',
         variant: 'warning',
-      })
-      return
+      });
+      return;
     }
 
-    const token = encodeBasicAuthToken(normalizedLogin, password)
+    const token = encodeBasicAuthToken(normalizedLogin, password);
     if (!token) {
       showToast({
         title: 'Ошибка кодирования',
         message: 'Не удалось подготовить данные авторизации.',
         variant: 'error',
-      })
-      return
+      });
+      return;
     }
-    window.sessionStorage.setItem('admin-auth-token', token)
-    setAuthToken(token)
-    setIsAuthorized(false)
-    setPassword('')
-  }
+    window.sessionStorage.setItem('admin-auth-token', token);
+    setAuthToken(token);
+    setIsAuthorized(false);
+    setPassword('');
+  };
 
   const logout = () => {
-    window.sessionStorage.removeItem('admin-auth-token')
-    setAuthToken('')
-    setIsAuthorized(false)
-    setErrorsData(null)
-    setLogin('')
-    setPassword('')
-  }
+    window.sessionStorage.removeItem('admin-auth-token');
+    setAuthToken('');
+    setIsAuthorized(false);
+    setErrorsData(null);
+    setLogin('');
+    setPassword('');
+  };
 
   if (!authToken) {
     return (
@@ -133,7 +137,7 @@ export function AdminErrorsPage() {
           </section>
         </div>
       </main>
-    )
+    );
   }
 
   if (!isAuthorized) {
@@ -147,14 +151,14 @@ export function AdminErrorsPage() {
           <p className='admin-page__empty'>Проверяем доступ...</p>
         </section>
       </main>
-    )
+    );
   }
 
   const data = errorsData ?? {
     totalErrors: 0,
     latestErrors: [],
     storage: 'disabled' as const,
-  }
+  };
 
   return (
     <main className='admin-page admin-errors-page'>
@@ -231,25 +235,29 @@ export function AdminErrorsPage() {
         </footer>
       </section>
     </main>
-  )
+  );
 }
 
 function encodeBasicAuthToken(login: string, password: string): string | null {
   try {
-    const value = `${login}:${password}`
-    const bytes = new TextEncoder().encode(value)
-    let binary = ''
+    const value = `${login}:${password}`;
+    const bytes = new TextEncoder().encode(value);
+    let binary = '';
     for (const byte of bytes) {
-      binary += String.fromCharCode(byte)
+      binary += String.fromCharCode(byte);
     }
-    return window.btoa(binary)
+    return window.btoa(binary);
   } catch {
-    return null
+    return null;
   }
 }
 
 function toErrorOriginLabel(origin?: 'faceit' | 'internal' | 'unknown'): string {
-  if (origin === 'faceit') return 'FACEIT'
-  if (origin === 'internal') return 'Наш backend'
-  return 'Не определен'
+  if (origin === 'faceit') {
+    return 'FACEIT';
+  }
+  if (origin === 'internal') {
+    return 'Наш backend';
+  }
+  return 'Не определен';
 }

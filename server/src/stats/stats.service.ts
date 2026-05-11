@@ -275,7 +275,9 @@ export class StatsService {
   }
 
   private roundFixed(value: number): number {
-    if (!Number.isFinite(value)) return 0;
+    if (!Number.isFinite(value)) {
+      return 0;
+    }
     return Math.round((value + Number.EPSILON) * 100) / 100;
   }
 
@@ -308,7 +310,9 @@ export class StatsService {
   }
 
   private parseGlobalRankingPosition(data: PlayerGlobalRankingResponse | null, playerId: string): number | null {
-    if (!data) return null;
+    if (!data) {
+      return null;
+    }
     if (typeof data.position === 'number' && data.position > 0) {
       return data.position;
     }
@@ -339,10 +343,14 @@ export class StatsService {
   }
 
   private toFiniteNumber(value: unknown): number | null {
-    if (typeof value === 'number' && Number.isFinite(value)) return value;
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return value;
+    }
     if (typeof value === 'string') {
       const parsed = Number(value.replace(',', '.').trim());
-      if (Number.isFinite(parsed)) return parsed;
+      if (Number.isFinite(parsed)) {
+        return parsed;
+      }
     }
     return null;
   }

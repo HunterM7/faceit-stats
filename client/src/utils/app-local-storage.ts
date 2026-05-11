@@ -1,4 +1,4 @@
-import { LocalStorage } from '@utils/local-storage'
+import { LocalStorage } from '@utils/local-storage';
 
 type AppLocalStorageSchema = {
   /** Виджеты. */
@@ -20,15 +20,15 @@ type AppLocalStorageSchema = {
       nickname: string;
     };
   };
-}
+};
 
-let storageLocal: LocalStorage<AppLocalStorageSchema> | null = null
+let storageLocal: LocalStorage<AppLocalStorageSchema> | null = null;
 
 export function StorageLocal(): LocalStorage<AppLocalStorageSchema> {
   if (storageLocal) {
-    return storageLocal
+    return storageLocal;
   }
 
-  storageLocal = new LocalStorage<AppLocalStorageSchema>('faceit-stats')
-  return storageLocal
+  storageLocal = new LocalStorage<AppLocalStorageSchema>('faceit-stats');
+  return storageLocal;
 }

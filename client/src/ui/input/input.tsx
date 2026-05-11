@@ -1,6 +1,6 @@
-import { useCallback, type ChangeEvent, type InputHTMLAttributes } from 'react'
-import { classNames } from '@/utils/classNames'
-import './input.scss'
+import { useCallback, type ChangeEvent, type InputHTMLAttributes } from 'react';
+import { classNames } from '@/utils/classNames';
+import './input.scss';
 
 interface InputProps extends Pick<InputHTMLAttributes<HTMLInputElement>, 'type' | 'name' | 'autoComplete' | 'placeholder' | 'disabled' | 'readOnly'> {
   /** Значение поля. */
@@ -15,20 +15,20 @@ interface InputProps extends Pick<InputHTMLAttributes<HTMLInputElement>, 'type' 
 
 /** Базовый компонент текстового поля ввода. */
 export function Input(props: InputProps) {
-  const { className, isClearable, value, disabled, readOnly, onChange, ...rest } = props
+  const { className, isClearable, value, disabled, readOnly, onChange, ...rest } = props;
 
-  const canClear = Boolean(isClearable && value && !disabled && !readOnly)
+  const canClear = Boolean(isClearable && value && !disabled && !readOnly);
 
   const onClearHandler = useCallback(() => {
     if (!canClear) {
-      return
+      return;
     }
-    onChange?.('')
-  }, [ canClear, onChange ])
+    onChange?.('');
+  }, [ canClear, onChange ]);
 
   const onChangeHandler = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-    onChange?.(event.target.value)
-  }, [ onChange ])
+    onChange?.(event.target.value);
+  }, [ onChange ]);
 
   return (
     <div className={classNames('input', className)}>
@@ -42,5 +42,5 @@ export function Input(props: InputProps) {
         </button>
       )}
     </div>
-  )
+  );
 }

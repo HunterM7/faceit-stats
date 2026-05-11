@@ -61,6 +61,10 @@ export default tseslint.config(
        */
       '@stylistic/indent': ['error', 2, { SwitchCase: 1 }],
       '@stylistic/keyword-spacing': ['error', { before: true, after: true }],
+      /** if / else / for / while / do — только с телом в `{ }` (не `if (x) return`). */
+      curly: ['error', 'all'],
+      /** Не больше одного statement на строку (запрещает `if (x) { return; }` в одну строку). */
+      'max-statements-per-line': ['error', { max: 1 }],
       '@stylistic/max-len': [
         'error',
         { code: 150, ignoreUrls: true, ignoreStrings: true, ignoreRegExpLiterals: true },

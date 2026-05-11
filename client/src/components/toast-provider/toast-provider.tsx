@@ -1,5 +1,5 @@
-import { Toaster } from 'sonner'
-import './toast-provider.scss'
+import { Toaster } from 'sonner';
+import './toast-provider.scss';
 
 export function ToastProvider() {
   return (
@@ -18,5 +18,5 @@ export function ToastProvider() {
         },
       }}
     />
-  )
+  );
 }

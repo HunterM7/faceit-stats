@@ -1,8 +1,8 @@
-import { Link } from 'react-router-dom'
-import type { CSSProperties } from 'react'
-import { AppHeader } from '@components/app-header/app-header'
-import cs2Bg from '@images/cs2-bg.jpg'
-import './landing-page.scss'
+import { Link } from 'react-router-dom';
+import type { CSSProperties } from 'react';
+import { AppHeader } from '@components/app-header/app-header';
+import cs2Bg from '@images/cs2-bg.jpg';
+import './landing-page.scss';
 
 export function LandingPage() {
   return (
@@ -45,5 +45,5 @@ export function LandingPage() {
         <p className='landing-page__footer-text'>FACEIT Widgets for OBS</p>
       </footer>
     </main>
-  )
+  );
 }

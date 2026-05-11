@@ -1,5 +1,5 @@
-import { WidgetStatistics } from '@widgets/widget-statistics/widget-statistics'
-import type { StatsPayload, Rank, StatsRatingQuery } from '@requests/stats'
+import { WidgetStatistics } from '@widgets/widget-statistics/widget-statistics';
+import type { StatsPayload, Rank, StatsRatingQuery } from '@requests/stats';
 import type { ComponentProps } from 'react';
 
 export type StatsWidgetPagePreviewState =
@@ -10,12 +10,12 @@ export type StatsWidgetPagePreviewState =
 
 function filterRankForRatingMode(rank: Rank, mode: StatsRatingQuery): Rank {
   if (mode === 'both') {
-    return { ...rank }
+    return { ...rank };
   }
   if (mode === 'country') {
-    return rank.country ? { country: rank.country } : {}
+    return rank.country ? { country: rank.country } : {};
   }
-  return rank.region ? { region: rank.region } : {}
+  return rank.region ? { region: rank.region } : {};
 }
 
 function mapStatsPayloadToWidgetProps(stats: StatsPayload, ratingMode: StatsRatingQuery): Pick<ComponentProps<typeof WidgetStatistics>, 'common' | 'daily' | 'recentMatches'> {
@@ -41,7 +41,7 @@ function mapStatsPayloadToWidgetProps(stats: StatsPayload, ratingMode: StatsRati
       kd: stats.last30.kd,
       kr: stats.last30.kr,
     },
-  }
+  };
 }
 
 type StatsWidgetPagePreviewProps = {
@@ -49,10 +49,10 @@ type StatsWidgetPagePreviewProps = {
   ratingMode: StatsRatingQuery;
   backgroundOpacity: number;
   borderRadius: number;
-}
+};
 
 export function StatsWidgetPagePreview(props: StatsWidgetPagePreviewProps) {
-  const { preview, ratingMode, backgroundOpacity, borderRadius } = props
+  const { preview, ratingMode, backgroundOpacity, borderRadius } = props;
 
   if (preview.kind === 'empty') {
     return (
@@ -61,7 +61,7 @@ export function StatsWidgetPagePreview(props: StatsWidgetPagePreviewProps) {
           Укажи ник на FACEIT.
         </p>
       </div>
-    )
+    );
   }
 
   if (preview.kind === 'loading') {
@@ -71,7 +71,7 @@ export function StatsWidgetPagePreview(props: StatsWidgetPagePreviewProps) {
           Загрузка предпросмотра…
         </p>
       </div>
-    )
+    );
   }
 
   if (preview.kind === 'error') {
@@ -81,10 +81,10 @@ export function StatsWidgetPagePreview(props: StatsWidgetPagePreviewProps) {
           {preview.message}
         </p>
       </div>
-    )
+    );
   }
 
-  const cardProps = mapStatsPayloadToWidgetProps(preview.stats, ratingMode)
+  const cardProps = mapStatsPayloadToWidgetProps(preview.stats, ratingMode);
 
   return (
     <div className='stats-widget-page__preview'>
@@ -97,5 +97,5 @@ export function StatsWidgetPagePreview(props: StatsWidgetPagePreviewProps) {
         />
       </div>
     </div>
-  )
+  );
 }

@@ -1,5 +1,5 @@
-import { useCallback } from 'react'
-import { toast } from 'sonner'
+import { useCallback } from 'react';
+import { toast } from 'sonner';
 
 export function useToast() {
   const showToast = useCallback(({ title, message, variant = 'info', durationMs }: ShowToastPayload) => {
@@ -7,11 +7,11 @@ export function useToast() {
       description: message,
       duration: durationMs,
       className: `app-toast app-toast--${variant}`,
-    }
-    toast(title, options)
-  }, [])
+    };
+    toast(title, options);
+  }, []);
 
-  return { showToast }
+  return { showToast };
 }
 
 type ShowToastPayload = {
@@ -19,4 +19,4 @@ type ShowToastPayload = {
   message?: string;
   variant?: 'info' | 'success' | 'warning' | 'error';
   durationMs?: number;
-}
+};

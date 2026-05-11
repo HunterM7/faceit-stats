@@ -1,8 +1,8 @@
-import { classNames } from '@/utils/classNames'
-import { formatNumberWithFixedDecimals } from '@/utils/number-format'
-import { WidgetStatisticsMetric } from '../widget-statistics-metric/widget-statistics-metric'
-import { MatchResult, WidgetStatisticsMatchResults } from '../widget-statistics-match-results/widget-statistics-match-results'
-import './widget-statistics-daily-panel.scss'
+import { classNames } from '@/utils/classNames';
+import { formatNumberWithFixedDecimals } from '@/utils/number-format';
+import { WidgetStatisticsMetric } from '../widget-statistics-metric/widget-statistics-metric';
+import { MatchResult, WidgetStatisticsMatchResults } from '../widget-statistics-match-results/widget-statistics-match-results';
+import './widget-statistics-daily-panel.scss';
 
 interface Props {
   /** Статистика игрока за текущий игровой день. */
@@ -23,9 +23,9 @@ interface Props {
 }
 
 export function WidgetStatisticsDailyPanel(props: Props) {
-  const { data: { wins, losses, avg, adr, kd }, className } = props
+  const { data: { wins, losses, avg, adr, kd }, className } = props;
 
-  const avgAdr = `${formatNumberWithFixedDecimals(avg, 0)} / ${formatNumberWithFixedDecimals(adr, 0)}`
+  const avgAdr = `${formatNumberWithFixedDecimals(avg, 0)} / ${formatNumberWithFixedDecimals(adr, 0)}`;
 
   return (
     <div className={classNames('widget-statistics-daily-panel', className)}>
@@ -39,5 +39,5 @@ export function WidgetStatisticsDailyPanel(props: Props) {
         <WidgetStatisticsMetric className='widget-statistics-daily-panel__metric' value={formatNumberWithFixedDecimals(kd, 2)} label='K/D'/>
       </div>
     </div>
-  )
+  );
 }
