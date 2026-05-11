@@ -73,6 +73,21 @@ export default tseslint.config(
       '@stylistic/quotes': ['error', 'single', { avoidEscape: true }],
       '@stylistic/semi': ['error', 'always'],
       '@stylistic/space-infix-ops': 'error',
+      /** Интерфейсы и типы: разделитель полей — `;`. */
+      '@stylistic/member-delimiter-style': [
+        'error',
+        {
+          multiline: {
+            delimiter: 'semi',
+            requireLast: true,
+          },
+          singleline: {
+            delimiter: 'semi',
+            requireLast: false,
+          },
+          multilineDetection: 'brackets',
+        },
+      ],
 
       'import/no-unresolved': 'off',
       'import/newline-after-import': ['warn', { count: 1 }],

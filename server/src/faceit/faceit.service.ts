@@ -4,9 +4,10 @@ import { AppConfigService } from '../config/app-config.service';
 import {
   type InternalMatchStatsResponse,
   type MatchHistoryResponse,
+  type PlayerGameStatsResponse,
   type PlayerGlobalRankingResponse,
   type PlayerResponse,
-} from '../stats/stats.types';
+} from './faceit.types';
 
 const FACEIT_BASE_URL = 'https://open.faceit.com/data/v4';
 
@@ -47,8 +48,8 @@ export class FaceitService {
     return response.data;
   }
 
-  async getPlayerGameStats(playerId: string): Promise<Record<string, unknown>> {
-    const response = await this.http.get<Record<string, unknown>>(`/players/${playerId}/stats/${this.config.gameId}`);
+  async getPlayerGameStats(playerId: string): Promise<PlayerGameStatsResponse> {
+    const response = await this.http.get<PlayerGameStatsResponse>(`/players/${playerId}/stats/${this.config.gameId}`);
     return response.data;
   }
 

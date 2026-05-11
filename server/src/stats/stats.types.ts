@@ -1,69 +1,27 @@
+import type {
+  InternalMatchStatsResponse,
+  MatchHistoryItem,
+  MatchHistoryResponse,
+  PlayerGameStatsResponse,
+  PlayerResponse,
+} from '../faceit/faceit.types';
+
 export type MatchResult = 'WIN' | 'LOSS' | 'UNKNOWN';
 
-export interface PlayerGameData {
-  faceit_elo?: number;
-  skill_level?: number;
-  /** Регион матчмейкинга для игры (например `EU`), нужен для Rankings API. */
-  region?: string;
-}
-
-/** Ответ `GET /rankings/games/.../regions/.../players/...`. */
-export interface PlayerGlobalRankingItem {
-  country?: string;
-  faceit_elo?: number;
-  game_skill_level?: number;
-  nickname?: string;
-  player_id?: string;
-  position?: number;
-}
-
-export interface PlayerGlobalRankingResponse {
-  start?: number;
-  end?: number;
-  position?: number;
-  items?: PlayerGlobalRankingItem[];
-}
-
-export interface PlayerResponse {
-  player_id?: string;
-  nickname?: string;
-  country?: string;
-  games?: Record<string, PlayerGameData>;
-}
-
-export interface MatchPlayer {
-  player_id: string;
-  nickname?: string;
-}
-
-export interface MatchTeam {
-  players?: MatchPlayer[];
-}
-
-export interface MatchHistoryItem {
-  match_id?: string;
-  game_id?: string;
-  status?: string;
-  finished_at?: number;
-  started_at?: number;
-  results?: {
-    winner?: string;
-    score?: Record<string, number>;
-  };
-  teams?: Record<string, MatchTeam>;
-}
-
-export interface MatchHistoryResponse {
-  items?: MatchHistoryItem[];
-}
-
-export interface InternalMatchStatsItem {
-  stats?: Record<string, string>;
-}
-
-export interface InternalMatchStatsResponse {
-  items?: InternalMatchStatsItem[];
-}
+/** Реэкспорт DTO FACEIT (раньше жили в этом файле). */
+export type {
+  InternalMatchStatsItem,
+  InternalMatchStatsResponse,
+  MatchHistoryItem,
+  MatchHistoryResponse,
+  MatchPlayer,
+  MatchTeam,
+  PlayerGameData,
+  PlayerGameStatsResponse,
+  PlayerGlobalRankingItem,
+  PlayerGlobalRankingResponse,
+  PlayerResponse,
+} from '../faceit/faceit.types';
 
 /**
  * `?rating=` для `/api/playerStatistics`.
@@ -116,7 +74,7 @@ export interface StatsResponse {
   updatedAt: string;
   raw: {
     player: PlayerResponse;
-    gameStats: Record<string, unknown>;
+    gameStats: PlayerGameStatsResponse;
     history: MatchHistoryResponse;
     internalStats: InternalMatchStatsResponse;
   };

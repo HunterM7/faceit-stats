@@ -81,7 +81,6 @@ export class StatsService {
     const items = history?.items || [];
     const latest = items[0] || null;
     const gameStats = player?.games?.[gameId] || {};
-    const lifetime = this.getLifetimeStats(gameStatsRaw);
     const internalItems = (internalStats?.items || [])
       .map((item) => this.parseInternalMatch(item))
       .filter((item): item is ParsedInternalMatch => item !== null);
@@ -93,7 +92,7 @@ export class StatsService {
     );
     const elo = typeof gameStats.faceit_elo === 'number' ? gameStats.faceit_elo : 0;
     const skillLevel = typeof gameStats.skill_level === 'number' ? gameStats.skill_level : 0;
-    const commonKdRatio = this.pickNumber(lifetime, [ 'Average K/D Ratio', 'K/D Ratio' ]) ?? 0;
+    const commonKdRatio = this.pickNumber(gameStatsRaw?.lifetime ?? {}, [ 'Average K/D Ratio', 'K/D Ratio' ]) ?? 0;
     const rankCountryPos = this.parseGlobalRankingPosition(rankingCountry, playerId);
     const rankRegionPos = this.parseGlobalRankingPosition(rankingRegion, playerId);
     const rank = this.buildRankBlock({
@@ -195,14 +194,6 @@ export class StatsService {
       currentSkillLevel,
       updatedAt: new Date().toISOString(),
     };
-  }
-
-  private getLifetimeStats(stats: Record<string, unknown>): Record<string, unknown> {
-    const maybeLifetime = stats?.lifetime;
-    if (typeof maybeLifetime === 'object' && maybeLifetime) {
-      return maybeLifetime as Record<string, unknown>;
-    }
-    return {};
   }
 
   private pickNumber(source: Record<string, unknown>, keys: string[]): number | null {
