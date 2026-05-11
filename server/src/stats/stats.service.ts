@@ -92,7 +92,6 @@ export class StatsService {
     const today = this.aggregateInternalMatches(
       internalItems.filter((item) => item.finishedAtMs !== null && item.finishedAtMs > todayStartMs),
     );
-    const fallback = this.buildLifetimeFallback(lifetime);
     const faceitElo = typeof gameStats.faceit_elo === 'number' ? gameStats.faceit_elo : 0;
     const skillLevel = typeof gameStats.skill_level === 'number' ? gameStats.skill_level : 0;
     const commonKdRatio = this.pickNumber(lifetime, [ 'Average K/D Ratio', 'K/D Ratio' ]) ?? 0;
@@ -131,7 +130,7 @@ export class StatsService {
         avg: last30.avg,
         adr: last30.adr,
         kd: last30.kd,
-        kr: last30.kr || fallback.kr || 0,
+        kr: last30.kr,
         matchResults: last30MatchResults,
       },
       latestMatchId: latest?.match_id || null,
@@ -252,17 +251,6 @@ export class StatsService {
       }
     }
     return null;
-  }
-
-  private buildLifetimeFallback(source: Record<string, unknown>): { avg: number | null; kr: number | null } {
-    const totalKills = this.pickNumber(source, [ 'Total Kills with extended stats' ]);
-    const totalMatches = this.pickNumber(source, [ 'Total Matches' ]);
-    const totalRounds = this.pickNumber(source, [ 'Total Rounds with extended stats' ]);
-
-    return {
-      avg: totalKills && totalMatches ? totalKills / totalMatches : null,
-      kr: totalKills && totalRounds ? totalKills / totalRounds : null,
-    };
   }
 
   private parseInternalMatch(item: InternalMatchStatsItem): ParsedInternalMatch | null {
