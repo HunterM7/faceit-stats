@@ -36,10 +36,10 @@ export class FaceitService {
     return response.data;
   }
 
-  async getPlayerHistory(playerId: string, game = 'cs2', limit = 5, offset = 0): Promise<MatchHistoryResponse> {
+  async getPlayerHistory(playerId: string, limit = 5, offset = 0): Promise<MatchHistoryResponse> {
     const response = await this.http.get<MatchHistoryResponse>(`/players/${playerId}/history`, {
       params: {
-        game,
+        game: this.config.gameId,
         limit,
         offset,
       },
@@ -47,13 +47,13 @@ export class FaceitService {
     return response.data;
   }
 
-  async getPlayerGameStats(playerId: string, game = 'cs2'): Promise<Record<string, unknown>> {
-    const response = await this.http.get<Record<string, unknown>>(`/players/${playerId}/stats/${game}`);
+  async getPlayerGameStats(playerId: string): Promise<Record<string, unknown>> {
+    const response = await this.http.get<Record<string, unknown>>(`/players/${playerId}/stats/${this.config.gameId}`);
     return response.data;
   }
 
-  async getPlayerInternalMatchesStats(playerId: string, game = 'cs2', limit = 30, offset = 0): Promise<InternalMatchStatsResponse> {
-    const response = await this.http.get<InternalMatchStatsResponse>(`/players/${playerId}/games/${game}/stats`, {
+  async getPlayerInternalMatchesStats(playerId: string, limit = 30, offset = 0): Promise<InternalMatchStatsResponse> {
+    const response = await this.http.get<InternalMatchStatsResponse>(`/players/${playerId}/games/${this.config.gameId}/stats`, {
       params: {
         limit,
         offset,

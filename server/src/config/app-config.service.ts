@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { CS2_FACEIT_GAME_ID } from './configuration';
 
 @Injectable()
 export class AppConfigService {
@@ -16,7 +17,7 @@ export class AppConfigService {
   }
 
   get gameId(): string {
-    return this.config.get<string>('faceit.gameId', 'cs2');
+    return this.config.get<string>('faceit.gameId', CS2_FACEIT_GAME_ID);
   }
 
   get faceitApiKey(): string {

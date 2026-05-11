@@ -174,4 +174,3 @@ Webhook стоит включать, только если появится тр
 - `GET /api/playerStatistics?nickname=ТВОЙ_FACEIT_NICK`
 - `GET /api/player?nickname=ТВОЙ_FACEIT_NICK`
 - `GET /api/lastMatch?playerId=FACEIT_PLAYER_ID`
-- `GET /api/duoMatches?nickname=ТВОЙ_FACEIT_NICK&teammateNickname=NICK_ТИММЕЙТА`

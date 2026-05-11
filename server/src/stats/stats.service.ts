@@ -3,7 +3,6 @@ import { AppConfigService } from '../config/app-config.service';
 import { FaceitService } from '../faceit/faceit.service';
 import {
   type InternalMatchStatsItem,
-  type DuoMatchesResponse,
   type LastMatchResponse,
   type MatchHistoryItem,
   type MatchResult,
@@ -73,9 +72,9 @@ export class StatsService {
         : Promise.resolve(null);
 
     const [ history, gameStatsRaw, internalStats, rankingRegion, rankingCountry ] = await Promise.all([
-      this.faceit.getPlayerHistory(playerId, gameId, 30),
-      this.faceit.getPlayerGameStats(playerId, gameId),
-      this.faceit.getPlayerInternalMatchesStats(playerId, gameId, 30),
+      this.faceit.getPlayerHistory(playerId, 30),
+      this.faceit.getPlayerGameStats(playerId),
+      this.faceit.getPlayerInternalMatchesStats(playerId, 30),
       rankingRegionPromise,
       rankingCountryPromise,
     ]);
@@ -154,7 +153,7 @@ export class StatsService {
 
     const [ player, history ] = await Promise.all([
       this.faceit.getPlayer(normalizedPlayerId),
-      this.faceit.getPlayerHistory(normalizedPlayerId, this.config.gameId, 1),
+      this.faceit.getPlayerHistory(normalizedPlayerId, 1),
     ]);
     const latest = history?.items?.[0] || null;
     const gameStats = player?.games?.[this.config.gameId] || {};
@@ -195,40 +194,6 @@ export class StatsService {
       currentElo,
       currentSkillLevel,
       updatedAt: new Date().toISOString(),
-    };
-  }
-
-  async getDuoMatchesInCsgo(rawNickname: string, rawTeammateNickname: string): Promise<DuoMatchesResponse> {
-    const nickname = rawNickname.trim();
-    const teammateNickname = rawTeammateNickname.trim();
-    if (!nickname || !teammateNickname) {
-      throw new Error('Параметры nickname и teammateNickname обязательны');
-    }
-
-    const gameId = 'csgo';
-    const [ player, teammate ] = await Promise.all([
-      this.faceit.getPlayerByNickname(nickname),
-      this.faceit.getPlayerByNickname(teammateNickname),
-    ]);
-
-    const playerId = player.player_id;
-    const teammateId = teammate.player_id;
-    if (!playerId || !teammateId) {
-      throw new Error('Игрок FACEIT не найден по никнейму');
-    }
-
-    const items = await this.loadAllPlayerHistory(playerId, gameId);
-    const matches = items
-      .map((item) => this.mapDuoMatch(item, playerId, teammateId))
-      .filter((item): item is NonNullable<typeof item> => item !== null);
-
-    return {
-      nickname: player.nickname || nickname,
-      teammateNickname: teammate.nickname || teammateNickname,
-      gameId,
-      totalChecked: items.length,
-      totalTogether: matches.length,
-      matches,
     };
   }
 
@@ -380,54 +345,6 @@ export class StatsService {
 
     if (!playerFactionId) return 'UNKNOWN';
     return playerFactionId === winnerFactionId ? 'WIN' : 'LOSS';
-  }
-
-  private getPlayerFactionId(match: MatchHistoryItem | null, playerId: string): string | null {
-    if (!match) return null;
-    const teams = match.teams || {};
-    for (const [ factionId, team ] of Object.entries(teams)) {
-      const hasPlayer = Array.isArray(team.players) && team.players.some((p) => p.player_id === playerId);
-      if (hasPlayer) return factionId;
-    }
-    return null;
-  }
-
-  private mapDuoMatch(match: MatchHistoryItem, playerId: string, teammateId: string) {
-    const playerFactionId = this.getPlayerFactionId(match, playerId);
-    const teammateFactionId = this.getPlayerFactionId(match, teammateId);
-    if (!playerFactionId || playerFactionId !== teammateFactionId) {
-      return null;
-    }
-
-    const score = match.results?.score || {};
-    const enemyFactionId = Object.keys(match.teams || {}).find((id) => id !== playerFactionId) || null;
-
-    return {
-      matchId: match.match_id || 'unknown',
-      finishedAt: match.finished_at ? new Date(match.finished_at * 1000).toISOString() : null,
-      status: match.status || null,
-      result: this.resolveResultForPlayer(match, playerId),
-      teamScore: this.toFiniteNumber(score[playerFactionId]),
-      enemyScore: enemyFactionId ? this.toFiniteNumber(score[enemyFactionId]) : null,
-      faceitUrl: match.match_id ? `https://www.faceit.com/en/csgo/room/${match.match_id}` : null,
-    };
-  }
-
-  private async loadAllPlayerHistory(playerId: string, gameId: string): Promise<MatchHistoryItem[]> {
-    const pageSize = 100;
-    const maxPages = 50;
-    const allItems: MatchHistoryItem[] = [];
-
-    for (let page = 0; page < maxPages; page += 1) {
-      const offset = page * pageSize;
-      const response = await this.faceit.getPlayerHistory(playerId, gameId, pageSize, offset);
-      const items = response?.items || [];
-      if (items.length === 0) break;
-      allItems.push(...items);
-      if (items.length < pageSize) break;
-    }
-
-    return allItems;
   }
 
   private buildRankBlock(args: {

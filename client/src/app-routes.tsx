@@ -16,11 +16,6 @@ const StatsPage = lazy(async () => {
   return { default: m.StatsPage }
 })
 
-const DuoFinderPage = lazy(async () => {
-  const m = await import('@pages/duo-finder-page/duo-finder-page')
-  return { default: m.DuoFinderPage }
-})
-
 const StatsWidgetPage = lazy(async () => {
   const m = await import('@pages/stats-widget-page/stats-widget-page')
   return { default: m.StatsWidgetPage }
@@ -48,7 +43,6 @@ export function AppRoutes() {
         <Route path='/' element={<LandingPage/>}/>
         <Route path='/matchResult' element={<OverlayPage/>}/>
         <Route path='/stats' element={<StatsPage/>}/>
-        <Route path='/duo' element={<DuoFinderPage/>}/>
         <Route path='/admin' element={<AdminPage/>}/>
         <Route path='/admin/errors' element={<AdminErrorsPage/>}/>
         <Route path='/widgets/stats' element={<StatsWidgetPage/>}/>

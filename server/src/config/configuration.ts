@@ -1,5 +1,8 @@
 import path from 'node:path';
 
+/** Идентификатор игры CS2 на FACEIT. */
+export const CS2_FACEIT_GAME_ID = 'cs2';
+
 export const configuration = () => ({
   app: {
     port: Number(process.env.PORT || 3333),
@@ -9,7 +12,7 @@ export const configuration = () => ({
   },
   faceit: {
     apiKey: process.env.FACEIT_API_KEY || '',
-    gameId: 'cs2',
+    gameId: CS2_FACEIT_GAME_ID,
   },
   admin: {
     login: process.env.ADMIN_LOGIN || '',

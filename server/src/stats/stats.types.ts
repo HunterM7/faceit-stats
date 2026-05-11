@@ -145,22 +145,3 @@ export interface PlayerSnapshotResponse {
   currentSkillLevel: number | null;
   updatedAt: string;
 }
-
-export interface DuoMatchItem {
-  matchId: string;
-  finishedAt: string | null;
-  status: string | null;
-  result: MatchResult;
-  teamScore: number | null;
-  enemyScore: number | null;
-  faceitUrl: string | null;
-}
-
-export interface DuoMatchesResponse {
-  nickname: string;
-  teammateNickname: string;
-  gameId: string;
-  totalChecked: number;
-  totalTogether: number;
-  matches: DuoMatchItem[];
-}
