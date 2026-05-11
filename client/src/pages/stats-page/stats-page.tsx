@@ -5,6 +5,8 @@ import { requestStats, type StatsPayload, type StatsRatingQuery } from '@request
 import { lastMatch, player } from '@requests/matchResult';
 import './stats-page.scss';
 
+const STATS_WIDGET_POLL_MS = import.meta.env.DEV ? 5000 : 20000;
+
 /** Без `rating` и для `country` API по умолчанию отдаёт только страну — параметр не дублируем. */
 function ratingParamForRequest(rating: StatsRatingQuery | undefined): StatsRatingQuery | undefined {
   if (rating === undefined || rating === 'country') {
@@ -188,7 +190,7 @@ export function StatsPage() {
     };
 
     refresh();
-    const timer = window.setInterval(pollMatchUpdates, 10000);
+    const timer = window.setInterval(pollMatchUpdates, STATS_WIDGET_POLL_MS);
     return () => {
       mounted = false;
       window.clearInterval(timer);
