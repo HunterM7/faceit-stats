@@ -33,7 +33,7 @@ type StatsState = {
     avg: number;
     adr: number;
     kd: number;
-    krRatio: number;
+    kr: number;
   };
 }
 
@@ -91,7 +91,7 @@ export function StatsPage() {
       avg: stats.last30.avg,
       adr: stats.last30.adr,
       kd: stats.last30.kd,
-      krRatio: stats.last30.krRatio,
+      kr: stats.last30.kr,
     },
   })
 
@@ -208,7 +208,7 @@ export function StatsPage() {
     avg: state.monthly.avg,
     adr: state.monthly.adr,
     kd: state.monthly.kd,
-    kr: state.monthly.krRatio,
+    kr: state.monthly.kr,
   }
 
   return (

@@ -39,7 +39,7 @@ function mapStatsPayloadToWidgetProps(stats: StatsPayload, ratingMode: StatsRati
       avg: stats.last30.avg,
       adr: stats.last30.adr,
       kd: stats.last30.kd,
-      kr: stats.last30.krRatio,
+      kr: stats.last30.kr,
     },
   }
 }

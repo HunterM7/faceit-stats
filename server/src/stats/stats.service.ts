@@ -131,7 +131,7 @@ export class StatsService {
         avg: last30.avg,
         adr: last30.adr,
         kd: last30.avgKD,
-        krRatio: last30.avgKR || fallback.krRatio || 0,
+        kr: last30.avgKR || fallback.kr || 0,
         matchResults: last30MatchResults,
       },
       latestMatchId: latest?.match_id || null,
@@ -254,14 +254,15 @@ export class StatsService {
     return null;
   }
 
-  private buildLifetimeFallback(source: Record<string, unknown>): { avg: number | null; krRatio: number | null } {
+  private buildLifetimeFallback(source: Record<string, unknown>): { avg: number | null; kr: number | null } {
     const totalKills = this.pickNumber(source, [ 'Total Kills with extended stats' ]);
     const totalMatches = this.pickNumber(source, [ 'Total Matches' ]);
     const totalRounds = this.pickNumber(source, [ 'Total Rounds with extended stats' ]);
 
-    const avg = totalKills && totalMatches ? totalKills / totalMatches : null;
-    const krRatio = totalKills && totalRounds ? totalKills / totalRounds : null;
-    return { avg, krRatio };
+    return {
+      avg: totalKills && totalMatches ? totalKills / totalMatches : null,
+      kr: totalKills && totalRounds ? totalKills / totalRounds : null,
+    };
   }
 
   private parseInternalMatch(item: InternalMatchStatsItem): ParsedInternalMatch | null {

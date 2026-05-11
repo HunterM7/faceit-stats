@@ -64,7 +64,7 @@ export type StatsPayload = {
     avg: number;
     adr: number;
     kd: number;
-    krRatio: number;
+    kr: number;
     /** Победы по времени, слева — более старые матчи (для графика). */
     matchResults?: boolean[];
   };

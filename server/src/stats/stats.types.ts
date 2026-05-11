@@ -106,7 +106,7 @@ export interface StatsResponse {
     avg: number;
     adr: number;
     kd: number;
-    krRatio: number;
+    kr: number;
     /** Победы за последние матчи по времени: `true` — победа, `false` — поражение (слева старые). */
     matchResults: boolean[];
   };
