@@ -54,7 +54,7 @@ export type StatsPayload = {
     wins: number;
     losses: number;
     avg: number;
-    averageAdr: number;
+    adr: number;
     kd: number;
   };
   last30: {
@@ -62,7 +62,7 @@ export type StatsPayload = {
     losses: number;
     winRate: number;
     avg: number;
-    averageAdr: number;
+    adr: number;
     kd: number;
     krRatio: number;
     /** Победы по времени, слева — более старые матчи (для графика). */

@@ -96,7 +96,7 @@ export interface StatsResponse {
     wins: number;
     losses: number;
     avg: number;
-    averageAdr: number;
+    adr: number;
     kd: number;
   };
   last30: {
@@ -104,7 +104,7 @@ export interface StatsResponse {
     losses: number;
     winRate: number;
     avg: number;
-    averageAdr: number;
+    adr: number;
     kd: number;
     krRatio: number;
     /** Победы за последние матчи по времени: `true` — победа, `false` — поражение (слева старые). */

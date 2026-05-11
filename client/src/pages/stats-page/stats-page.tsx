@@ -24,14 +24,14 @@ type StatsState = {
     wins: number;
     losses: number;
     avg: number;
-    averageAdr: number;
+    adr: number;
     kd: number;
   };
   monthly: {
     winRate: number;
     matchResults: boolean[];
     avg: number;
-    averageAdr: number;
+    adr: number;
     kd: number;
     krRatio: number;
   };
@@ -82,14 +82,14 @@ export function StatsPage() {
       wins: stats.daily.wins,
       losses: stats.daily.losses,
       avg: stats.daily.avg,
-      averageAdr: stats.daily.averageAdr,
+      adr: stats.daily.adr,
       kd: stats.daily.kd,
     },
     monthly: {
       winRate: stats.last30.winRate,
       matchResults: stats.last30.matchResults ?? [],
       avg: stats.last30.avg,
-      averageAdr: stats.last30.averageAdr,
+      adr: stats.last30.adr,
       kd: stats.last30.kd,
       krRatio: stats.last30.krRatio,
     },
@@ -206,7 +206,7 @@ export function StatsPage() {
     wins: state.daily.wins,
     losses: state.daily.losses,
     avg: state.daily.avg,
-    adr: state.daily.averageAdr,
+    adr: state.daily.adr,
     kd: state.daily.kd,
   }
 
@@ -214,7 +214,7 @@ export function StatsPage() {
     winRatePercent: state.monthly.winRate,
     results: state.monthly.matchResults,
     avg: state.monthly.avg,
-    adr: state.monthly.averageAdr,
+    adr: state.monthly.adr,
     kd: state.monthly.kd,
     kr: state.monthly.krRatio,
   }

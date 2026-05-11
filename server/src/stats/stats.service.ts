@@ -121,7 +121,7 @@ export class StatsService {
         wins: today.wins,
         losses: today.losses,
         avg: today.avg,
-        averageAdr: today.adr,
+        adr: today.adr,
         kd: today.avgKD,
       },
       last30: {
@@ -129,7 +129,7 @@ export class StatsService {
         losses: last30.losses,
         winRate: last30.winRate,
         avg: last30.avg,
-        averageAdr: last30.adr,
+        adr: last30.adr,
         kd: last30.avgKD,
         krRatio: last30.avgKR || fallback.krRatio || 0,
         matchResults: last30MatchResults,
