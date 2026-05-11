@@ -202,14 +202,6 @@ export function StatsPage() {
     return null
   }
 
-  const daily: ComponentProps<typeof WidgetStatistics>['daily'] = {
-    wins: state.daily.wins,
-    losses: state.daily.losses,
-    avg: state.daily.avg,
-    adr: state.daily.adr,
-    kd: state.daily.kd,
-  }
-
   const recentMatches: ComponentProps<typeof WidgetStatistics>['recentMatches'] = {
     winRatePercent: state.monthly.winRate,
     results: state.monthly.matchResults,
@@ -223,7 +215,7 @@ export function StatsPage() {
     <div className='stats-page'>
       <WidgetStatistics
         common={state.common}
-        daily={daily}
+        daily={state.daily}
         recentMatches={recentMatches}
         backgroundOpacity={backgroundOpacityParam}
         borderRadius={borderRadiusParam}
