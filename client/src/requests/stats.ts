@@ -53,7 +53,7 @@ export type StatsPayload = {
   daily: {
     wins: number;
     losses: number;
-    averageKills: number;
+    avg: number;
     averageAdr: number;
     kd: number;
   };
@@ -61,7 +61,7 @@ export type StatsPayload = {
     wins: number;
     losses: number;
     winRate: number;
-    averageKills: number;
+    avg: number;
     averageAdr: number;
     kd: number;
     krRatio: number;

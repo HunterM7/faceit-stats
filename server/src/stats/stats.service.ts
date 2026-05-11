@@ -120,7 +120,7 @@ export class StatsService {
       daily: {
         wins: today.wins,
         losses: today.losses,
-        averageKills: today.avgKills,
+        avg: today.avg,
         averageAdr: today.adr,
         kd: today.avgKD,
       },
@@ -128,7 +128,7 @@ export class StatsService {
         wins: last30.wins,
         losses: last30.losses,
         winRate: last30.winRate,
-        averageKills: last30.avgKills,
+        avg: last30.avg,
         averageAdr: last30.adr,
         kd: last30.avgKD,
         krRatio: last30.avgKR || fallback.krRatio || 0,
@@ -254,14 +254,14 @@ export class StatsService {
     return null;
   }
 
-  private buildLifetimeFallback(source: Record<string, unknown>): { averageKills: number | null; krRatio: number | null } {
+  private buildLifetimeFallback(source: Record<string, unknown>): { avg: number | null; krRatio: number | null } {
     const totalKills = this.pickNumber(source, [ 'Total Kills with extended stats' ]);
     const totalMatches = this.pickNumber(source, [ 'Total Matches' ]);
     const totalRounds = this.pickNumber(source, [ 'Total Rounds with extended stats' ]);
 
-    const averageKills = totalKills && totalMatches ? totalKills / totalMatches : null;
+    const avg = totalKills && totalMatches ? totalKills / totalMatches : null;
     const krRatio = totalKills && totalRounds ? totalKills / totalRounds : null;
-    return { averageKills, krRatio };
+    return { avg, krRatio };
   }
 
   private parseInternalMatch(item: InternalMatchStatsItem): ParsedInternalMatch | null {
@@ -311,7 +311,7 @@ export class StatsService {
     wins: number;
     losses: number;
     winRate: number;
-    avgKills: number;
+    avg: number;
     avgKD: number;
     avgKR: number;
     adr: number;
@@ -321,7 +321,7 @@ export class StatsService {
         wins: 0,
         losses: 0,
         winRate: 0,
-        avgKills: 0,
+        avg: 0,
         avgKD: 0,
         avgKR: 0,
         adr: 0,
@@ -353,7 +353,7 @@ export class StatsService {
       wins: summary.wins,
       losses: summary.losses,
       winRate: Math.floor((summary.wins / totalMatches) * 100),
-      avgKills: Math.round(summary.kills / totalMatches),
+      avg: Math.round(summary.kills / totalMatches),
       avgKD: this.roundFixed(summary.kills / summary.deaths),
       avgKR: this.roundFixed(summary.kills / summary.rounds),
       adr: this.roundFixed(summary.damage / summary.rounds),

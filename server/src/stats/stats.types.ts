@@ -95,7 +95,7 @@ export interface StatsResponse {
   daily: {
     wins: number;
     losses: number;
-    averageKills: number;
+    avg: number;
     averageAdr: number;
     kd: number;
   };
@@ -103,7 +103,7 @@ export interface StatsResponse {
     wins: number;
     losses: number;
     winRate: number;
-    averageKills: number;
+    avg: number;
     averageAdr: number;
     kd: number;
     krRatio: number;

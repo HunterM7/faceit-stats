@@ -23,14 +23,14 @@ type StatsState = {
   daily: {
     wins: number;
     losses: number;
-    averageKills: number;
+    avg: number;
     averageAdr: number;
     kd: number;
   };
   monthly: {
     winRate: number;
     matchResults: boolean[];
-    averageKills: number;
+    avg: number;
     averageAdr: number;
     kd: number;
     krRatio: number;
@@ -81,14 +81,14 @@ export function StatsPage() {
     daily: {
       wins: stats.daily.wins,
       losses: stats.daily.losses,
-      averageKills: stats.daily.averageKills,
+      avg: stats.daily.avg,
       averageAdr: stats.daily.averageAdr,
       kd: stats.daily.kd,
     },
     monthly: {
       winRate: stats.last30.winRate,
       matchResults: stats.last30.matchResults ?? [],
-      averageKills: stats.last30.averageKills,
+      avg: stats.last30.avg,
       averageAdr: stats.last30.averageAdr,
       kd: stats.last30.kd,
       krRatio: stats.last30.krRatio,
@@ -205,7 +205,7 @@ export function StatsPage() {
   const daily: ComponentProps<typeof WidgetStatistics>['daily'] = {
     wins: state.daily.wins,
     losses: state.daily.losses,
-    avg: state.daily.averageKills,
+    avg: state.daily.avg,
     adr: state.daily.averageAdr,
     kd: state.daily.kd,
   }
@@ -213,7 +213,7 @@ export function StatsPage() {
   const recentMatches: ComponentProps<typeof WidgetStatistics>['recentMatches'] = {
     winRatePercent: state.monthly.winRate,
     results: state.monthly.matchResults,
-    avg: state.monthly.averageKills,
+    avg: state.monthly.avg,
     adr: state.monthly.averageAdr,
     kd: state.monthly.kd,
     kr: state.monthly.krRatio,

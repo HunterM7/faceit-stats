@@ -29,14 +29,14 @@ function mapStatsPayloadToWidgetProps(stats: StatsPayload, ratingMode: StatsRati
     daily: {
       wins: stats.daily.wins,
       losses: stats.daily.losses,
-      avg: stats.daily.averageKills,
+      avg: stats.daily.avg,
       adr: stats.daily.averageAdr,
       kd: stats.daily.kd,
     },
     recentMatches: {
       winRatePercent: stats.last30.winRate,
       results: stats.last30.matchResults ?? [],
-      avg: stats.last30.averageKills,
+      avg: stats.last30.avg,
       adr: stats.last30.averageAdr,
       kd: stats.last30.kd,
       kr: stats.last30.krRatio,
