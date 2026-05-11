@@ -1,5 +1,3 @@
-import type { InternalMatchStatsResponse, MatchHistoryResponse, PlayerGameStatsResponse, PlayerResponse } from '../faceit/faceit.types';
-
 export type MatchResult = 'WIN' | 'LOSS';
 
 /** Реэкспорт DTO FACEIT (раньше жили в этом файле). */
@@ -65,12 +63,6 @@ export interface StatsResponse {
   latestMatchStatus: string | null;
   latestMatchResult: MatchResult;
   updatedAt: string;
-  raw: {
-    player: PlayerResponse;
-    gameStats: PlayerGameStatsResponse;
-    history: MatchHistoryResponse;
-    internalStats: InternalMatchStatsResponse;
-  };
 }
 
 /**
@@ -84,10 +76,6 @@ export interface LastMatchResponse {
   result: MatchResult;
   /** Время окончания последнего матча игрока. */
   finishedAt: string | null;
-  /** Сырые данные истории. */
-  raw: {
-    history: MatchHistoryResponse | Record<string, never>;
-  };
 }
 
 export interface PlayerSnapshotResponse {

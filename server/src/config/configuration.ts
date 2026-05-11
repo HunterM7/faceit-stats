@@ -5,6 +5,7 @@ export const CS2_FACEIT_GAME_ID = 'cs2' as const;
 
 export const configuration = () => ({
   app: {
+    devMode: process.env.DEV_MODE === 'true',
     port: Number(process.env.PORT || 3333),
     corsOrigin: process.env.CLIENT_URL || '',
     // Resolve from compiled server directory, not process cwd.

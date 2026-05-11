@@ -123,12 +123,7 @@ export class StatsService {
       latestMatchStatus: latest?.status || null,
       latestMatchResult: this.resolveResultForPlayer(latest, playerId),
       updatedAt: new Date().toISOString(),
-      raw: {
-        player,
-        gameStats: gameStatsRaw,
-        history,
-        internalStats,
-      },
+      ...(this.config.devMode && { raw: { player, gameStats: gameStatsRaw, history, internalStats } }),
     };
   }
 
@@ -144,7 +139,7 @@ export class StatsService {
       matchId: latest.match_id,
       result: this.resolveResultForPlayer(latest, playerId),
       finishedAt: new Date(latest.finished_at * 1000).toISOString(),
-      raw: { history },
+      ...(this.config.devMode && { raw: { history } }),
     };
   }
 

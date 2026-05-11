@@ -6,6 +6,10 @@ import { CS2_FACEIT_GAME_ID } from './configuration';
 export class AppConfigService {
   constructor(private readonly config: ConfigService) {}
 
+  get devMode(): boolean {
+    return this.config.get<boolean>('app.devMode', false);
+  }
+
   get port(): number {
     return this.config.get<number>('app.port', 3333);
   }
