@@ -83,9 +83,6 @@ export function WidgetStatistics(props: WidgetStatisticsProps) {
   return (
     <div className={classNames('widget-statistics', className)} style={cardStyle}>
       <WidgetStatisticsCommonPanel data={common} rankView={rankView} rankVisible={rankVisible}/>
-
-      <div className='widget-statistics__divider'/>
-
       <div className='widget-statistics__panels'>
         <WidgetStatisticsDailyPanel data={daily} className={classNames('widget-statistics__panel', getPanelStateClass('today'))}/>
         <WidgetStatisticsRecentMatchesPanel data={recentMatches} className={classNames('widget-statistics__panel', getPanelStateClass('recentMatches'))}/>

@@ -1,5 +1,6 @@
 import { classNames } from '@/utils/classNames';
 import { formatNumberWithFixedDecimals } from '@/utils/number-format';
+import { WidgetStatisticsPanelName } from '../widget-statistics-panel-name/widget-statistics-panel-name';
 import { WidgetStatisticsMetric } from '../widget-statistics-metric/widget-statistics-metric';
 import { MatchResult, WidgetStatisticsMatchResults } from '../widget-statistics-match-results/widget-statistics-match-results';
 import './widget-statistics-daily-panel.scss';
@@ -29,7 +30,7 @@ export function WidgetStatisticsDailyPanel(props: Props) {
 
   return (
     <div className={classNames('widget-statistics-daily-panel', className)}>
-      <div className='widget-statistics-daily-panel__title'>STATS TODAY</div>
+      <WidgetStatisticsPanelName>STATS TODAY</WidgetStatisticsPanelName>
       <div className='widget-statistics-daily-panel__grid'>
         <div className='widget-statistics-daily-panel__match-results'>
           <WidgetStatisticsMatchResults value={wins} result={MatchResult.Win}/>

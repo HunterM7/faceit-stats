@@ -1,5 +1,6 @@
 import { classNames } from '@/utils/classNames';
 import { formatNumberWithFixedDecimals } from '@/utils/number-format';
+import { WidgetStatisticsPanelName } from '../widget-statistics-panel-name/widget-statistics-panel-name';
 import { WidgetStatisticsMetric } from '../widget-statistics-metric/widget-statistics-metric';
 import { WidgetStatisticsLast30WinRate } from '../widget-statistics-last30-win-rate/widget-statistics-last30-win-rate';
 import './widget-statistics-recent-matches-panel.scss';
@@ -32,7 +33,7 @@ export function WidgetStatisticsRecentMatchesPanel(props: Props) {
 
   return (
     <div className={classNames('widget-statistics-recent-matches-panel', className)}>
-      <div className='widget-statistics-recent-matches-panel__title'>LAST 30 MATCHES</div>
+      <WidgetStatisticsPanelName>LAST 30 MATCHES</WidgetStatisticsPanelName>
       <div className='widget-statistics-recent-matches-panel__grid'>
         <WidgetStatisticsLast30WinRate winRatePercent={winRatePercent} matchResults={matchResults} className='widget-statistics-recent-matches-panel__metric'/>
         <WidgetStatisticsMetric value={avgAdr} label='AVG / ADR' className='widget-statistics-recent-matches-panel__metric'/>
