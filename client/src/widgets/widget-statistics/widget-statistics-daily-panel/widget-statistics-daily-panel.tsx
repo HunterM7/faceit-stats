@@ -18,15 +18,18 @@ interface Props {
     adr: number;
     /** Соотношение убийств к смертям. */
     kd: number;
+    /** Среднее количество убийств за раунд. */
+    kr: number;
   };
   /** Дополнительный класс для стилизации компонента. */
   className?: string | undefined;
 }
 
 export function WidgetStatisticsDailyPanel(props: Props) {
-  const { data: { wins, losses, avg, adr, kd }, className } = props;
+  const { data: { wins, losses, avg, adr, kd, kr }, className } = props;
 
   const avgAdr = `${formatNumberWithFixedDecimals(avg, 0)} / ${formatNumberWithFixedDecimals(adr, 0)}`;
+  const kdKr = `${formatNumberWithFixedDecimals(kd, 2)} / ${formatNumberWithFixedDecimals(kr, 2)}`;
 
   return (
     <div className={classNames('widget-statistics-daily-panel', className)}>
@@ -37,7 +40,7 @@ export function WidgetStatisticsDailyPanel(props: Props) {
           <WidgetStatisticsMatchResults value={losses} result={MatchResult.Lose}/>
         </div>
         <WidgetStatisticsMetric className='widget-statistics-daily-panel__metric' value={avgAdr} label='AVG / ADR'/>
-        <WidgetStatisticsMetric className='widget-statistics-daily-panel__metric' value={formatNumberWithFixedDecimals(kd, 2)} label='K/D'/>
+        <WidgetStatisticsMetric className='widget-statistics-daily-panel__metric' value={kdKr} label='K/D / K/R'/>
       </div>
     </div>
   );

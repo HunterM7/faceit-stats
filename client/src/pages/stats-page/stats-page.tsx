@@ -81,6 +81,7 @@ export function StatsPage() {
       avg: stats.daily.avg,
       adr: stats.daily.adr,
       kd: stats.daily.kd,
+      kr: stats.daily.kr,
     },
     monthly: {
       winRatePercent: stats.last30.winRatePercent,

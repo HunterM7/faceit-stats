@@ -47,6 +47,7 @@ export interface StatsResponse {
     avg: number;
     adr: number;
     kd: number;
+    kr: number;
   };
   last30: {
     wins: number;

@@ -56,6 +56,7 @@ export type StatsPayload = {
     avg: number;
     adr: number;
     kd: number;
+    kr: number;
   };
   last30: {
     wins: number;

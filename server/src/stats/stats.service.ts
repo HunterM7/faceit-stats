@@ -108,6 +108,7 @@ export class StatsService {
         avg: today.avg,
         adr: today.adr,
         kd: today.kd,
+        kr: today.kr,
       },
       last30: {
         wins: last30.wins,
@@ -217,15 +218,7 @@ export class StatsService {
     adr: number;
   } {
     if (items.length === 0) {
-      return {
-        wins: 0,
-        losses: 0,
-        winRatePercent: 0,
-        avg: 0,
-        kd: 0,
-        kr: 0,
-        adr: 0,
-      };
+      return { wins: 0, losses: 0, winRatePercent: 0, avg: 0, kd: 0, kr: 0, adr: 0 };
     }
 
     const summary = items.reduce((acc, item) => {
@@ -239,14 +232,7 @@ export class StatsService {
       acc.rounds += item.rounds;
       acc.damage += item.damage;
       return acc;
-    }, {
-      wins: 0,
-      losses: 0,
-      kills: 0,
-      deaths: 0,
-      rounds: 0,
-      damage: 0,
-    });
+    }, { wins: 0, losses: 0, kills: 0, deaths: 0, rounds: 0, damage: 0 });
 
     const totalMatches = items.length;
     return {
