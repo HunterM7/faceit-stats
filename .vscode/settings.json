@@ -1,4 +1,11 @@
 {
+  // Workspaces: postinstall удаляет `client/node_modules` — TypeScript лежит в корневом `node_modules`.
+  // Путь `client/node_modules/typescript/lib` у многих не существует, из‑за этого tsserver мог не работать.
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "typescript.validate.enable": true,
+  "javascript.validate.enable": true,
+  "typescript.tsserver.experimental.enableProjectDiagnostics": true,
   "eslint.workingDirectories": ["server", "client"],
   "stylelint.configFile": "${workspaceFolder}/client/.stylelintrc.json",
   "editor.codeActionsOnSave": {
