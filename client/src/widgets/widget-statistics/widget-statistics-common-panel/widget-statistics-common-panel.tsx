@@ -1,5 +1,7 @@
 import { classNames } from '@/utils/classNames';
 import { formatNumberWithFixedDecimals } from '@/utils/number-format';
+import { ChallengerTier, ChallengerTierIcon } from '@/components/challenger-tier-icon/challenger-tier-icon';
+import { useMemo } from 'react';
 import { SkillLevelIcon } from '@/components/skill-level-icon/skill-level-icon';
 import { WidgetStatisticsValue } from '../widget-statistics-value/widget-statistics-value';
 import { WidgetStatisticsCommonPanelRating } from './widget-statistics-common-panel-rating/widget-statistics-common-panel-rating';
@@ -27,6 +29,22 @@ interface Props {
 export function WidgetStatisticsCommonPanel(props: Props) {
   const { data: { skillLevel, elo, kd, rank }, rankView, rankVisible } = props;
 
+  const challengerTier = useMemo(() => {
+    if (!rank.region?.rating || rank.region.rating > 1000) {
+      return;
+    }
+    switch (rank.region.rating) {
+    case 1:
+      return ChallengerTier.Gold;
+    case 2:
+      return ChallengerTier.Silver;
+    case 3:
+      return ChallengerTier.Bronze;
+    default:
+      return ChallengerTier.Other;
+    }
+  }, [ rank.region?.rating ]);
+
   const switchable = rank.country && rank.region;
 
   const getRankSlideClass = (target: 'country' | 'region') => {
@@ -44,7 +62,10 @@ export function WidgetStatisticsCommonPanel(props: Props) {
   return (
     <div className='widget-statistics-common-panel'>
       <div className='widget-statistics-common-panel__level-badge'>
-        <SkillLevelIcon skillLevel={skillLevel} className='widget-statistics-common-panel__level-icon'/>
+        {challengerTier
+          ? <ChallengerTierIcon tier={challengerTier} className='widget-statistics-common-panel__level-icon'/>
+          : <SkillLevelIcon skillLevel={skillLevel} className='widget-statistics-common-panel__level-icon'/>
+        }
         <WidgetStatisticsValue label='ELO'>{elo}</WidgetStatisticsValue>
       </div>
 
