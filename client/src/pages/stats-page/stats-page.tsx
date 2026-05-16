@@ -94,8 +94,6 @@ export function StatsPage() {
   });
 
   useEffect(() => {
-    let mounted = true;
-
     const refresh = async () => {
       const nextParams = new URLSearchParams();
       nextParams.set('nickname', rawNickname ?? '');
@@ -126,7 +124,7 @@ export function StatsPage() {
           ratingParamForRequest(ratingParam),
         );
 
-        if (!mounted || !stats) {
+        if (!stats) {
           return;
         }
 
@@ -134,9 +132,6 @@ export function StatsPage() {
         latestMatchIdRef.current = stats.latestMatchId ?? null;
         setState(mapStatsToState(stats));
       } catch {
-        if (!mounted) {
-          return;
-        }
         // Keep the last successful state on transient fetch errors.
       }
     };
@@ -176,7 +171,7 @@ export function StatsPage() {
           analyticsSource,
           ratingParamForRequest(ratingParam),
         );
-        if (!mounted || !nextStats) {
+        if (!nextStats) {
           return;
         }
 
@@ -193,7 +188,6 @@ export function StatsPage() {
     refresh();
     const timer = window.setInterval(pollMatchUpdates, STATS_WIDGET_POLL_MS);
     return () => {
-      mounted = false;
       window.clearInterval(timer);
     };
   }, [ backgroundOpacityParam, borderRadiusParam, location.search, nicknameParam, ratingParam, rawNickname, searchParams, setSearchParams ]);
