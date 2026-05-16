@@ -124,10 +124,6 @@ export function StatsPage() {
           ratingParamForRequest(ratingParam),
         );
 
-        if (!stats) {
-          return;
-        }
-
         playerIdRef.current = stats.playerId ?? null;
         latestMatchIdRef.current = stats.latestMatchId ?? null;
         setState(mapStatsToState(stats));
@@ -171,9 +167,6 @@ export function StatsPage() {
           analyticsSource,
           ratingParamForRequest(ratingParam),
         );
-        if (!nextStats) {
-          return;
-        }
 
         playerIdRef.current = nextStats.playerId ?? playerIdRef.current;
         latestMatchIdRef.current = nextStats.latestMatchId ?? currentMatchId;
