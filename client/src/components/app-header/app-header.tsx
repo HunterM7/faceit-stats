@@ -3,7 +3,14 @@ import { NavLink } from 'react-router-dom';
 import { classNames } from '@/utils/classNames';
 import './app-header.scss';
 
-export function AppHeader() {
+type Props = {
+  /** Дополнительный класс для стилизации компонента. */
+  className?: string | undefined;
+};
+
+export function AppHeader(props: Props) {
+  const { className } = props;
+
   const [ isScrolled, setIsScrolled ] = useState(false);
 
   useEffect(() => {
@@ -14,7 +21,7 @@ export function AppHeader() {
   }, []);
 
   return (
-    <header className={`app-header ${isScrolled ? 'app-header--scrolled' : ''}`}>
+    <header className={classNames('app-header', isScrolled && 'app-header--scrolled', className)}>
       <div className='app-header__inner'>
         <NavLink to='/' end className='app-header__brand'>
           FACEIT WIDGETS

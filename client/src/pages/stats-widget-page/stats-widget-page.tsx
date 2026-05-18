@@ -315,20 +315,20 @@ export function StatsWidgetPage() {
 
   return (
     <main className='stats-widget-page'>
-      <AppHeader/>
+      <AppHeader className='stats-widget-page__header'/>
       <section className='stats-widget-page__layout'>
         <div className='stats-widget-page__panel stats-widget-page__panel--header'>
           <div className='stats-widget-page__top'>
-            <p className='stats-widget-page__badge'>WIDGET PAGE</p>
-            <h1 className='stats-widget-page__top-title'>Stats Widget</h1>
+            <p className='stats-widget-page__badge'>Страница виджета</p>
+            <h1 className='stats-widget-page__top-title'>Виджет статистики</h1>
             <p className='stats-widget-page__top-lead'>
-              Виджет с ELO, уровнем, winrate и актуальной статистикой игрока FACEIT. Здесь можно настроить параметры и сразу
+              Виджет с ELO, уровнем, винрейтом и актуальной статистикой игрока FACEIT. Здесь можно настроить параметры и сразу
               получить ссылку для OBS.
             </p>
           </div>
           <div className='stats-widget-page__header-actions'>
             <Link to='/' className='stats-widget-page__link'>На главную</Link>
-            <Link to='/widgets/match-result' className='stats-widget-page__link'>К странице Match Result</Link>
+            <Link to='/widgets/match-result' className='stats-widget-page__link'>К виджету результата матча</Link>
           </div>
         </div>
 
@@ -376,20 +376,20 @@ export function StatsWidgetPage() {
         </div>
 
         <div className='stats-widget-page__panel stats-widget-page__comment'>
-          <p className='stats-widget-page__comment-title'>Ссылка на Stats Widget</p>
+          <p className='stats-widget-page__comment-title'>Ссылка на виджет статистики</p>
           <div className='stats-widget-page__hint-list stats-widget-page__hint-list--plain stats-widget-page__hint-list--query-docs'>
             <span className='stats-widget-page__hint-chip stats-widget-page__hint-chip--plain'>
-              Обязательный query: <code className='stats-widget-page__code'>nickname</code>
+              Обязательный параметр: <code className='stats-widget-page__code'>nickname</code>
             </span>
             <span className='stats-widget-page__hint-chip stats-widget-page__hint-chip--plain'>
-              Опционально: <code className='stats-widget-page__code'>bg</code> (0–100),{' '}
+              По желанию: <code className='stats-widget-page__code'>bg</code> (0–100),{' '}
               <code className='stats-widget-page__code'>radius</code> (0–18),{' '}
               <code className='stats-widget-page__code'>rating</code> — без него или <code className='stats-widget-page__code'>country</code>: только страна;{' '}
               <code className='stats-widget-page__code'>region</code> / <code className='stats-widget-page__code'>both</code>: как в настройках выше.
             </span>
           </div>
           <div className='stats-widget-page__hint-list stats-widget-page__hint-list--muted'>
-            <span className='stats-widget-page__hint-chip stats-widget-page__hint-chip--muted'>Заполни nickname, чтобы сгенерировать ссылку</span>
+            <span className='stats-widget-page__hint-chip stats-widget-page__hint-chip--muted'>Укажи ник, чтобы сгенерировать ссылку</span>
           </div>
           <div className='stats-widget-page__link-row'>
             <input
@@ -397,8 +397,8 @@ export function StatsWidgetPage() {
               type='text'
               readOnly
               value={widgetUrl}
-              placeholder='Укажи nickname, чтобы сгенерировать ссылку'
-              aria-label='Ссылка на stats widget'
+              placeholder='Укажи ник, чтобы сгенерировать ссылку'
+              aria-label='Ссылка на виджет статистики'
             />
             <Button variant={ButtonVariant.Primary} onClick={() => void copy()} disabled={!canBuild}>
               Копировать URL

@@ -3,7 +3,8 @@
   top: 10px;
   z-index: 40;
   margin: 0 auto 22px;
-  width: min(1040px, calc(100% - 32px));
+  width: 100%;
+  max-width: 1040px;
   padding: 10px 14px;
   border-radius: 12px;
   border: 1px solid transparent;
