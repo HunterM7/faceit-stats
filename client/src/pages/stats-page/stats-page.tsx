@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState, type ComponentProps } from 'react';
-import { useLocation, useSearchParams } from 'react-router-dom';
 import { WidgetStatistics } from '@widgets/widget-statistics/widget-statistics';
 import { requestStats, type StatsPayload, type StatsRatingQuery } from '@requests/stats';
 import { lastMatch, player } from '@requests/matchResult';
+import { useStatsWidgetSearchParams } from './use-stats-widget-search-params';
 import './stats-page.scss';
 
 const STATS_WIDGET_POLL_MS = import.meta.env.DEV ? 5000 : 20000;
@@ -23,45 +23,7 @@ type StatsState = {
 
 export function StatsPage() {
   const analyticsSource = 'stats_widget';
-  const location = useLocation();
-  const [ searchParams, setSearchParams ] = useSearchParams();
-
-  const rawNickname = searchParams.get('nickname');
-  const rawBg = searchParams.get('bg');
-  const rawRadius = searchParams.get('radius');
-  const nicknameParam = rawNickname?.trim();
-  const backgroundOpacityParam = (() => {
-    if (!rawBg) {
-      return undefined;
-    }
-    if (!/^\d+$/.test(rawBg)) {
-      return undefined;
-    }
-    const parsed = Number(rawBg);
-    if (parsed < 0 || parsed > 100) {
-      return undefined;
-    }
-    return parsed;
-  })();
-
-  const borderRadiusParam = (() => {
-    if (!rawRadius) {
-      return undefined;
-
-    }
-    if (!/^\d+$/.test(rawRadius)) {
-      return undefined;
-    }
-    const parsed = Number(rawRadius);
-    if (parsed < 0 || parsed > 18) {
-      return undefined;
-    }
-    return parsed;
-  })();
-
-  const rawRating = searchParams.get('rating');
-  const ratingParam =
-    rawRating === 'country' || rawRating === 'region' || rawRating === 'both' ? rawRating : undefined;
+  const { nickname, backgroundOpacity, borderRadius, rating } = useStatsWidgetSearchParams();
 
   const [ state, setState ] = useState<StatsState | undefined>(undefined);
   const playerIdRef = useRef<string | null>(null);
@@ -94,53 +56,27 @@ export function StatsPage() {
   });
 
   useEffect(() => {
-    const refresh = async () => {
-      const nextParams = new URLSearchParams();
-      nextParams.set('nickname', rawNickname ?? '');
-      if (backgroundOpacityParam !== undefined) {
-        nextParams.set('bg', String(backgroundOpacityParam));
-      }
-      if (borderRadiusParam !== undefined) {
-        nextParams.set('radius', String(borderRadiusParam));
-      }
-      if (ratingParam) {
-        nextParams.set('rating', ratingParam);
-      }
+    if (!nickname) {
+      return;
+    }
 
-      const hasNicknameWithoutEquals = /(?:\?|&)nickname(?:&|$)/.test(location.search);
-      if (hasNicknameWithoutEquals || nextParams.toString() !== searchParams.toString()) {
-        setSearchParams(nextParams, { replace: true });
-        return;
-      }
-
-      if (!nicknameParam) {
-        return;
-      }
-
-      try {
-        const stats: StatsPayload = await requestStats(
-          nicknameParam,
-          analyticsSource,
-          ratingParamForRequest(ratingParam),
-        );
-
+    requestStats(nickname, analyticsSource, ratingParamForRequest(rating))
+      .then((stats) => {
         playerIdRef.current = stats.playerId ?? null;
         latestMatchIdRef.current = stats.latestMatchId ?? null;
         setState(mapStatsToState(stats));
-      } catch {
-        // Keep the last successful state on transient fetch errors.
-      }
-    };
+      })
+      .catch(() => { /* Игнорируем возможные ошибки. */});
 
     const pollMatchUpdates = async () => {
-      if (isPollingRef.current || !nicknameParam) {
+      if (isPollingRef.current) {
         return;
       }
       isPollingRef.current = true;
 
       try {
         if (!playerIdRef.current) {
-          const snapshot = await player(nicknameParam, analyticsSource);
+          const snapshot = await player(nickname, analyticsSource);
           playerIdRef.current = snapshot.playerId ?? null;
         }
 
@@ -163,9 +99,9 @@ export function StatsPage() {
 
         latestMatchIdRef.current = currentMatchId;
         const nextStats = await requestStats(
-          nicknameParam,
+          nickname,
           analyticsSource,
-          ratingParamForRequest(ratingParam),
+          ratingParamForRequest(rating),
         );
 
         playerIdRef.current = nextStats.playerId ?? playerIdRef.current;
@@ -178,12 +114,11 @@ export function StatsPage() {
       }
     };
 
-    refresh();
-    const timer = window.setInterval(pollMatchUpdates, STATS_WIDGET_POLL_MS);
+    const timer = setInterval(pollMatchUpdates, STATS_WIDGET_POLL_MS);
     return () => {
-      window.clearInterval(timer);
+      clearInterval(timer);
     };
-  }, [ backgroundOpacityParam, borderRadiusParam, location.search, nicknameParam, ratingParam, rawNickname, searchParams, setSearchParams ]);
+  }, [ nickname, rating ]);
 
   if (state === undefined) {
     return null;
@@ -195,8 +130,8 @@ export function StatsPage() {
         common={state.common}
         daily={state.daily}
         recentMatches={state.monthly}
-        backgroundOpacity={backgroundOpacityParam}
-        borderRadius={borderRadiusParam}
+        backgroundOpacity={backgroundOpacity}
+        borderRadius={borderRadius}
         className='stats-page__widget'
       />
     </div>
