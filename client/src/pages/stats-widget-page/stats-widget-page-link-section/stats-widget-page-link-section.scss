@@ -1,0 +1,44 @@
+.stats-widget-page-link-section {
+  border-radius: 12px;
+  border: 1px solid rgba(149, 170, 214, 0.24);
+  background: rgba(13, 21, 37, 0.9);
+  padding: 16px;
+
+  &__title {
+    margin: 0;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: rgba(206, 221, 255, 0.8);
+  }
+
+  &__hint {
+    margin: 8px 0 0;
+    font-size: 13px;
+    color: rgba(212, 224, 247, 0.76);
+  }
+
+  &__link-row {
+    margin-top: 10px;
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 10px;
+  }
+
+  &__link-url {
+    border-radius: 8px;
+    padding: 9px 10px;
+    background: rgba(0, 0, 0, 0.32);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #f1f3f7;
+    font: inherit;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  @media (max-width: 900px) {
+    &__link-row {
+      grid-template-columns: 1fr;
+    }
+  }
+}

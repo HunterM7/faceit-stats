@@ -1,7 +1,7 @@
-import { Link } from 'react-router-dom';
-import type { CSSProperties } from 'react';
 import { AppHeader } from '@components/app-header/app-header';
-import cs2Bg from '@images/cs2-bg.jpg';
+import { Footer } from '@components/footer/footer';
+import { LandingPageHero } from './landing-page-hero/landing-page-hero';
+import { LandingPageShowcase } from './landing-page-showcase/landing-page-showcase';
 import './landing-page.scss';
 
 export function LandingPage() {
@@ -9,41 +9,12 @@ export function LandingPage() {
     <main className='landing-page'>
       <AppHeader/>
 
-      <section className='landing-page__hero'>
-        <p className='landing-page__badge'>ДЛЯ OBS / BROWSER SOURCE</p>
-        <h1 className='landing-page__hero-title'>FACEIT виджеты на стрим</h1>
-        <p className='landing-page__subtitle'>
-          Отдельные страницы каждого виджета с понятными настройками, инструкциями для OBS и быстрым копированием ссылок.
-        </p>
-      </section>
+      <div className='landing-page__content'>
+        <LandingPageHero/>
+        <LandingPageShowcase/>
+      </div>
 
-      <section className='landing-page__showcase' id='widgets'>
-        <div className='landing-page__showcase-inner'>
-          <article
-            className='landing-page__widget-block'
-            style={{ '--widget-bg': `url(${cs2Bg})` } as CSSProperties}
-          >
-            <div className='landing-page__widget-head'>
-              <p className='landing-page__widget-headline'>Твоя статистика</p>
-            </div>
-            <Link to='/widgets/stats' className='landing-page__widget-cta'>Создать виджет</Link>
-          </article>
-
-          <article
-            className='landing-page__widget-block'
-            style={{ '--widget-bg': `url(${cs2Bg})` } as CSSProperties}
-          >
-            <div className='landing-page__widget-head'>
-              <p className='landing-page__widget-headline'>Итог матча</p>
-            </div>
-            <Link to='/widgets/match-result' className='landing-page__widget-cta'>Создать виджет</Link>
-          </article>
-        </div>
-      </section>
-
-      <footer className='landing-page__footer'>
-        <p className='landing-page__footer-text'>FACEIT Widgets for OBS</p>
-      </footer>
+      <Footer className='landing-page__footer'/>
     </main>
   );
 }

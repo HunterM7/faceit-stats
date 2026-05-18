@@ -45,20 +45,20 @@ function mapStatsPayloadToWidgetProps(stats: StatsPayload, ratingMode: StatsRati
   };
 }
 
-type StatsWidgetPagePreviewProps = {
+type StatsWidgetPageContentPreviewProps = {
   preview: StatsWidgetPagePreviewState;
   ratingMode: StatsRatingQuery;
   backgroundOpacity: number;
   borderRadius: number;
 };
 
-export function StatsWidgetPagePreview(props: StatsWidgetPagePreviewProps) {
+export function StatsWidgetPageContentPreview(props: StatsWidgetPageContentPreviewProps) {
   const { preview, ratingMode, backgroundOpacity, borderRadius } = props;
 
   if (preview.kind === 'empty') {
     return (
-      <div className='stats-widget-page__preview'>
-        <p className='stats-widget-page__preview-placeholder'>
+      <div className='stats-widget-page-content__preview'>
+        <p className='stats-widget-page-content__preview-placeholder'>
           Укажи ник на FACEIT.
         </p>
       </div>
@@ -67,8 +67,8 @@ export function StatsWidgetPagePreview(props: StatsWidgetPagePreviewProps) {
 
   if (preview.kind === 'loading') {
     return (
-      <div className='stats-widget-page__preview'>
-        <p className='stats-widget-page__preview-placeholder' aria-live='polite'>
+      <div className='stats-widget-page-content__preview'>
+        <p className='stats-widget-page-content__preview-placeholder' aria-live='polite'>
           Загрузка предпросмотра…
         </p>
       </div>
@@ -77,8 +77,8 @@ export function StatsWidgetPagePreview(props: StatsWidgetPagePreviewProps) {
 
   if (preview.kind === 'error') {
     return (
-      <div className='stats-widget-page__preview'>
-        <p className='stats-widget-page__preview-placeholder stats-widget-page__preview-placeholder--error' role='alert'>
+      <div className='stats-widget-page-content__preview'>
+        <p className='stats-widget-page-content__preview-placeholder stats-widget-page-content__preview-placeholder--error' role='alert'>
           {preview.message}
         </p>
       </div>
@@ -88,13 +88,13 @@ export function StatsWidgetPagePreview(props: StatsWidgetPagePreviewProps) {
   const cardProps = mapStatsPayloadToWidgetProps(preview.stats, ratingMode);
 
   return (
-    <div className='stats-widget-page__preview'>
-      <div className='stats-widget-page__preview-stage'>
+    <div className='stats-widget-page-content__preview'>
+      <div className='stats-widget-page-content__preview-stage'>
         <WidgetStatistics
           {...cardProps}
           backgroundOpacity={backgroundOpacity}
           borderRadius={borderRadius}
-          className='stats-widget-page__preview-card'
+          className='stats-widget-page-content__preview-card'
         />
       </div>
     </div>
