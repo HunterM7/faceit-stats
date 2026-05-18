@@ -21,7 +21,7 @@
 
   &__y-tick {
     flex-shrink: 0;
-    font-size: 11px;
+    font-size: 12px;
     line-height: 1;
     color: rgba(208, 220, 245, 0.72);
     font-variant-numeric: tabular-nums;
@@ -88,7 +88,7 @@
   }
 
   &__bar-label {
-    font-size: 11px;
+    font-size: 12px;
     color: rgba(208, 220, 245, 0.66);
     text-align: center;
     min-width: 0;
@@ -102,7 +102,7 @@
 
   &__group {
     text-align: center;
-    font-size: 11px;
+    font-size: 12px;
     color: rgba(208, 220, 245, 0.8);
     padding-top: 6px;
     height: 20px;

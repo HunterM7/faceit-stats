@@ -22,6 +22,8 @@
   &__lead {
     margin: 10px 0 0;
     max-width: 760px;
+    font-size: 18px;
+    line-height: 1.5;
     color: rgba(230, 233, 239, 0.86);
   }
 
@@ -93,7 +95,7 @@
   &__preview-placeholder {
     margin: 0;
     max-width: 280px;
-    font-size: 14px;
+    font-size: 18px;
     line-height: 1.45;
     color: rgba(208, 222, 255, 0.72);
     text-align: center;
@@ -106,7 +108,7 @@
 
   &__metric-label {
     margin: 0;
-    font-size: 12px;
+    font-size: 14px;
     letter-spacing: 0.4px;
     text-transform: uppercase;
     color: rgba(208, 222, 255, 0.72);
@@ -114,7 +116,7 @@
 
   &__input-label {
     margin: 8px 0 0;
-    font-size: 14px;
+    font-size: 18px;
     color: rgba(225, 232, 247, 0.92);
   }
 
@@ -122,7 +124,7 @@
     margin: 0;
     flex: 1;
     min-width: 0;
-    font-size: 14px;
+    font-size: 18px;
     font-weight: 600;
     color: rgba(225, 232, 247, 0.92);
   }
@@ -162,7 +164,7 @@
   &__bg-reset {
     flex-shrink: 0;
     padding: 5px 10px;
-    font-size: 13px;
+    font-size: 16px;
     font-weight: 700;
   }
 
@@ -173,7 +175,7 @@
     min-width: 40px;
     padding: 4px 9px;
     border-radius: 999px;
-    font-size: 13px;
+    font-size: 16px;
     font-weight: 700;
     font-variant-numeric: tabular-nums;
     letter-spacing: 0.02em;
@@ -264,7 +266,8 @@
     border: 1px solid rgba(255, 255, 255, 0.2);
     background: rgba(0, 0, 0, 0.32);
     color: #f1f3f7;
-    font: inherit;
+    font-family: inherit;
+    font-size: 18px;
     cursor: pointer;
 
     &:focus-visible {

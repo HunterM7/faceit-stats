@@ -6,7 +6,7 @@
 
   &__title {
     margin: 0;
-    font-size: 13px;
+    font-size: 16px;
     text-transform: uppercase;
     letter-spacing: 0.4px;
     color: rgba(206, 221, 255, 0.8);
@@ -14,7 +14,7 @@
 
   &__hint {
     margin: 8px 0 0;
-    font-size: 13px;
+    font-size: 16px;
     color: rgba(212, 224, 247, 0.76);
   }
 
@@ -31,7 +31,8 @@
     background: rgba(0, 0, 0, 0.32);
     border: 1px solid rgba(255, 255, 255, 0.2);
     color: #f1f3f7;
-    font: inherit;
+    font-family: inherit;
+    font-size: 18px;
     width: 100%;
     box-sizing: border-box;
   }
