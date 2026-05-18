@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { AppHeader } from '@components/app-header/app-header';
+import { Header } from '@components/header/header';
 import { Button, ButtonVariant } from '../../ui/button/button';
 import { Input } from '../../ui/input/input';
 import { LinkButton } from '../../ui/link-button/link-button';
@@ -65,7 +65,7 @@ export function MatchResultWidgetPage() {
 
   return (
     <main className='match-result-widget-page'>
-      <AppHeader/>
+      <Header/>
       <section className='match-result-widget-page__card'>
         <div className='match-result-widget-page__top'>
           <p className='match-result-widget-page__badge'>WIDGET PAGE</p>

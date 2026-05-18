@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { classNames } from '@/utils/classNames';
-import './app-header.scss';
+import './header.scss';
 
 type Props = {
   /** Дополнительный класс для стилизации компонента. */
   className?: string | undefined;
 };
 
-export function AppHeader(props: Props) {
+export function Header(props: Props) {
   const { className } = props;
 
   const [ isScrolled, setIsScrolled ] = useState(false);
@@ -21,21 +21,21 @@ export function AppHeader(props: Props) {
   }, []);
 
   return (
-    <header className={classNames('app-header', isScrolled && 'app-header--scrolled', className)}>
-      <div className='app-header__inner'>
-        <NavLink to='/' end className='app-header__brand'>
+    <header className={classNames('header', isScrolled && 'header--scrolled', className)}>
+      <div className='header__inner'>
+        <NavLink to='/' end className='header__brand'>
           FACEIT WIDGETS
         </NavLink>
-        <nav className='app-header__nav'>
+        <nav className='header__nav'>
           <NavLink
             to='/widgets/stats'
-            className={({ isActive }) => classNames('app-header__nav-link', isActive && 'app-header__nav-link--active')}
+            className={({ isActive }) => classNames('header__nav-link', isActive && 'header__nav-link--active')}
           >
             Stats Widget
           </NavLink>
           <NavLink
             to='/widgets/match-result'
-            className={({ isActive }) => classNames('app-header__nav-link', isActive && 'app-header__nav-link--active')}
+            className={({ isActive }) => classNames('header__nav-link', isActive && 'header__nav-link--active')}
           >
             Match Result
           </NavLink>
