@@ -68,16 +68,16 @@ function StatsWidgetPageBgOpacityField(props: StatsWidgetPageBgOpacityFieldProps
   const { value, onChange, onReset, isResetDisabled } = props;
 
   return (
-    <div className='stats-widget-page-content__bg-shell'>
-      <div className='stats-widget-page-content__bg-row'>
-        <p className='stats-widget-page-content__bg-label'>
+    <div className='stats-widget-page-content__field'>
+      <div className='stats-widget-page-content__field-label-row'>
+        <p className='stats-widget-page-content__input-label stats-widget-page-content__input-label--inline'>
           Прозрачность фона
         </p>
-        <div className='stats-widget-page-content__bg-trailing'>
-          <span className='stats-widget-page-content__bg-value' aria-live='polite'>{value}</span>
+        <div className='stats-widget-page-content__field-actions'>
+          <span className='stats-widget-page-content__field-value' aria-live='polite'>{value}</span>
           <Button
             variant={ButtonVariant.Secondary}
-            className='stats-widget-page-content__bg-reset'
+            className='stats-widget-page-content__field-reset'
             disabled={isResetDisabled}
             onClick={onReset}
             aria-label='Сбросить прозрачность фона к значению по умолчанию'
@@ -94,7 +94,7 @@ function StatsWidgetPageBgOpacityField(props: StatsWidgetPageBgOpacityFieldProps
         step={1}
         value={value}
         onChange={(event) => onChange(Number(event.target.value))}
-        className='stats-widget-page-content__bg-range'
+        className='stats-widget-page-content__range'
         aria-label='Прозрачность фона виджета, проценты от 0 до 100'
       />
     </div>
@@ -112,16 +112,16 @@ function StatsWidgetPageBorderRadiusField(props: StatsWidgetPageBorderRadiusFiel
   const { value, onChange, onReset, isResetDisabled } = props;
 
   return (
-    <div className='stats-widget-page-content__bg-shell stats-widget-page-content__bg-shell--stacked stats-widget-page-content__bg-shell--rating'>
-      <div className='stats-widget-page-content__bg-row'>
-        <p className='stats-widget-page-content__bg-label'>
+    <div className='stats-widget-page-content__field'>
+      <div className='stats-widget-page-content__field-label-row'>
+        <p className='stats-widget-page-content__input-label stats-widget-page-content__input-label--inline'>
           Скругление углов
         </p>
-        <div className='stats-widget-page-content__bg-trailing'>
-          <span className='stats-widget-page-content__bg-value' aria-live='polite'>{value}</span>
+        <div className='stats-widget-page-content__field-actions'>
+          <span className='stats-widget-page-content__field-value' aria-live='polite'>{value}</span>
           <Button
             variant={ButtonVariant.Secondary}
-            className='stats-widget-page-content__bg-reset'
+            className='stats-widget-page-content__field-reset'
             disabled={isResetDisabled}
             onClick={onReset}
             aria-label='Сбросить скругление углов к значению по умолчанию'
@@ -138,7 +138,7 @@ function StatsWidgetPageBorderRadiusField(props: StatsWidgetPageBorderRadiusFiel
         step={1}
         value={value}
         onChange={(event) => onChange(Number(event.target.value))}
-        className='stats-widget-page-content__bg-range'
+        className='stats-widget-page-content__range'
         aria-label='Скругление углов виджета в пикселях, от 0 до 18'
       />
     </div>
@@ -154,14 +154,12 @@ function StatsWidgetPageRatingField(props: StatsWidgetPageRatingFieldProps) {
   const { value, onChange } = props;
 
   return (
-    <div className='stats-widget-page-content__bg-shell stats-widget-page-content__bg-shell--stacked'>
-      <div className='stats-widget-page-content__bg-row'>
-        <p className='stats-widget-page-content__bg-label'>
-          Отображаемый рейтинг
-        </p>
-      </div>
+    <div className='stats-widget-page-content__field'>
+      <p className='stats-widget-page-content__input-label stats-widget-page-content__input-label--in-field'>
+        Отображаемый рейтинг
+      </p>
       <select
-        className='stats-widget-page-content__rating-select'
+        className='stats-widget-page-content__select'
         value={value}
         onChange={(event) => onChange(event.target.value as StatsRatingQuery)}
         aria-label='Значение query-параметра rating для ссылки на виджет'
