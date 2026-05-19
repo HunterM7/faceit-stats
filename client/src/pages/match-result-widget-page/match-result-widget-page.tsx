@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Header } from '@components/header/header';
 import { Button, ButtonVariant } from '../../ui/button/button';
 import { Input } from '../../ui/input/input';
+import { Select } from '@/ui/select/select';
 import { LinkButton } from '../../ui/link-button/link-button';
 import { useToast } from '@components/toast-provider/use-toast';
 import { buildUrl, type BoolSetting } from '@utils/widget-url';
@@ -105,50 +106,50 @@ export function MatchResultWidgetPage() {
 
           <label className='match-result-widget-page__grid-field'>
             test
-            <select
-              className='match-result-widget-page__grid-select'
+            <Select
               value={testMode}
-              onChange={(e) => setTestMode(e.target.value as BoolSetting)}
-            >
-              <option value='false'>false</option>
-              <option value='true'>true</option>
-            </select>
+              options={[
+                { value: 'false', label: 'false' },
+                { value: 'true', label: 'true' },
+              ]}
+              onChange={setTestMode}
+            />
           </label>
 
           <label className='match-result-widget-page__grid-field'>
             hideRank
-            <select
-              className='match-result-widget-page__grid-select'
+            <Select
               value={hideRank}
-              onChange={(e) => setHideRank(e.target.value as BoolSetting)}
-            >
-              <option value='false'>false</option>
-              <option value='true'>true</option>
-            </select>
+              options={[
+                { value: 'false', label: 'false' },
+                { value: 'true', label: 'true' },
+              ]}
+              onChange={setHideRank}
+            />
           </label>
 
           <label className='match-result-widget-page__grid-field'>
             hideChallenger
-            <select
-              className='match-result-widget-page__grid-select'
+            <Select
               value={hideChallenger}
-              onChange={(e) => setHideChallenger(e.target.value as BoolSetting)}
-            >
-              <option value='false'>false</option>
-              <option value='true'>true</option>
-            </select>
+              options={[
+                { value: 'false', label: 'false' },
+                { value: 'true', label: 'true' },
+              ]}
+              onChange={setHideChallenger}
+            />
           </label>
 
           <label className='match-result-widget-page__grid-field'>
             transparent
-            <select
-              className='match-result-widget-page__grid-select'
+            <Select
               value={transparent}
-              onChange={(e) => setTransparent(e.target.value as BoolSetting)}
-            >
-              <option value='true'>true</option>
-              <option value='false'>false</option>
-            </select>
+              options={[
+                { value: 'false', label: 'false' },
+                { value: 'true', label: 'true' },
+              ]}
+              onChange={setTransparent}
+            />
           </label>
         </div>
 

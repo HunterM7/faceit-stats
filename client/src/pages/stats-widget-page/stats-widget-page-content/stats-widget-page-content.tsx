@@ -3,6 +3,7 @@ import { requestStats, type StatsPayload, type StatsRatingQuery } from '@request
 import { classNames } from '@/utils/classNames';
 import { Button, ButtonVariant } from '@/ui/button/button';
 import { Input } from '@/ui/input/input';
+import { Select } from '@/ui/select/select';
 import { StorageLocal } from '@utils/app-local-storage';
 import { StatsWidgetPageLinkSection } from '../stats-widget-page-link-section/stats-widget-page-link-section';
 import {
@@ -158,16 +159,15 @@ function StatsWidgetPageRatingField(props: StatsWidgetPageRatingFieldProps) {
       <p className='stats-widget-page-content__input-label stats-widget-page-content__input-label--in-field'>
         Отображаемый рейтинг
       </p>
-      <select
-        className='stats-widget-page-content__select'
+      <Select
         value={value}
-        onChange={(event) => onChange(event.target.value as StatsRatingQuery)}
-        aria-label='Значение query-параметра rating для ссылки на виджет'
-      >
-        <option value='country'>Только страна</option>
-        <option value='region'>Только регион</option>
-        <option value='both'>Страна и регион</option>
-      </select>
+        options={[
+          { value: 'country', label: 'Только страна' },
+          { value: 'region', label: 'Только регион' },
+          { value: 'both', label: 'Страна и регион' },
+        ]}
+        onChange={onChange}
+      />
     </div>
   );
 }
