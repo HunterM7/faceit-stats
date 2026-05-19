@@ -10,3 +10,7 @@ trim_trailing_whitespace = true
 [*.{ts,tsx,js,mjs,cjs,json,yml,yaml,md,html,css,scss}]
 indent_style = space
 indent_size = 2
+
+# Однострочные иконки: без LF в конце (иначе в редакторе «вторая пустая строка»).
+[*.svg]
+insert_final_newline = false
