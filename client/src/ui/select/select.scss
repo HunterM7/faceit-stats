@@ -38,18 +38,26 @@
     text-align: left;
   }
 
-  &__icon {
-    display: inline-flex;
+  &__chevron,
+  &__check {
+    display: block;
     flex-shrink: 0;
-    align-items: center;
-    justify-content: center;
-    color: rgba(241, 243, 247, 0.72);
-    line-height: 0;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
   }
 
   &__chevron {
-    display: block;
+    width: 12px;
+    height: 12px;
+    background-image: url('@images/icons/select-chevron.svg');
     transition: transform 0.16s ease;
+  }
+
+  &__check {
+    width: 14px;
+    height: 14px;
+    background-image: url('@images/icons/select-check.svg');
   }
 
   &__content {
@@ -94,12 +102,7 @@
   }
 
   &__item-indicator {
-    display: inline-flex;
     flex-shrink: 0;
-    align-items: center;
-    justify-content: center;
-    color: rgba(160, 178, 255, 0.95);
-    line-height: 0;
   }
 }
 
