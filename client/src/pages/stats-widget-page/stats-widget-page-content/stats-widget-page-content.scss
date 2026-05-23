@@ -7,13 +7,6 @@
   margin: 0 auto;
   gap: 14px;
 
-  &__panel {
-    border-radius: 12px;
-    border: 1px solid rgba(149, 170, 214, 0.24);
-    background: rgba(13, 21, 37, 0.9);
-    padding: 16px;
-  }
-
   &__title {
     margin: 0;
     font-size: clamp(24px, 4vw, 34px);
@@ -43,14 +36,13 @@
     flex-shrink: 0;
   }
 
-  &__metric--preview {
+  &__preview-section {
     display: flex;
     flex-direction: column;
     flex: 1;
   }
 
   &__preview {
-    margin-top: 10px;
     flex: 1;
     min-height: 220px;
     display: flex;
@@ -106,16 +98,8 @@
     }
   }
 
-  &__metric-label {
-    margin: 0;
-    font-size: 14px;
-    letter-spacing: 0.4px;
-    text-transform: uppercase;
-    color: rgba(208, 222, 255, 0.72);
-  }
-
   &__input-label {
-    margin: 12px 0 0;
+    margin: 0;
     font-size: 18px;
     color: rgba(225, 232, 247, 0.92);
   }
@@ -130,11 +114,16 @@
     margin: 0;
   }
 
+  &__fields {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
   &__field {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    margin-top: 22px;
   }
 
   &__field-label-row {
@@ -245,7 +234,6 @@
 
   &__text-input {
     width: 100%;
-    margin-top: 10px;
     box-sizing: border-box;
   }
 

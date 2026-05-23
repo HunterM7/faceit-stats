@@ -1,6 +1,7 @@
 import { startTransition, useEffect, useState } from 'react';
 import { requestStats, type StatsPayload, type StatsRatingQuery } from '@requests/stats';
 import { classNames } from '@/utils/classNames';
+import { Section } from '@/components/section/section';
 import { Button, ButtonVariant } from '@/ui/button/button';
 import { Input } from '@/ui/input/input';
 import { Select } from '@/ui/select/select';
@@ -270,25 +271,24 @@ export function StatsWidgetPageContent(props: StatsWidgetPageContentProps) {
 
   return (
     <div className={classNames('stats-widget-page-content', className)}>
-      <div className='stats-widget-page-content__panel'>
+      <Section>
         <h1 className='stats-widget-page-content__title'>Виджет статистики</h1>
         <p className='stats-widget-page-content__lead'>
           Виджет с ELO, уровнем, винрейтом и актуальной статистикой игрока FACEIT. Здесь можно настроить параметры и сразу
           получить ссылку для OBS.
         </p>
-      </div>
+      </Section>
 
       <div className='stats-widget-page-content__metrics'>
         <div className='stats-widget-page-content__aside'>
-          <article className='stats-widget-page-content__panel stats-widget-page-content__metric stats-widget-page-content__metric--preview'>
-            <p className='stats-widget-page-content__metric-label'>Предпросмотр</p>
+          <Section title='Предпросмотр' className='stats-widget-page-content__preview-section'>
             <StatsWidgetPageContentPreview
               preview={previewState}
               ratingMode={ratingMode}
               backgroundOpacity={backgroundOpacityForPreview}
               borderRadius={borderRadiusForPreview}
             />
-          </article>
+          </Section>
           <StatsWidgetPageLinkSection
             className='stats-widget-page-content__aside-link'
             nickname={nickname}
@@ -298,36 +298,41 @@ export function StatsWidgetPageContent(props: StatsWidgetPageContentProps) {
           />
         </div>
 
-        <article className='stats-widget-page-content__panel stats-widget-page-content__metric'>
-          <p className='stats-widget-page-content__metric-label'>Параметры виджета</p>
-          <p className='stats-widget-page-content__input-label'>Ник FACEIT</p>
-          <Input
-            className='stats-widget-page-content__text-input'
-            isClearable
-            name='nickname'
-            type='text'
-            value={nickname}
-            onChange={handleNicknameChange}
-            placeholder='например: s1mple'
-            autoComplete='nickname'
-          />
-          <StatsWidgetPageBgOpacityField
-            value={backgroundOpacityForPreview}
-            onChange={handleBgOpacityPercentChange}
-            onReset={handleBackgroundOpacityReset}
-            isResetDisabled={backgroundOpacity === undefined}
-          />
-          <StatsWidgetPageBorderRadiusField
-            value={borderRadiusForPreview}
-            onChange={handleBorderRadiusPxChange}
-            onReset={handleBorderRadiusReset}
-            isResetDisabled={borderRadius === undefined}
-          />
-          <StatsWidgetPageRatingField
-            value={ratingMode}
-            onChange={handleRatingModeChange}
-          />
-        </article>
+        <Section title='Параметры виджета'>
+          <div className='stats-widget-page-content__fields'>
+            <div className='stats-widget-page-content__field'>
+              <p className='stats-widget-page-content__input-label stats-widget-page-content__input-label--in-field'>
+                Ник FACEIT
+              </p>
+              <Input
+                className='stats-widget-page-content__text-input'
+                isClearable
+                name='nickname'
+                type='text'
+                value={nickname}
+                onChange={handleNicknameChange}
+                placeholder='например: s1mple'
+                autoComplete='nickname'
+              />
+            </div>
+            <StatsWidgetPageBgOpacityField
+              value={backgroundOpacityForPreview}
+              onChange={handleBgOpacityPercentChange}
+              onReset={handleBackgroundOpacityReset}
+              isResetDisabled={backgroundOpacity === undefined}
+            />
+            <StatsWidgetPageBorderRadiusField
+              value={borderRadiusForPreview}
+              onChange={handleBorderRadiusPxChange}
+              onReset={handleBorderRadiusReset}
+              isResetDisabled={borderRadius === undefined}
+            />
+            <StatsWidgetPageRatingField
+              value={ratingMode}
+              onChange={handleRatingModeChange}
+            />
+          </div>
+        </Section>
       </div>
     </div>
   );

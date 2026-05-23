@@ -31,13 +31,13 @@ export function Header(props: Props) {
             to='/widgets/stats'
             className={({ isActive }) => classNames('header__nav-link', isActive && 'header__nav-link--active')}
           >
-            Stats Widget
+            Виджет статистики
           </NavLink>
           <NavLink
             to='/widgets/match-result'
             className={({ isActive }) => classNames('header__nav-link', isActive && 'header__nav-link--active')}
           >
-            Match Result
+            Виджет-оверлей
           </NavLink>
         </nav>
       </div>

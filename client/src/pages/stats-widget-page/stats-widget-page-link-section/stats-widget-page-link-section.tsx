@@ -1,5 +1,6 @@
 import { classNames } from '@utils/classNames';
 import type { StatsRatingQuery } from '@requests/stats';
+import { Section } from '@/components/section/section';
 import { Button, ButtonVariant } from '@/ui/button/button';
 import { LinkButton } from '@/ui/link-button/link-button';
 import { useStatsWidgetPageLink } from './use-stats-widget-page-link';
@@ -24,8 +25,7 @@ export function StatsWidgetPageLinkSection(props: StatsWidgetPageLinkSectionProp
   const { widgetUrl, canBuild, copy } = useStatsWidgetPageLink({ nickname, backgroundOpacity, borderRadius, ratingMode });
 
   return (
-    <article className={classNames('stats-widget-page-link-section', className)}>
-      <p className='stats-widget-page-link-section__title'>Ссылка на виджет</p>
+    <Section title='Ссылка на виджет' className={classNames('stats-widget-page-link-section', className)}>
       <p className='stats-widget-page-link-section__hint'>Используй эту ссылку в OBS или других программах для стриминга</p>
       <div className='stats-widget-page-link-section__link-row'>
         <input
@@ -43,6 +43,6 @@ export function StatsWidgetPageLinkSection(props: StatsWidgetPageLinkSectionProp
           Открыть виджет
         </LinkButton>
       </div>
-    </article>
+    </Section>
   );
 }
