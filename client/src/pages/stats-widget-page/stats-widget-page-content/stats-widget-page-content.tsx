@@ -11,6 +11,7 @@ import {
   StatsWidgetPageContentPreview,
   type StatsWidgetPagePreviewState,
 } from './stats-widget-page-content-preview/stats-widget-page-content-preview';
+import { StatsWidgetPageContentHeroSteps } from './stats-widget-page-content-hero-steps/stats-widget-page-content-hero-steps';
 import './stats-widget-page-content.scss';
 
 const DEFAULT_WIDGET_BG_PERCENT = 96;
@@ -271,34 +272,28 @@ export function StatsWidgetPageContent(props: StatsWidgetPageContentProps) {
 
   return (
     <div className={classNames('stats-widget-page-content', className)}>
-      <Section>
-        <h1 className='stats-widget-page-content__title'>Виджет статистики</h1>
-        <p className='stats-widget-page-content__lead'>
-          Виджет с ELO, уровнем, винрейтом и актуальной статистикой игрока FACEIT. Здесь можно настроить параметры и сразу
-          получить ссылку для OBS.
-        </p>
-      </Section>
+      <header className='stats-widget-page-content__hero'>
+        <div className='stats-widget-page-content__hero-copy'>
+          <h1 className='stats-widget-page-content__hero-title'>Виджет статистики</h1>
+          <p className='stats-widget-page-content__hero-lead'>
+            Виджет с твоей основной статистикой с FACEIT - как за сегодня, так и за последние 30 матчей.
+            Данные обновляются автоматически в реальном времени.
+          </p>
+        </div>
+        <StatsWidgetPageContentHeroSteps/>
+      </header>
 
       <div className='stats-widget-page-content__metrics'>
-        <div className='stats-widget-page-content__aside'>
-          <Section title='Предпросмотр' className='stats-widget-page-content__preview-section'>
-            <StatsWidgetPageContentPreview
-              preview={previewState}
-              ratingMode={ratingMode}
-              backgroundOpacity={backgroundOpacityForPreview}
-              borderRadius={borderRadiusForPreview}
-            />
-          </Section>
-          <StatsWidgetPageLinkSection
-            className='stats-widget-page-content__aside-link'
-            nickname={nickname}
-            backgroundOpacity={backgroundOpacity}
-            borderRadius={borderRadius}
+        <Section title='Предпросмотр' className='stats-widget-page-content__preview-section stats-widget-page-content__metrics-preview'>
+          <StatsWidgetPageContentPreview
+            preview={previewState}
             ratingMode={ratingMode}
+            backgroundOpacity={backgroundOpacityForPreview}
+            borderRadius={borderRadiusForPreview}
           />
-        </div>
+        </Section>
 
-        <Section title='Параметры виджета'>
+        <Section title='Параметры виджета' className='stats-widget-page-content__metrics-params'>
           <div className='stats-widget-page-content__fields'>
             <div className='stats-widget-page-content__field'>
               <p className='stats-widget-page-content__input-label stats-widget-page-content__input-label--in-field'>
@@ -333,6 +328,14 @@ export function StatsWidgetPageContent(props: StatsWidgetPageContentProps) {
             />
           </div>
         </Section>
+
+        <StatsWidgetPageLinkSection
+          className='stats-widget-page-content__metrics-link'
+          nickname={nickname}
+          backgroundOpacity={backgroundOpacity}
+          borderRadius={borderRadius}
+          ratingMode={ratingMode}
+        />
       </div>
     </div>
   );
