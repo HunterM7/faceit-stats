@@ -1,0 +1,70 @@
+.stats-widget-page-content-guide-lightbox-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  overflow: hidden;
+  background: rgba(4, 8, 18, 0.88);
+  backdrop-filter: blur(4px);
+  cursor: zoom-out;
+  touch-action: none;
+
+  &__close {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    z-index: 2;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    cursor: pointer;
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 16px;
+      height: 2px;
+      background: rgba(240, 244, 255, 0.92);
+      transform-origin: center;
+    }
+
+    &::before {
+      transform: translate(-50%, -50%) rotate(45deg);
+    }
+
+    &::after {
+      transform: translate(-50%, -50%) rotate(-45deg);
+    }
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.14);
+    }
+  }
+
+  &__stage {
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+  }
+
+  &__img {
+    display: block;
+    max-width: min(96vw, 1400px);
+    max-height: 92vh;
+    object-fit: contain;
+    border-radius: 10px;
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+    cursor: default;
+    transform-origin: center center;
+    will-change: transform;
+  }
+}

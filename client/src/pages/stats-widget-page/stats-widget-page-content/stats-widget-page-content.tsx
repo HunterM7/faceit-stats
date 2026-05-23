@@ -11,6 +11,7 @@ import {
   StatsWidgetPageContentPreview,
   type StatsWidgetPagePreviewState,
 } from './stats-widget-page-content-preview/stats-widget-page-content-preview';
+import { StatsWidgetPageContentGuide } from './stats-widget-page-content-guide/stats-widget-page-content-guide';
 import { StatsWidgetPageContentHeroSteps } from './stats-widget-page-content-hero-steps/stats-widget-page-content-hero-steps';
 import './stats-widget-page-content.scss';
 
@@ -280,7 +281,7 @@ export function StatsWidgetPageContent(props: StatsWidgetPageContentProps) {
             Данные обновляются автоматически в реальном времени.
           </p>
         </div>
-        <StatsWidgetPageContentHeroSteps/>
+        <StatsWidgetPageContentHeroSteps className='stats-widget-page-content__hero-steps'/>
       </header>
 
       <div className='stats-widget-page-content__metrics'>
@@ -337,6 +338,7 @@ export function StatsWidgetPageContent(props: StatsWidgetPageContentProps) {
           ratingMode={ratingMode}
         />
       </div>
+      <StatsWidgetPageContentGuide/>
     </div>
   );
 }
