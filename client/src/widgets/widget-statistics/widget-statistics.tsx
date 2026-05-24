@@ -25,7 +25,7 @@ interface WidgetStatisticsProps {
 }
 
 export function WidgetStatistics(props: WidgetStatisticsProps) {
-  const { common, daily, recentMatches, className, backgroundOpacity = 96, borderRadius = 16 } = props;
+  const { common, daily, recentMatches, className, backgroundOpacity = 90, borderRadius = 16 } = props;
   const normalizedOpacity = Math.min(100, Math.max(0, backgroundOpacity)) / 100;
   const normalizedBorderRadiusPx = Math.min(18, Math.max(0, Math.round(borderRadius)));
   const cardStyle = {

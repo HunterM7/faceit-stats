@@ -14,7 +14,7 @@ import {
 import { StatsWidgetPageContentGuide } from './stats-widget-page-content-guide/stats-widget-page-content-guide';
 import './stats-widget-page-content.scss';
 
-const DEFAULT_WIDGET_BG_PERCENT = 96;
+const DEFAULT_WIDGET_BG_PERCENT = 90;
 const DEFAULT_WIDGET_BORDER_RADIUS_PX = 16;
 const DEFAULT_RATING_MODE: StatsRatingQuery = 'country';
 const STATS_WIDGET_PREVIEW_SOURCE = 'stats_widget' as const;
