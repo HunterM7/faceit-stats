@@ -47,6 +47,23 @@ function normalizeBackgroundOpacityPercent(stored: unknown): number {
   return rounded;
 }
 
+function formatStatsPreviewError(error: unknown): string {
+  const message = error instanceof Error ? error.message : '';
+  if (message === 'Игрок FACEIT не найден по никнейму') {
+    return 'Не нашли твой FACEIT профиль по этому нику. Проверь написание.';
+  }
+  if (message === 'Никнейм пустой') {
+    return 'Укажи свой FACEIT ник.';
+  }
+  if (message.startsWith('Ошибка запроса:')) {
+    return 'Не удалось загрузить твою статистику. Попробуй ещё раз.';
+  }
+  if (message.length) {
+    return message;
+  }
+  return 'Не удалось загрузить твою статистику';
+}
+
 function normalizeBorderRadiusPx(stored: unknown): number {
   const parsed = typeof stored === 'number'
     ? stored
@@ -78,13 +95,12 @@ function StatsWidgetPageBgOpacityField(props: StatsWidgetPageBgOpacityFieldProps
           Прозрачность фона
         </p>
         <div className='stats-widget-page-content__field-actions'>
-          <span className='stats-widget-page-content__field-value' aria-live='polite'>{value}</span>
+          <span className='stats-widget-page-content__field-value'>{value}</span>
           <Button
             variant={ButtonVariant.Secondary}
             className='stats-widget-page-content__field-reset'
             disabled={isResetDisabled}
             onClick={onReset}
-            aria-label='Сбросить прозрачность фона к значению по умолчанию'
           >
             Сброс
           </Button>
@@ -99,7 +115,6 @@ function StatsWidgetPageBgOpacityField(props: StatsWidgetPageBgOpacityFieldProps
         value={value}
         onChange={(event) => onChange(Number(event.target.value))}
         className='stats-widget-page-content__range'
-        aria-label='Прозрачность фона виджета, проценты от 0 до 100'
       />
     </div>
   );
@@ -122,13 +137,12 @@ function StatsWidgetPageBorderRadiusField(props: StatsWidgetPageBorderRadiusFiel
           Скругление углов
         </p>
         <div className='stats-widget-page-content__field-actions'>
-          <span className='stats-widget-page-content__field-value' aria-live='polite'>{value}</span>
+          <span className='stats-widget-page-content__field-value'>{value}</span>
           <Button
             variant={ButtonVariant.Secondary}
             className='stats-widget-page-content__field-reset'
             disabled={isResetDisabled}
             onClick={onReset}
-            aria-label='Сбросить скругление углов к значению по умолчанию'
           >
             Сброс
           </Button>
@@ -143,7 +157,6 @@ function StatsWidgetPageBorderRadiusField(props: StatsWidgetPageBorderRadiusFiel
         value={value}
         onChange={(event) => onChange(Number(event.target.value))}
         className='stats-widget-page-content__range'
-        aria-label='Скругление углов виджета в пикселях, от 0 до 18'
       />
     </div>
   );
@@ -224,7 +237,7 @@ export function StatsWidgetPageContent(props: StatsWidgetPageContentProps) {
         if (cancelled) {
           return;
         }
-        const message = error instanceof Error ? error.message : 'Не удалось загрузить данные';
+        const message = formatStatsPreviewError(error);
         setPreviewState({ kind: 'error', nickname: trimmed, message });
       });
     return () => {
@@ -277,7 +290,7 @@ export function StatsWidgetPageContent(props: StatsWidgetPageContentProps) {
         <div className='stats-widget-page-content__hero-copy'>
           <h1 className='stats-widget-page-content__hero-title'>Виджет статистики</h1>
           <p className='stats-widget-page-content__hero-lead'>
-            Виджет с твоей основной статистикой с FACEIT - как за сегодня, так и за последние 30 матчей.
+            Виджет с твоей основной статистикой с FACEIT — как за сегодня, так и за последние 30 матчей.
             Данные обновляются автоматически в реальном времени.
           </p>
         </div>
@@ -298,7 +311,7 @@ export function StatsWidgetPageContent(props: StatsWidgetPageContentProps) {
           <div className='stats-widget-page-content__fields'>
             <div className='stats-widget-page-content__field'>
               <p className='stats-widget-page-content__input-label stats-widget-page-content__input-label--in-field'>
-                Ник FACEIT
+                FACEIT ник
               </p>
               <Input
                 className='stats-widget-page-content__text-input'

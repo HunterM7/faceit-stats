@@ -59,7 +59,7 @@ export function StatsWidgetPageContentPreview(props: StatsWidgetPageContentPrevi
     return (
       <div className='stats-widget-page-content__preview'>
         <p className='stats-widget-page-content__preview-placeholder'>
-          Укажи ник на FACEIT.
+          Укажи свой FACEIT ник
         </p>
       </div>
     );
@@ -68,7 +68,7 @@ export function StatsWidgetPageContentPreview(props: StatsWidgetPageContentPrevi
   if (preview.kind === 'loading') {
     return (
       <div className='stats-widget-page-content__preview'>
-        <p className='stats-widget-page-content__preview-placeholder' aria-live='polite'>
+        <p className='stats-widget-page-content__preview-placeholder'>
           Загрузка предпросмотра…
         </p>
       </div>
@@ -78,7 +78,7 @@ export function StatsWidgetPageContentPreview(props: StatsWidgetPageContentPrevi
   if (preview.kind === 'error') {
     return (
       <div className='stats-widget-page-content__preview'>
-        <p className='stats-widget-page-content__preview-placeholder stats-widget-page-content__preview-placeholder--error' role='alert'>
+        <p className='stats-widget-page-content__preview-placeholder stats-widget-page-content__preview-placeholder--error'>
           {preview.message}
         </p>
       </div>

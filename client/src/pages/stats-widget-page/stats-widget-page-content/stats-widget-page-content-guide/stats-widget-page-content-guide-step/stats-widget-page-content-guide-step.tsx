@@ -29,7 +29,6 @@ export function StatsWidgetPageContentGuideStep(props: Props) {
           <button
             type='button'
             className='stats-widget-page-content-guide-step__shot-button'
-            aria-label={`Увеличить: ${image.alt}`}
             onClick={() => {
               onImageClick(image);
             }}
@@ -45,7 +44,7 @@ export function StatsWidgetPageContentGuideStep(props: Props) {
         </figure>
       )}
       <div className='stats-widget-page-content-guide-step__body'>
-        <span className='stats-widget-page-content-guide-step__num' aria-hidden='true'>{index + 1}</span>
+        <span className='stats-widget-page-content-guide-step__num'>{index + 1}</span>
         <div className='stats-widget-page-content-guide-step__copy'>
           <p className='stats-widget-page-content-guide-step__title'>{title}</p>
           <p className='stats-widget-page-content-guide-step__text'>{text}</p>

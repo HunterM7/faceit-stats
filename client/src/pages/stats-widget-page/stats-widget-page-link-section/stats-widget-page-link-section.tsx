@@ -26,15 +26,14 @@ export function StatsWidgetPageLinkSection(props: StatsWidgetPageLinkSectionProp
 
   return (
     <Section title='Ссылка на виджет' className={classNames('stats-widget-page-link-section', className)}>
-      <p className='stats-widget-page-link-section__hint'>Используй эту ссылку в OBS или других программах для стриминга</p>
+      <p className='stats-widget-page-link-section__hint'>Используй эту ссылку в OBS или других программах для стриминга.</p>
       <div className='stats-widget-page-link-section__link-row'>
         <input
           className='stats-widget-page-link-section__link-url'
           type='text'
           readOnly
           value={widgetUrl}
-          placeholder='Укажи ник, чтобы сгенерировать ссылку'
-          aria-label='Ссылка на виджет статистики'
+          placeholder='Укажи свой FACEIT ник, чтобы сгенерировать ссылку'
         />
         <Button variant={ButtonVariant.Primary} onClick={copy} disabled={!canBuild}>
           Копировать URL

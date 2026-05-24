@@ -13,7 +13,7 @@ type GuideStep = Pick<ComponentProps<typeof StatsWidgetPageContentGuideStep>, 't
 const STEPS: GuideStep[] = [
   {
     title: 'Скопируй ссылку на виджет',
-    text: 'Нажми «Копировать URL» в блоке «Ссылка на виджет». В этом URL уже содержится твой ник и настройки оформления виджета.',
+    text: 'Нажми «Копировать URL» в блоке «Ссылка на виджет». В этом URL уже есть твой FACEIT ник и настройки оформления виджета.',
   },
   {
     title: 'Создай источник «Браузер» в OBS',
@@ -63,7 +63,7 @@ export function StatsWidgetPageContentGuide(props: StatsWidgetPageContentGuidePr
       title='Как использовать ссылку в OBS'
       className={classNames('stats-widget-page-content-guide', className)}
     >
-      <ol className='stats-widget-page-content-guide__steps' aria-label='Как подключить виджет в OBS'>
+      <ol className='stats-widget-page-content-guide__steps'>
         {STEPS.map((step, index) => (
           <StatsWidgetPageContentGuideStep
             key={step.title}
