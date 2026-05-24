@@ -1,0 +1,33 @@
+---
+description: Не использовать ARIA-атрибуты в проекте
+alwaysApply: true
+---
+
+# Без ARIA
+
+В проекте **не добавлять** атрибуты `aria-*` и не вводить API-пропы вроде `ariaLabel` — до отдельного явного решения команды.
+
+## Правила
+
+- Не писать `aria-label`, `aria-expanded`, `aria-selected`, `aria-hidden`, `aria-live`, `aria-controls` и любые другие `aria-*`.
+- Не добавлять `role` ради доступности (`listbox`, `option`, `group` и т.п.).
+- Подписи — видимый текст: `<label>`, `<p>`, заголовки рядом с контролом.
+- Если правите файл, где уже есть `aria-*`, — убирайте их в рамках задачи.
+
+## Исключения
+
+Только если пользователь **явно** попросил ARIA в текущей задаче.
+
+## Примеры
+
+```tsx
+// ❌
+<button aria-label="Закрыть" />
+<Select ariaLabel="Рейтинг" />
+<div role="listbox" aria-activedescendant="…" />
+
+// ✅
+<button type="button">Закрыть</button>
+<p className="field-label">Отображаемый рейтинг</p>
+<Select value={value} options={options} onChange={setValue} />
+```

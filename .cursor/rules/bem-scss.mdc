@@ -1,0 +1,46 @@
+---
+description: Только БЭМ в SCSS и className
+alwaysApply: true
+---
+
+# БЭМ в стилях и разметке
+
+## SCSS
+
+- **Один блок** на компонент (файл `component.scss` → блок `.component`).
+- Вложенность только через `&__element`, `&--modifier`, `&:псевдо`.
+- **Запрещено** писать селекторы блока вне его корневого `.block { }`:
+  - ❌ `.select:disabled { }` отдельно от `.select`
+  - ❌ `.select__item--active { }` в корне файла
+  - ❌ `.select-root .select__chevron`
+- Модификаторы состояния элемента — вложенно: `&__item { &--active { } &--selected { &--active { } } }`.
+- Модификатор блока, влияющий на элемент: `&--open { &__chevron { } }`.
+- `@keyframes` — в конце файла, без привязки к блоку.
+
+Проверка: `npm run lint:styles` (правило `selector-nested-pattern`).
+
+## TSX / JSX
+
+- Только классы одного блока: `block`, `block__element`, `block--modifier`, `block__element--modifier`.
+- ❌ Второй блок в том же компоненте (`select-root` + `select`).
+- ❌ Утилитарные/чужие классы в UI-компонентах без явной просьбы.
+- `className` снаружи вешать на **корень блока**, не на внутренние элементы.
+
+## Пример
+
+```scss
+.select {
+  &__trigger { &:disabled { opacity: 0.55; } }
+  &__item {
+    &--active { background: …; }
+    &--selected { &--active { background: …; } }
+  }
+  &--open { &__chevron { transform: rotate(180deg); } }
+}
+```
+
+```tsx
+<div className={classNames('select', open && 'select--open', className)}>
+  <button type="button" className="select__trigger">…</button>
+</div>
+```
