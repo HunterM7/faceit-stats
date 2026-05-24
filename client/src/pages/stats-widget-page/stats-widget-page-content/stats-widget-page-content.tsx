@@ -12,7 +12,6 @@ import {
   type StatsWidgetPagePreviewState,
 } from './stats-widget-page-content-preview/stats-widget-page-content-preview';
 import { StatsWidgetPageContentGuide } from './stats-widget-page-content-guide/stats-widget-page-content-guide';
-import { StatsWidgetPageContentHeroSteps } from './stats-widget-page-content-hero-steps/stats-widget-page-content-hero-steps';
 import './stats-widget-page-content.scss';
 
 const DEFAULT_WIDGET_BG_PERCENT = 96;
@@ -291,10 +290,11 @@ export function StatsWidgetPageContent(props: StatsWidgetPageContentProps) {
           <h1 className='stats-widget-page-content__hero-title'>Виджет статистики</h1>
           <p className='stats-widget-page-content__hero-lead'>
             Виджет с твоей основной статистикой с FACEIT — как за сегодня, так и за последние 30 матчей.
+          </p>
+          <p className='stats-widget-page-content__hero-lead'>
             Данные обновляются автоматически в реальном времени.
           </p>
         </div>
-        <StatsWidgetPageContentHeroSteps className='stats-widget-page-content__hero-steps'/>
       </header>
 
       <div className='stats-widget-page-content__metrics'>

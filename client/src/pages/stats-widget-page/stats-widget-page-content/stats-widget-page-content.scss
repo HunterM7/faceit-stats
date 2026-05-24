@@ -11,10 +11,6 @@
   gap: 14px;
 
   &__hero {
-    display: grid;
-    grid-template-columns: var(--layout-grid-columns);
-    gap: var(--layout-grid-gap);
-    align-items: start;
     position: relative;
     margin: 0 0 8px;
     padding-bottom: 22px;
@@ -37,10 +33,6 @@
 
   &__hero-copy {
     min-width: 0;
-  }
-
-  &__hero-steps {
-    align-self: start;
   }
 
   &__hero-title {
@@ -301,10 +293,6 @@
   }
 
   @media (max-width: 900px) {
-    &__hero {
-      grid-template-columns: 1fr;
-    }
-
     &__metrics {
       grid-template-columns: 1fr;
     }
