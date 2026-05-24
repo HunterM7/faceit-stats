@@ -26,9 +26,6 @@ export function StatsWidgetPageContentGuideLightbox(props: StatsWidgetPageConten
       return;
     }
 
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         closeLightbox();
@@ -36,10 +33,7 @@ export function StatsWidgetPageContentGuideLightbox(props: StatsWidgetPageConten
     };
 
     window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      window.removeEventListener('keydown', handleKeyDown);
-    };
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [ closeLightbox, image ]);
 
   if (!image) {

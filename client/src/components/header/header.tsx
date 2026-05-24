@@ -14,10 +14,14 @@ export function Header(props: Props) {
   const [ isScrolled, setIsScrolled ] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setIsScrolled(window.scrollY > 12);
+    const scrollElement = document.getElementById('root');
+    if (!scrollElement) {
+      return;
+    }
+    const onScroll = () => setIsScrolled(scrollElement.scrollTop > 12);
     onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    scrollElement.addEventListener('scroll', onScroll, { passive: true });
+    return () => scrollElement.removeEventListener('scroll', onScroll);
   }, []);
 
   return (
