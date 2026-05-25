@@ -23,7 +23,7 @@ const ADMIN_PERIOD_OPTIONS: Array<{ id: AdminPeriod; label: string }> = [
 const ADMIN_SCOPE_OPTIONS: Array<{ id: AdminScope; label: string }> = [
   { id: 'overall', label: 'Общая статистика' },
   { id: 'stats_widget', label: 'Виджет статистики' },
-  { id: 'overlay_widget', label: 'Виджет оверлея' },
+  { id: 'overlay_widget', label: 'Виджет-оверлей' },
 ];
 
 const SCOPE_DESCRIPTION_MAP: Record<AdminScope, string> = {

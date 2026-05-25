@@ -3,6 +3,12 @@ import { WidgetOverlayLevelIcon } from './widget-overlay-level-icon/widget-overl
 import { WidgetOverlayParticles } from './widget-overlay-particles/widget-overlay-particles';
 import './widget-overlay.scss';
 import { classNames } from '@/utils/classNames';
+import {
+  WIDGET_OVERLAY_COUNTER_DURATION_MS,
+  WIDGET_OVERLAY_DELTA_LEAD_IN_MS,
+  WIDGET_OVERLAY_HIDE_AFTER_ANIMATION_MS,
+  WIDGET_OVERLAY_PREVIEW_MS,
+} from './widget-overlay-timing';
 
 /** Актуальный матч. */
 export interface MatchResult {
@@ -32,11 +38,10 @@ type EloOverlayTick =
 
 export function WidgetOverlay(props: WidgetOverlayProps) {
   const { match } = props;
-  const previewMs = 2000;
-  const deltaLeadInMs = 1000;
-  const counterDurationMs = 1400;
-  const zeroHoldMs = 1000;
-  const hideAfterAnimationMs = previewMs + deltaLeadInMs + counterDurationMs + zeroHoldMs;
+  const previewMs = WIDGET_OVERLAY_PREVIEW_MS;
+  const deltaLeadInMs = WIDGET_OVERLAY_DELTA_LEAD_IN_MS;
+  const counterDurationMs = WIDGET_OVERLAY_COUNTER_DURATION_MS;
+  const hideAfterAnimationMs = WIDGET_OVERLAY_HIDE_AFTER_ANIMATION_MS;
 
   const [ visible, setVisible ] = useState(false);
   const [ result, setResult ] = useState<'WIN' | 'LOSS'>('WIN');
@@ -229,10 +234,14 @@ export function WidgetOverlay(props: WidgetOverlayProps) {
           key={burstSeed}
           className={classNames('widget-overlay__notice', result == 'LOSS' ? 'widget-overlay__notice--loss' : 'widget-overlay__notice--win')}
         >
-          <WidgetOverlayLevelIcon skillLevel={skillLevel} result={result}/>
-          <div className='widget-overlay__elo'>{eloDisplay ?? '--'} ELO</div>
-          <div className={`${result === 'LOSS' ? 'widget-overlay__delta widget-overlay__delta--negative' : 'widget-overlay__delta widget-overlay__delta--positive'} ${isDeltaVisible ? 'widget-overlay__delta--show' : 'widget-overlay__delta--hidden'}`}>
-            {eloDeltaText} ELO
+          <div className='widget-overlay__anchor'>
+            <div className='widget-overlay__elo'>{eloDisplay ?? '--'} ELO</div>
+            <div className='widget-overlay__level'>
+              <WidgetOverlayLevelIcon skillLevel={skillLevel} result={result}/>
+            </div>
+            <div className={`${result === 'LOSS' ? 'widget-overlay__delta widget-overlay__delta--negative' : 'widget-overlay__delta widget-overlay__delta--positive'} ${isDeltaVisible ? 'widget-overlay__delta--show' : 'widget-overlay__delta--hidden'}`}>
+              {eloDeltaText} ELO
+            </div>
           </div>
         </div>
       </div>

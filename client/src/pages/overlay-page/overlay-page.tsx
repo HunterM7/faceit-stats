@@ -2,42 +2,8 @@ import { useEffect, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { lastMatch, player } from '@/requests/matchResult';
 import { WidgetOverlay, type MatchResult } from '@widgets/widget-overlay/widget-overlay';
+import { useOverlayTestMatchCycle } from '@widgets/widget-overlay/use-overlay-test-match-cycle';
 import './overlay-page.scss';
-
-interface OverlayTestMatch {
-  before: {
-    skillLevel: number;
-    elo: number;
-  };
-  after: {
-    skillLevel: number;
-    elo: number;
-  };
-  result: 'WIN' | 'LOSS';
-}
-
-const TEST_MATCH_FLOW: OverlayTestMatch[] = [
-  { before: { skillLevel: 7, elo: 1528 }, after: { skillLevel: 8, elo: 1553 }, result: 'WIN' },
-  { before: { skillLevel: 8, elo: 1553 }, after: { skillLevel: 7, elo: 1529 }, result: 'LOSS' },
-  { before: { skillLevel: 7, elo: 1529 }, after: { skillLevel: 8, elo: 1552 }, result: 'WIN' },
-  { before: { skillLevel: 8, elo: 1552 }, after: { skillLevel: 7, elo: 1530 }, result: 'LOSS' },
-  { before: { skillLevel: 7, elo: 1530 }, after: { skillLevel: 8, elo: 1560 }, result: 'WIN' },
-  { before: { skillLevel: 8, elo: 1560 }, after: { skillLevel: 8, elo: 1531 }, result: 'LOSS' },
-  { before: { skillLevel: 8, elo: 1531 }, after: { skillLevel: 7, elo: 1510 }, result: 'LOSS' },
-  { before: { skillLevel: 7, elo: 1510 }, after: { skillLevel: 8, elo: 1538 }, result: 'WIN' },
-  { before: { skillLevel: 8, elo: 1538 }, after: { skillLevel: 7, elo: 1511 }, result: 'LOSS' },
-  { before: { skillLevel: 7, elo: 1511 }, after: { skillLevel: 8, elo: 1537 }, result: 'WIN' },
-  { before: { skillLevel: 8, elo: 1537 }, after: { skillLevel: 7, elo: 1512 }, result: 'LOSS' },
-  { before: { skillLevel: 7, elo: 1512 }, after: { skillLevel: 8, elo: 1536 }, result: 'WIN' },
-  { before: { skillLevel: 8, elo: 1536 }, after: { skillLevel: 7, elo: 1513 }, result: 'LOSS' },
-  { before: { skillLevel: 7, elo: 1513 }, after: { skillLevel: 8, elo: 1535 }, result: 'WIN' },
-  { before: { skillLevel: 8, elo: 1535 }, after: { skillLevel: 7, elo: 1505 }, result: 'LOSS' },
-  { before: { skillLevel: 7, elo: 1505 }, after: { skillLevel: 8, elo: 1534 }, result: 'WIN' },
-  { before: { skillLevel: 8, elo: 1534 }, after: { skillLevel: 7, elo: 1506 }, result: 'LOSS' },
-  { before: { skillLevel: 7, elo: 1506 }, after: { skillLevel: 8, elo: 1533 }, result: 'WIN' },
-  { before: { skillLevel: 8, elo: 1533 }, after: { skillLevel: 7, elo: 1507 }, result: 'LOSS' },
-  { before: { skillLevel: 7, elo: 1507 }, after: { skillLevel: 7, elo: 1528 }, result: 'WIN' },
-];
 
 function overlayResultFromApi(result: string | undefined): 'WIN' | 'LOSS' {
   if (result === 'LOSS') {
@@ -48,12 +14,6 @@ function overlayResultFromApi(result: string | undefined): 'WIN' | 'LOSS' {
 
 const analyticsSource = 'overlay_widget';
 const pollMs = 5000;
-const testPauseMs = 3000;
-const previewMs = 2000;
-const deltaLeadInMs = 1000;
-const counterDurationMs = 1400;
-const zeroHoldMs = 1000;
-const hideAfterAnimationMs = previewMs + deltaLeadInMs + counterDurationMs + zeroHoldMs;
 
 function captureErrorMessage(error: unknown, fallback: string): string {
   return error instanceof Error ? error.message : fallback;
@@ -70,6 +30,7 @@ export function OverlayPage() {
     ? 'Похоже, что ты не указал свой FACEIT-ник. Добавь его в адресной строке после nickname='
     : null;
 
+  const testMatch = useOverlayTestMatchCycle(isTestMode);
   const [ overlayMatch, setOverlayMatch ] = useState<MatchResult | null>(null);
   const [ overlayLoadError, setOverlayLoadError ] = useState<string | null>(null);
 
@@ -90,40 +51,11 @@ export function OverlayPage() {
     }
 
     if (isTestMode) {
-      let showTimer: number | null = null;
-      let hideTimer: number | null = null;
-      let flowIndex = 0;
-
-      const schedule = () => {
-        const flowMatch = TEST_MATCH_FLOW[flowIndex % TEST_MATCH_FLOW.length];
-        flowIndex += 1;
-
-        setOverlayMatch({
-          elo: flowMatch.after.elo,
-          skillLevel: flowMatch.after.skillLevel,
-          result: flowMatch.result,
-        });
-
-        hideTimer = window.setTimeout(() => {
-          hideTimer = null;
-          showTimer = window.setTimeout(schedule, testPauseMs);
-        }, hideAfterAnimationMs);
-      };
-
-      showTimer = window.setTimeout(schedule, 0);
       const resetLoadErrorRaf = window.requestAnimationFrame(() => {
         setOverlayLoadError(null);
       });
       return () => {
         window.cancelAnimationFrame(resetLoadErrorRaf);
-        if (showTimer) {
-          window.clearTimeout(showTimer);
-        }
-        if (hideTimer) {
-          window.clearTimeout(hideTimer);
-
-        }
-        setOverlayMatch(null);
       };
     }
 
@@ -303,6 +235,7 @@ export function OverlayPage() {
   ]);
 
   const blockingMessage = missingNicknameMessage ?? overlayLoadError;
+  const activeMatch = isTestMode ? testMatch : overlayMatch;
 
   return (
     <div className='overlay-page'>
@@ -312,7 +245,7 @@ export function OverlayPage() {
           <div className='overlay-page__error-message'>{blockingMessage}</div>
         </div>
       ) : (
-        <WidgetOverlay match={overlayMatch}/>
+        <WidgetOverlay match={activeMatch}/>
       )}
     </div>
   );

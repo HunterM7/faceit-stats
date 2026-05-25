@@ -1,7 +1,9 @@
 export interface OverlayParticle {
   id: string;
-  xVw: number;
-  yVh: number;
+  /** Смещение по X в долях ширины контейнера виджета (1 ≈ 1cqw). */
+  xCqw: number;
+  /** Смещение по Y в долях высоты контейнера виджета (1 ≈ 1cqh). */
+  yCqh: number;
   delayMs: number;
   durationMs: number;
   scale: number;
@@ -12,8 +14,8 @@ export interface OverlayParticle {
 
 const GRID_COLUMNS: number = 24;
 const GRID_ROWS: number = 14;
-const GRID_SPREAD_X_VW: number = 48;
-const GRID_SPREAD_Y_VH: number = 46;
+const GRID_SPREAD_X_CQW: number = 48;
+const GRID_SPREAD_Y_CQH: number = 46;
 
 const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
 
@@ -24,23 +26,23 @@ export function buildOverlayBurstParticles(seed: number): OverlayParticle[] {
 
   for (let row = 0; row < GRID_ROWS; row += 1) {
     const rowProgress = GRID_ROWS === 1 ? 0.5 : row / (GRID_ROWS - 1);
-    const yVh = (rowProgress - 0.5) * GRID_SPREAD_Y_VH * 2;
+    const yCqh = (rowProgress - 0.5) * GRID_SPREAD_Y_CQH * 2;
 
     for (let column = 0; column < GRID_COLUMNS; column += 1) {
       const columnProgress = GRID_COLUMNS === 1 ? 0.5 : column / (GRID_COLUMNS - 1);
-      const xVw = (columnProgress - 0.5) * GRID_SPREAD_X_VW * 2;
-      const centerMask = Math.abs(xVw) < 5 && Math.abs(yVh) < 3;
+      const xCqw = (columnProgress - 0.5) * GRID_SPREAD_X_CQW * 2;
+      const centerMask = Math.abs(xCqw) < 5 && Math.abs(yCqh) < 3;
       if (centerMask) {
         continue;
       }
 
-      const distance = Math.hypot(xVw / GRID_SPREAD_X_VW, yVh / GRID_SPREAD_Y_VH);
+      const distance = Math.hypot(xCqw / GRID_SPREAD_X_CQW, yCqh / GRID_SPREAD_Y_CQH);
       const delayMs = 70 + (distance * 460) + randomInRange(0, 55);
 
       particles.push({
         id: `${seed}-${index}`,
-        xVw,
-        yVh,
+        xCqw,
+        yCqh,
         delayMs,
         durationMs: 950 + randomInRange(0, 220),
         scale: 1,

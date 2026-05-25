@@ -6,10 +6,12 @@ export interface WidgetOverlayLevelIconProps {
   /** Сырой уровень из API; `null`, если `currentSkillLevel` не пришёл — в разметке показываем `--`. */
   skillLevel: number | null;
   result: 'WIN' | 'LOSS';
+  /** Дополнительный класс для стилизации компонента. */
+  className?: string | undefined;
 }
 
 export function WidgetOverlayLevelIcon(props: WidgetOverlayLevelIconProps) {
-  const { skillLevel, result } = props;
+  const { skillLevel, result, className } = props;
 
   const prevLevelRef = useRef<number | null>(null);
   const [ pulseNonce, setPulseNonce ] = useState(0);
@@ -31,8 +33,8 @@ export function WidgetOverlayLevelIcon(props: WidgetOverlayLevelIconProps) {
       className={classNames(
         'widget-overlay-level-icon',
         pulseNonce > 0 && (result === 'LOSS' ? 'widget-overlay-level-icon--pulse-down' : 'widget-overlay-level-icon--pulse-up'),
+        className,
       )}
-      aria-hidden='true'
     >
       <span
         className={classNames(

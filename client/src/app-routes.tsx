@@ -21,9 +21,9 @@ const StatsWidgetPage = lazy(async () => {
   return { default: m.StatsWidgetPage };
 });
 
-const MatchResultWidgetPage = lazy(async () => {
-  const m = await import('@pages/match-result-widget-page/match-result-widget-page');
-  return { default: m.MatchResultWidgetPage };
+const OverlayWidgetPage = lazy(async () => {
+  const m = await import('@pages/overlay-widget-page/overlay-widget-page');
+  return { default: m.OverlayWidgetPage };
 });
 
 const AdminPage = lazy(async () => {
@@ -46,7 +46,7 @@ export function AppRoutes() {
         <Route path='/admin' element={<AdminPage/>}/>
         <Route path='/admin/errors' element={<AdminErrorsPage/>}/>
         <Route path='/widgets/stats' element={<StatsWidgetPage/>}/>
-        <Route path='/widgets/match-result' element={<MatchResultWidgetPage/>}/>
+        <Route path='/widgets/match-result' element={<OverlayWidgetPage/>}/>
       </Routes>
     </Suspense>
   );
