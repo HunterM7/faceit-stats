@@ -4,6 +4,9 @@
 
 ## Обязательно
 
+- **Документация API** — публичные пропсы, поля объектов, методы `ref` и т.п.: JSDoc кратко, но по смыслу полно; см. [`.cursor/rules/jsdoc-public-api.mdc`](.cursor/rules/jsdoc-public-api.mdc).
+- **Минимальный код** — только необходимое для задачи, без лишних обёрток и шаблонного шума; см. [`.cursor/rules/minimal-code.mdc`](.cursor/rules/minimal-code.mdc).
+- **TypeScript** — в основном `interface`; опциональные поля в наших контрактах — `?` и `| undefined` (не для DTO ответа сервера); см. [`.cursor/rules/typescript-interface.mdc`](.cursor/rules/typescript-interface.mdc).
 - **БЭМ** — один блок на компонент, все стили внутри `.block { }`; см. [`.cursor/rules/bem-scss.mdc`](.cursor/rules/bem-scss.mdc).
 - **Без ARIA** — не добавлять `aria-*` и a11y-`role`; см. [`.cursor/rules/no-aria.mdc`](.cursor/rules/no-aria.mdc).
 

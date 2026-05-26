@@ -1,13 +1,31 @@
 import { useEffect, useState } from 'react';
 import { OVERLAY_TEST_FLOW } from './overlay-test-flow';
-import type { MatchResult } from './widget-overlay';
+import type { OverlayMatchResult, OverlayMatchSnapshot } from './overlay-test-flow';
 import {
   OVERLAY_TEST_PAUSE_MS,
   WIDGET_OVERLAY_HIDE_AFTER_ANIMATION_MS,
 } from './widget-overlay-timing';
 
-export function useOverlayTestMatchCycle(enabled: boolean): MatchResult | null {
-  const [ match, setMatch ] = useState<MatchResult | null>(null);
+/** Текущий шаг демо-цикла для передачи в `WidgetOverlay` через `ref.showMatchResult`. */
+export interface OverlayTestCycleValue {
+  /** Снимок до шага; `null`, если истории нет. */
+  previousMatch: OverlayMatchSnapshot | null;
+  /** Снимок после шага; `null` — калибровка без ELO/уровня. */
+  match: OverlayMatchResult | null;
+  /** Исход шага (в т.ч. при калибровке, когда `match` — `null`). */
+  result: OverlayMatchResult['result'];
+}
+
+/**
+ * Циклически обновляет пару «предыдущий / текущий» матч из `OVERLAY_TEST_FLOW` для предпросмотра и `test=true`.
+ * @param enabled — при `false` возвращает `null` и не ставит таймеры.
+ */
+export function useOverlayTestMatchCycle(enabled: boolean): OverlayTestCycleValue | null {
+  const [ cycle, setCycle ] = useState<OverlayTestCycleValue>({
+    previousMatch: null,
+    match: null,
+    result: 'WIN',
+  });
 
   useEffect(() => {
     if (!enabled) {
@@ -15,23 +33,30 @@ export function useOverlayTestMatchCycle(enabled: boolean): MatchResult | null {
     }
 
     let showTimer: number | null = null;
-    let hideTimer: number | null = null;
     let flowIndex = 0;
 
     const schedule = () => {
       const flowMatch = OVERLAY_TEST_FLOW[flowIndex % OVERLAY_TEST_FLOW.length];
       flowIndex += 1;
 
-      setMatch({
-        elo: flowMatch.after.elo,
-        skillLevel: flowMatch.after.skillLevel,
+      setCycle({
+        previousMatch: flowMatch.before
+          ? { elo: flowMatch.before.elo, skillLevel: flowMatch.before.skillLevel }
+          : null,
+        match: flowMatch.after
+          ? {
+            elo: flowMatch.after.elo,
+            skillLevel: flowMatch.after.skillLevel,
+            result: flowMatch.result,
+          }
+          : null,
         result: flowMatch.result,
       });
 
-      hideTimer = window.setTimeout(() => {
-        hideTimer = null;
-        showTimer = window.setTimeout(schedule, OVERLAY_TEST_PAUSE_MS);
-      }, WIDGET_OVERLAY_HIDE_AFTER_ANIMATION_MS);
+      showTimer = window.setTimeout(
+        schedule,
+        WIDGET_OVERLAY_HIDE_AFTER_ANIMATION_MS + OVERLAY_TEST_PAUSE_MS,
+      );
     };
 
     showTimer = window.setTimeout(schedule, 0);
@@ -40,11 +65,9 @@ export function useOverlayTestMatchCycle(enabled: boolean): MatchResult | null {
       if (showTimer) {
         window.clearTimeout(showTimer);
       }
-      if (hideTimer) {
-        window.clearTimeout(hideTimer);
-      }
+      setCycle({ previousMatch: null, match: null, result: 'WIN' });
     };
   }, [ enabled ]);
 
-  return enabled ? match : null;
+  return enabled ? cycle : null;
 }

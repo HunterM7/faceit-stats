@@ -47,7 +47,8 @@
     animation: widget-overlay-notice-in 720ms ease-out forwards;
   }
 
-  &__elo {
+  &__elo,
+  &__result-label {
     position: relative;
     z-index: 1;
     margin: 0;
@@ -61,6 +62,22 @@
     text-shadow:
       0 0.04em 0.16em rgba(0, 0, 0, 0.9),
       0 0 0.32em rgba(0, 0, 0, 0.5);
+  }
+
+  &__result-label {
+    &--win {
+      color: #5bff5b;
+      text-shadow:
+        0 0.04em 0.16em rgba(0, 0, 0, 0.9),
+        0 0 0.3em rgba(74, 255, 74, 0.32);
+    }
+
+    &--loss {
+      color: #ff5466;
+      text-shadow:
+        0 0.04em 0.16em rgba(0, 0, 0, 0.9),
+        0 0 0.3em rgba(255, 84, 102, 0.28);
+    }
   }
 
   &__level {
@@ -127,7 +144,8 @@
       font-size: calc(7.4vh * var(--overlay-scale));
     }
 
-    &__elo {
+    &__elo,
+    &__result-label {
       letter-spacing: 1px;
       text-shadow: 0 3px 12px rgba(0, 0, 0, 0.9), 0 0 24px rgba(0, 0, 0, 0.5);
     }

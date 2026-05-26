@@ -1,0 +1,68 @@
+---
+description: Писать минимально необходимый код без лишних обёрток и «улучшений»
+alwaysApply: true
+---
+
+# Минимальный код
+
+Пиши **только то, что нужно для задачи**. Без «улучшений на будущее», без лишних слоёв и без шаблонного шума.
+
+## Правила
+
+- Минимальный diff: меняй ровно то, что просят; не рефактори соседний код «заодно».
+- Не добавляй абстракции «на один раз» — хелперы, обёртки, прокси-экспорты, если можно обойтись прямым кодом.
+- Не усложняй API компонента без явной просьбы: лишние пропсы, опциональные хуки, «на всякий случай».
+- Не добавляй комментарии к очевидному коду; комментарий — только для неочевидной бизнес-логики **или** краткий JSDoc на публичный контракт (пропсы, `ref`, экспортируемые функции) — см. [jsdoc-public-api.mdc](jsdoc-public-api.mdc).
+- Не тащи «стандартные приколы», если они не нужны проекту или задаче.
+
+## Чего не добавлять без явной просьбы
+
+- `displayName` у компонентов
+- промежуточные имена + реэкспорт (`const FooInner = …; export { FooInner as Foo }`)
+- `aria-*`, a11y-`role` и пропы вроде `ariaLabel` — см. [no-aria.mdc](no-aria.mdc)
+- лишние типы/интерфейсы «на будущее»
+- экспорт типов из файлов компонентов (`WidgetOverlayHandle`, props-типы и т.п.) — ref выводи через `ComponentRef<typeof Component>`
+- defensive-код для крайне маловероятных кейсов
+- тесты, которые только дублируют очевидное поведение
+
+## Примеры
+
+```tsx
+// ❌
+import { WidgetOverlay, type WidgetOverlayHandle } from './widget-overlay';
+const ref = useRef<WidgetOverlayHandle>(null);
+
+// ✅
+import { type ComponentRef, useRef } from 'react';
+import { WidgetOverlay } from './widget-overlay';
+const ref = useRef<ComponentRef<typeof WidgetOverlay>>(null);
+```
+
+```tsx
+// ❌
+const WidgetOverlayInner = forwardRef(...);
+WidgetOverlayInner.displayName = 'WidgetOverlay';
+export { WidgetOverlayInner as WidgetOverlay };
+
+// ✅
+export const WidgetOverlay = forwardRef(...);
+```
+
+```tsx
+// ❌
+function normalizeMatchInput(input: MatchInput | null | undefined): NormalizedMatch | null {
+  if (!input) return null;
+  return { elo: input.elo ?? null, skillLevel: input.skillLevel ?? null };
+}
+
+// ✅ — если нормализация нужна в одном месте, пиши inline
+widgetRef.current?.showMatchResult({
+  previous: previous ? { elo: previous.elo, skillLevel: previous.skillLevel ?? undefined } : undefined,
+  current: { elo: current.elo, skillLevel: current.skillLevel ?? undefined },
+  result,
+});
+```
+
+## Исключения
+
+Только если пользователь **явно** попросил конкретную «обвязку» или расширение в текущей задаче.

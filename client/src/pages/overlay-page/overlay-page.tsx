@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { type ComponentRef, useEffect, useRef, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { lastMatch, player } from '@/requests/matchResult';
-import { WidgetOverlay, type MatchResult } from '@widgets/widget-overlay/widget-overlay';
+import { WidgetOverlay } from '@widgets/widget-overlay/widget-overlay';
+import type { OverlayMatchResult, OverlayMatchSnapshot } from '@widgets/widget-overlay/overlay-test-flow';
 import { useOverlayTestMatchCycle } from '@widgets/widget-overlay/use-overlay-test-match-cycle';
 import './overlay-page.scss';
 
@@ -30,8 +31,9 @@ export function OverlayPage() {
     ? 'Похоже, что ты не указал свой FACEIT-ник. Добавь его в адресной строке после nickname='
     : null;
 
-  const testMatch = useOverlayTestMatchCycle(isTestMode);
-  const [ overlayMatch, setOverlayMatch ] = useState<MatchResult | null>(null);
+  const testCycle = useOverlayTestMatchCycle(isTestMode);
+  const [ overlayMatch, setOverlayMatch ] = useState<OverlayMatchResult | null>(null);
+  const [ overlayPreviousMatch, setOverlayPreviousMatch ] = useState<OverlayMatchSnapshot | null>(null);
   const [ overlayLoadError, setOverlayLoadError ] = useState<string | null>(null);
 
   useEffect(() => {
@@ -64,6 +66,7 @@ export function OverlayPage() {
       const frameId = window.requestAnimationFrame(() => {
         if (!cancelledLocal) {
           setOverlayMatch(null);
+          setOverlayPreviousMatch(null);
           setOverlayLoadError(null);
         }
       });
@@ -86,7 +89,8 @@ export function OverlayPage() {
       }
     });
 
-    const publishMatch = (payload: MatchResult) => {
+    const publishMatch = (previous: OverlayMatchSnapshot | null, payload: OverlayMatchResult) => {
+      setOverlayPreviousMatch(previous);
       setOverlayMatch(payload);
     };
 
@@ -161,11 +165,17 @@ export function OverlayPage() {
           return;
         }
 
-        publishMatch({
-          elo: nextEloForOverlay,
-          skillLevel: nextLevelForOverlay,
-          result: overlayResultFromApi(matchData.result),
-        });
+        publishMatch(
+          {
+            elo: snapshotElo,
+            skillLevel: snapshotLevel,
+          },
+          {
+            elo: nextEloForOverlay,
+            skillLevel: nextLevelForOverlay,
+            result: overlayResultFromApi(matchData.result),
+          },
+        );
       } catch (error) {
         if (!cancelled) {
           setOverlayLoadError(captureErrorMessage(error, 'Не удалось обновить данные игрока.'));
@@ -197,7 +207,7 @@ export function OverlayPage() {
           lastMatchId = matchData.matchId;
         }
         if (matchData.matchId && typeof lastKnownElo === 'number') {
-          publishMatch({
+          publishMatch(null, {
             elo: lastKnownElo,
             skillLevel: initialLevel,
             result: overlayResultFromApi(matchData.result),
@@ -222,6 +232,7 @@ export function OverlayPage() {
       }
       window.requestAnimationFrame(() => {
         setOverlayMatch(null);
+        setOverlayPreviousMatch(null);
       });
     };
   }, [
@@ -235,7 +246,35 @@ export function OverlayPage() {
   ]);
 
   const blockingMessage = missingNicknameMessage ?? overlayLoadError;
-  const activeMatch = isTestMode ? testMatch : overlayMatch;
+  const activeMatch = isTestMode ? (testCycle?.match ?? null) : overlayMatch;
+  const activePreviousMatch = isTestMode ? (testCycle?.previousMatch ?? null) : overlayPreviousMatch;
+
+  const widgetOverlayRef = useRef<ComponentRef<typeof WidgetOverlay>>(null);
+
+  useEffect(() => {
+    if (blockingMessage) {
+      return;
+    }
+
+    if (!activeMatch) {
+      if (isTestMode && testCycle) {
+        widgetOverlayRef.current?.showMatchResult({ result: testCycle.result });
+      }
+      return;
+    }
+
+    widgetOverlayRef.current?.showMatchResult({
+      previous: activePreviousMatch
+        && typeof activePreviousMatch.elo === 'number'
+        && typeof activePreviousMatch.skillLevel === 'number'
+        ? { elo: activePreviousMatch.elo, skillLevel: activePreviousMatch.skillLevel }
+        : undefined,
+      current: typeof activeMatch.elo === 'number' && typeof activeMatch.skillLevel === 'number'
+        ? { elo: activeMatch.elo, skillLevel: activeMatch.skillLevel }
+        : undefined,
+      result: activeMatch.result,
+    });
+  }, [ activeMatch, activePreviousMatch, blockingMessage, isTestMode, testCycle ]);
 
   return (
     <div className='overlay-page'>
@@ -245,7 +284,7 @@ export function OverlayPage() {
           <div className='overlay-page__error-message'>{blockingMessage}</div>
         </div>
       ) : (
-        <WidgetOverlay match={activeMatch}/>
+        <WidgetOverlay ref={widgetOverlayRef}/>
       )}
     </div>
   );

@@ -1,0 +1,50 @@
+---
+description: Предпочитать interface; type — когда interface не подходит
+alwaysApply: true
+---
+
+# TypeScript: `interface` и `type`
+
+В основном описываем формы объектов и контракты через **`interface`**.
+
+## Опциональные поля в наших контрактах (пропсы, параметры, локальные формы)
+
+Если поле **необязательное**, помимо `?` указывай явно **`| undefined`** (например `foo?: string | undefined`), чтобы было видно, что значение может отсутствовать и при вызове можно передать `undefined`.
+
+**Исключение:** типы **ответа сервера** / DTO из API — там не добавляем `| undefined` «для красоты»: сервер не присылает `undefined` (поле либо есть в JSON, либо отсутствует; для этого достаточно опциональности/`null` по смыслу контракта).
+
+```ts
+// ✅ пропсы / ref-параметры / наши объекты настроек
+interface PanelProps {
+  title?: string | undefined;
+}
+
+// ✅ DTO с бэка — без лишнего | undefined
+interface PlayerApiRow {
+  nickname: string;
+  avatarUrl?: string | null;
+}
+```
+
+## Когда `type`
+
+Используй **`type`**, если:
+
+- **`interface` не подходит** — например union (`'a' | 'b'`), mapped types, conditional types, tuple, utility над union;
+- через **`interface` получается громоздко** — тогда `type` с алиасом на выражение читается лучше.
+
+## Примеры
+
+```ts
+// ✅ объектная форма
+interface UserRow {
+  id: string;
+  nickname: string;
+}
+
+// ✅ union / выражение — только type
+type MatchOutcome = 'WIN' | 'LOSS';
+
+// ✅ выборка полей — type (или interface extends Pick<…> — на вкус команды)
+type UserId = Pick<UserRow, 'id'>;
+```

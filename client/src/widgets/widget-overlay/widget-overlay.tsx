@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { WidgetOverlayLevelIcon } from './widget-overlay-level-icon/widget-overlay-level-icon';
 import { WidgetOverlayParticles } from './widget-overlay-particles/widget-overlay-particles';
 import './widget-overlay.scss';
@@ -10,20 +10,30 @@ import {
   WIDGET_OVERLAY_PREVIEW_MS,
 } from './widget-overlay-timing';
 
-/** Актуальный матч. */
-export interface MatchResult {
-  /** Текущий ELO игрока. */
+/** Параметры матча. */
+interface Match {
+  /** Уровень ELO игрока на момент матча. */
   elo: number;
-  /** Текущий уровень игрока. */
-  skillLevel: number | null;
+  /** Уровень мастерства игрока на момент матча. */
+  skillLevel: number;
+}
+
+/** Параметры метода `showMatchResult`. */
+interface ShowMatchResultParams {
+  /** Параметры предыдущего матча. */
+  previous?: Match | undefined;
+  /** Параметры текущего матча. */
+  current?: Match | undefined;
   /** Исход матча. */
   result: 'WIN' | 'LOSS';
 }
 
-export interface WidgetOverlayProps {
-  /** Актуальный матч. */
-  match: MatchResult | null;
+interface Ref {
+  /** Запускает анимацию результатов последнего матча (победа/поражение). */
+  showMatchResult(params: ShowMatchResultParams): void;
 }
+
+type OverlayDisplayMode = 'stats' | 'result-label';
 
 type EloOverlayTick =
   | { kind: 'static'; elo: number | null; delta: number | null; skillLevel: number | null }
@@ -36,14 +46,15 @@ type EloOverlayTick =
     toLevel: number | null;
   };
 
-export function WidgetOverlay(props: WidgetOverlayProps) {
-  const { match } = props;
+/** Виджет-оверлей с показом результатов последнего матча. */
+export const WidgetOverlay = forwardRef<Ref>((_props, ref) => {
   const previewMs = WIDGET_OVERLAY_PREVIEW_MS;
   const deltaLeadInMs = WIDGET_OVERLAY_DELTA_LEAD_IN_MS;
   const counterDurationMs = WIDGET_OVERLAY_COUNTER_DURATION_MS;
   const hideAfterAnimationMs = WIDGET_OVERLAY_HIDE_AFTER_ANIMATION_MS;
 
   const [ visible, setVisible ] = useState(false);
+  const [ displayMode, setDisplayMode ] = useState<OverlayDisplayMode>('stats');
   const [ result, setResult ] = useState<'WIN' | 'LOSS'>('WIN');
   const [ skillLevel, setSkillLevel ] = useState<number | null>(null);
   const [ eloDisplay, setEloDisplay ] = useState<number | null>(null);
@@ -55,11 +66,8 @@ export function WidgetOverlay(props: WidgetOverlayProps) {
   const eloAnimationDelayTimeoutRef = useRef<number | null>(null);
   const eloAnimationStartTimeoutRef = useRef<number | null>(null);
   const hideOverlayTimerRef = useRef<number | null>(null);
-  const lastEloRef = useRef<number | null>(null);
-  const lastLevelRef = useRef<number | null>(null);
-  const lastResultRef = useRef<'WIN' | 'LOSS'>('WIN');
 
-  const runEloOverlaySequence = useCallback((tick: EloOverlayTick) => {
+  const clearAllTimersAndRaf = useCallback(() => {
     if (eloAnimationFrameRef.current !== null) {
       window.cancelAnimationFrame(eloAnimationFrameRef.current);
       eloAnimationFrameRef.current = null;
@@ -72,7 +80,13 @@ export function WidgetOverlay(props: WidgetOverlayProps) {
       window.clearTimeout(eloAnimationStartTimeoutRef.current);
       eloAnimationStartTimeoutRef.current = null;
     }
+    if (hideOverlayTimerRef.current !== null) {
+      window.clearTimeout(hideOverlayTimerRef.current);
+      hideOverlayTimerRef.current = null;
+    }
+  }, []);
 
+  const runEloOverlaySequence = useCallback((tick: EloOverlayTick) => {
     if (tick.kind === 'static') {
       setEloDisplay(tick.elo);
       setDeltaDisplay(tick.delta);
@@ -116,109 +130,53 @@ export function WidgetOverlay(props: WidgetOverlayProps) {
     }, previewMs);
   }, [ counterDurationMs, deltaLeadInMs, previewMs ]);
 
-  useEffect(() => {
-    const clearHideTimer = () => {
-      if (hideOverlayTimerRef.current !== null) {
-        window.clearTimeout(hideOverlayTimerRef.current);
-        hideOverlayTimerRef.current = null;
-      }
-    };
+  const showMatchResult = useCallback(
+    ({ previous, current, result: nextResult }: ShowMatchResultParams) => {
+      clearAllTimersAndRaf();
 
-    const applyQuietSnapshot = (next: MatchResult) => {
-      lastEloRef.current = next.elo;
-      lastLevelRef.current = next.skillLevel;
-      lastResultRef.current = next.result;
-      setResult(next.result);
-      runEloOverlaySequence({
-        kind: 'static',
-        elo: next.elo,
-        delta: null,
-        skillLevel: next.skillLevel,
-      });
-    };
+      setResult(nextResult);
+      setBurstSeed(Date.now());
 
-    let cancelled = false;
-    const frameId = window.requestAnimationFrame(() => {
-      if (cancelled) {
+      if (current === undefined || previous === undefined) {
+        setDisplayMode('result-label');
+        setVisible(true);
+        hideOverlayTimerRef.current = window.setTimeout(() => {
+          hideOverlayTimerRef.current = null;
+          setVisible(false);
+        }, hideAfterAnimationMs);
         return;
       }
 
-      clearHideTimer();
+      setDisplayMode('stats');
 
-      if (!match) {
-        lastEloRef.current = null;
-        lastLevelRef.current = null;
-        setVisible(false);
-        return;
-      }
-
-      if (
-        lastEloRef.current !== null
-        && match.elo === lastEloRef.current
-        && match.skillLevel === lastLevelRef.current
-        && match.result === lastResultRef.current
-      ) {
-        return;
-      }
-
-      if (lastEloRef.current === null) {
-        applyQuietSnapshot(match);
-        setVisible(false);
-        return;
-      }
-
-      if (match.elo === lastEloRef.current) {
-        applyQuietSnapshot(match);
-        return;
-      }
-
-      const fromElo = lastEloRef.current;
-      const fromLevel = lastLevelRef.current;
-      lastEloRef.current = match.elo;
-      lastLevelRef.current = match.skillLevel;
-      lastResultRef.current = match.result;
-
-      const signedDelta = match.elo - fromElo;
-      setResult(match.result);
+      const signedDelta = current.elo - previous.elo;
       runEloOverlaySequence({
         kind: 'tween',
-        fromElo,
-        toElo: match.elo,
+        fromElo: previous.elo,
+        toElo: current.elo,
         delta: signedDelta,
-        fromLevel,
-        toLevel: match.skillLevel,
+        fromLevel: previous.skillLevel,
+        toLevel: current.skillLevel,
       });
-      setBurstSeed(Date.now());
+
       setVisible(true);
       hideOverlayTimerRef.current = window.setTimeout(() => {
         hideOverlayTimerRef.current = null;
         setVisible(false);
       }, hideAfterAnimationMs);
-    });
+    },
+    [ clearAllTimersAndRaf, hideAfterAnimationMs, runEloOverlaySequence ],
+  );
 
-    return () => {
-      cancelled = true;
-      window.cancelAnimationFrame(frameId);
-      clearHideTimer();
-    };
-  }, [ hideAfterAnimationMs, match, runEloOverlaySequence ]);
+  useImperativeHandle(ref, () => ({
+    showMatchResult,
+  }), [ showMatchResult ]);
 
   useEffect(() => {
     return () => {
-      if (eloAnimationFrameRef.current !== null) {
-        window.cancelAnimationFrame(eloAnimationFrameRef.current);
-      }
-      if (eloAnimationDelayTimeoutRef.current !== null) {
-        window.clearTimeout(eloAnimationDelayTimeoutRef.current);
-      }
-      if (eloAnimationStartTimeoutRef.current !== null) {
-        window.clearTimeout(eloAnimationStartTimeoutRef.current);
-      }
-      if (hideOverlayTimerRef.current !== null) {
-        window.clearTimeout(hideOverlayTimerRef.current);
-      }
+      clearAllTimersAndRaf();
     };
-  }, []);
+  }, [ clearAllTimersAndRaf ]);
 
   let eloDeltaText = '--';
   if (typeof deltaDisplay === 'number') {
@@ -235,16 +193,27 @@ export function WidgetOverlay(props: WidgetOverlayProps) {
           className={classNames('widget-overlay__notice', result == 'LOSS' ? 'widget-overlay__notice--loss' : 'widget-overlay__notice--win')}
         >
           <div className='widget-overlay__anchor'>
-            <div className='widget-overlay__elo'>{eloDisplay ?? '--'} ELO</div>
-            <div className='widget-overlay__level'>
-              <WidgetOverlayLevelIcon skillLevel={skillLevel} result={result}/>
-            </div>
-            <div className={`${result === 'LOSS' ? 'widget-overlay__delta widget-overlay__delta--negative' : 'widget-overlay__delta widget-overlay__delta--positive'} ${isDeltaVisible ? 'widget-overlay__delta--show' : 'widget-overlay__delta--hidden'}`}>
-              {eloDeltaText} ELO
-            </div>
+            {displayMode === 'result-label' ? (
+              <div className={classNames(
+                'widget-overlay__result-label',
+                result === 'LOSS' ? 'widget-overlay__result-label--loss' : 'widget-overlay__result-label--win',
+              )}>
+                {result === 'LOSS' ? 'Поражение' : 'Победа'}
+              </div>
+            ) : (
+              <>
+                <div className='widget-overlay__elo'>{eloDisplay ?? '--'} ELO</div>
+                <div className='widget-overlay__level'>
+                  <WidgetOverlayLevelIcon skillLevel={skillLevel} result={result}/>
+                </div>
+                <div className={`${result === 'LOSS' ? 'widget-overlay__delta widget-overlay__delta--negative' : 'widget-overlay__delta widget-overlay__delta--positive'} ${isDeltaVisible ? 'widget-overlay__delta--show' : 'widget-overlay__delta--hidden'}`}>
+                  {eloDeltaText} ELO
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
     </div>
   );
-}
+});

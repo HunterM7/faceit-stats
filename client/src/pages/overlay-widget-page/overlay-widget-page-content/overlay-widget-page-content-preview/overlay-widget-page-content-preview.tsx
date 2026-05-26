@@ -1,3 +1,4 @@
+import { type ComponentRef, useEffect, useRef } from 'react';
 import { WidgetOverlay } from '@widgets/widget-overlay/widget-overlay';
 import { useOverlayTestMatchCycle } from '@widgets/widget-overlay/use-overlay-test-match-cycle';
 
@@ -8,7 +9,31 @@ type OverlayWidgetPageContentPreviewProps = {
 export function OverlayWidgetPageContentPreview(props: OverlayWidgetPageContentPreviewProps) {
   const { nickname } = props;
   const hasNickname = nickname.trim().length > 0;
-  const previewMatch = useOverlayTestMatchCycle(hasNickname);
+  const previewCycle = useOverlayTestMatchCycle(hasNickname);
+  const widgetOverlayRef = useRef<ComponentRef<typeof WidgetOverlay>>(null);
+
+  useEffect(() => {
+    if (!previewCycle) {
+      return;
+    }
+
+    if (!previewCycle.match) {
+      widgetOverlayRef.current?.showMatchResult({ result: previewCycle.result });
+      return;
+    }
+
+    widgetOverlayRef.current?.showMatchResult({
+      previous: previewCycle.previousMatch
+        && typeof previewCycle.previousMatch.elo === 'number'
+        && typeof previewCycle.previousMatch.skillLevel === 'number'
+        ? { elo: previewCycle.previousMatch.elo, skillLevel: previewCycle.previousMatch.skillLevel }
+        : undefined,
+      current: typeof previewCycle.match.elo === 'number' && typeof previewCycle.match.skillLevel === 'number'
+        ? { elo: previewCycle.match.elo, skillLevel: previewCycle.match.skillLevel }
+        : undefined,
+      result: previewCycle.match.result,
+    });
+  }, [ previewCycle ]);
 
   if (!hasNickname) {
     return (
@@ -24,7 +49,7 @@ export function OverlayWidgetPageContentPreview(props: OverlayWidgetPageContentP
     <div className='overlay-widget-page-content__preview'>
       <div className='overlay-widget-page-content__preview-stage'>
         <div className='overlay-widget-page-content__preview-card'>
-          <WidgetOverlay match={previewMatch}/>
+          <WidgetOverlay ref={widgetOverlayRef}/>
         </div>
       </div>
     </div>
