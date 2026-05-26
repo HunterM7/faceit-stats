@@ -3,31 +3,31 @@
   width: 150px;
   height: 150px;
   margin: 0;
-  border-radius: 999px;
-  background: rgba(5, 8, 14, 0.86);
   box-shadow: 0 0 30px rgba(0, 0, 0, 0.45);
 
-  &--pulse-up {
-    animation: widget-overlay-level-icon-pulse-up 420ms ease-in-out;
+  &__chart {
+    display: block;
+    width: 100%;
+    height: 100%;
   }
 
-  &--pulse-down {
-    animation: widget-overlay-level-icon-pulse-down 420ms ease-in-out;
+  &__bg {
+    fill: #111111;
   }
 
-  &__ring {
-    position: absolute;
-    inset: 14px;
-    border-radius: 999px;
-    border: 12px solid rgba(19, 24, 36, 0.96);
+  &__track {
+    fill: none;
+    stroke: #cdcdcd;
+    stroke-opacity: 0.14;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+  }
 
-    &--win {
-      border-color: #ff6f3e;
-    }
-
-    &--loss {
-      border-color: #ff5466;
-    }
+  &__progress {
+    fill: none;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    transition: stroke 1.4s ease;
   }
 
   &__core {
@@ -40,40 +40,45 @@
     font-weight: 900;
     line-height: 1;
     letter-spacing: 1px;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.85), 0 0 18px rgba(0, 0, 0, 0.45);
+    transform-origin: center center;
+    transition: color 1.4s ease;
 
-    &--win {
-      color: #ff6f3e;
-      text-shadow: 0 0 24px rgba(255, 111, 62, 0.35);
+    &--pulse-up {
+      animation: widget-overlay-level-icon-core-pulse-up 720ms cubic-bezier(0.33, 1, 0.68, 1);
     }
 
-    &--loss {
-      color: #ff4f6b;
-      text-shadow: 0 0 24px rgba(255, 79, 107, 0.35);
+    &--pulse-down {
+      animation: widget-overlay-level-icon-core-pulse-down 620ms cubic-bezier(0.55, 0, 0.45, 1);
     }
   }
 }
 
-@keyframes widget-overlay-level-icon-pulse-up {
+@keyframes widget-overlay-level-icon-core-pulse-up {
   0% {
     transform: scale(1);
+    filter: brightness(1);
   }
-  55% {
-    transform: scale(1.085);
+  50% {
+    transform: scale(1.2);
+    filter: brightness(1.1);
   }
   100% {
     transform: scale(1);
+    filter: brightness(1);
   }
 }
 
-@keyframes widget-overlay-level-icon-pulse-down {
+@keyframes widget-overlay-level-icon-core-pulse-down {
   0% {
     transform: scale(1);
+    filter: brightness(1);
   }
-  55% {
-    transform: scale(0.915);
+  50% {
+    transform: scale(0.84);
+    filter: brightness(0.92);
   }
   100% {
     transform: scale(1);
+    filter: brightness(1);
   }
 }

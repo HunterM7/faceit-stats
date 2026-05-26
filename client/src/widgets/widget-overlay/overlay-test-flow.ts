@@ -13,8 +13,8 @@ export type OverlayTestFlowStep = {
 };
 
 export const OVERLAY_TEST_FLOW: OverlayTestFlowStep[] = [
-  { before: { skillLevel: 7, elo: 1528 }, after: { skillLevel: 8, elo: 1553 }, result: 'WIN' },
-  { before: { skillLevel: 8, elo: 1553 }, after: { skillLevel: 7, elo: 1529 }, result: 'LOSS' },
+  { before: { skillLevel: 9, elo: 1960 }, after: { skillLevel: 9, elo: 1985 }, result: 'WIN' },
+  { before: { skillLevel: 9, elo: 1985 }, after: { skillLevel: 10, elo: 2010 }, result: 'WIN' },
   { before: { skillLevel: 7, elo: 1529 }, after: { skillLevel: 8, elo: 1552 }, result: 'WIN' },
   { before: { skillLevel: 8, elo: 1552 }, after: { skillLevel: 7, elo: 1530 }, result: 'LOSS' },
   { before: { skillLevel: 7, elo: 1530 }, after: { skillLevel: 8, elo: 1560 }, result: 'WIN' },
