@@ -43,6 +43,12 @@ export function Header(props: Props) {
           >
             Виджет-оверлей
           </NavLink>
+          <NavLink
+            to='/widgets/twitch-commands'
+            className={({ isActive }) => classNames('header__nav-link', isActive && 'header__nav-link--active')}
+          >
+            Twitch команды
+          </NavLink>
         </nav>
       </div>
     </header>

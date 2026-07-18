@@ -1,0 +1,24 @@
+.twitch-commands-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  color: #e6e9ef;
+  background:
+    radial-gradient(circle at 50% 52%, rgba(97, 125, 255, 0.2), transparent 36%),
+    radial-gradient(circle at 18% 88%, rgba(74, 146, 255, 0.14), transparent 34%),
+    radial-gradient(circle at 82% 92%, rgba(168, 116, 255, 0.12), transparent 38%),
+    radial-gradient(circle at top, #21283a 0%, #10131a 45%, #0b0d13 100%);
+  padding: 26px 16px 32px;
+  box-sizing: border-box;
+
+  &__header {
+    width: 100%;
+    max-width: 1340px;
+  }
+
+  &__footer {
+    width: 100%;
+    max-width: 1280px;
+    margin: 24px auto 0;
+  }
+}

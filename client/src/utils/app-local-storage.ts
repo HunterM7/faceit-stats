@@ -19,6 +19,11 @@ type AppLocalStorageSchema = {
       /** Ник FACEIT. */
       nickname: string;
     };
+    /** Команды для Twitch-чатбота. */
+    twitch: {
+      /** Ник FACEIT. */
+      nickname: string;
+    };
   };
 };
 

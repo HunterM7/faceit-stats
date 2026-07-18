@@ -7,6 +7,7 @@ import { AdminAnalyticsModule } from './modules/admin-analytics/admin-analytics.
 import { LastMatchModule } from './modules/last-match/last-match.module';
 import { PlayerModule } from './modules/player/player.module';
 import { PlayerStatisticsModule } from './modules/player-statistics/player-statistics.module';
+import { TwitchCommandsModule } from './modules/twitch-commands/twitch-commands.module';
 import { StatsModule } from './stats/stats.module';
 
 @Module({
@@ -23,6 +24,7 @@ import { StatsModule } from './stats/stats.module';
     PlayerStatisticsModule,
     LastMatchModule,
     PlayerModule,
+    TwitchCommandsModule,
   ],
 })
 export class AppModule {}

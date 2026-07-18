@@ -26,6 +26,11 @@ const OverlayWidgetPage = lazy(async () => {
   return { default: m.OverlayWidgetPage };
 });
 
+const TwitchCommandsPage = lazy(async () => {
+  const m = await import('@pages/twitch-commands-page/twitch-commands-page');
+  return { default: m.TwitchCommandsPage };
+});
+
 const AdminPage = lazy(async () => {
   const m = await import('@pages/admin-page/admin-page');
   return { default: m.AdminPage };
@@ -47,6 +52,7 @@ export function AppRoutes() {
         <Route path='/admin/errors' element={<AdminErrorsPage/>}/>
         <Route path='/widgets/stats' element={<StatsWidgetPage/>}/>
         <Route path='/widgets/match-result' element={<OverlayWidgetPage/>}/>
+        <Route path='/widgets/twitch-commands' element={<TwitchCommandsPage/>}/>
       </Routes>
     </Suspense>
   );
