@@ -1,11 +1,16 @@
 type StorageSchema = Record<string, unknown>;
 
+/** Примитивы и numeric enum — листья пути, в них не углубляемся. */
+type StorageLeaf = string | number | boolean | bigint | null | undefined;
+
 type Path<T> = T extends Record<string, unknown>
   ? {
     [K in keyof T & string]:
-    T[K] extends Record<string, unknown>
-      ? `${K}` | `${K}.${Path<T[K]>}`
-      : `${K}`;
+    T[K] extends StorageLeaf
+      ? `${K}`
+      : T[K] extends Record<string, unknown>
+        ? `${K}` | `${K}.${Path<T[K]>}`
+        : `${K}`;
   }[keyof T & string]
   : never;
 

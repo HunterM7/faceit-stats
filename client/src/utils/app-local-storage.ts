@@ -1,4 +1,5 @@
 import { LocalStorage } from '@utils/local-storage';
+import { TwitchChatbot } from '@utils/twitchChatbot';
 
 type AppLocalStorageSchema = {
   /** Виджеты. */
@@ -23,6 +24,8 @@ type AppLocalStorageSchema = {
     twitch: {
       /** Ник FACEIT. */
       nickname: string;
+      /** Выбранный чатбот для генерации кода. */
+      chatbot: TwitchChatbot;
     };
   };
 };

@@ -30,8 +30,30 @@ interface PlayerApiRow {
 
 Используй **`type`**, если:
 
-- **`interface` не подходит** — например union (`'a' | 'b'`), mapped types, conditional types, tuple, utility над union;
+- **`interface` не подходит** — mapped types, conditional types, tuple, utility над union;
 - через **`interface` получается громоздко** — тогда `type` с алиасом на выражение читается лучше.
+
+## Закрытые наборы вариантов — `enum`, не строковый union
+
+Фиксированный список вариантов (чатбот, исход матча и т.п.) описывай через **`enum` без строковых значений** у членов. В коде сравнивай и передавай **`Enum.Member`**, а не сырые строки `'…'`.
+
+```ts
+// ❌
+type TwitchChatbot = 'nightbot' | 'streamelements';
+if (chatbot === 'streamelements') { … }
+
+// ❌ строковый enum
+enum TwitchChatbot {
+  Nightbot = 'nightbot',
+  StreamElements = 'streamelements',
+}
+
+// ✅
+enum TwitchChatbot { Nightbot, StreamElements }
+if (chatbot === TwitchChatbot.StreamElements) { … }
+```
+
+Строковый union (`'a' | 'b'`) — только если enum неудобен (внешний контракт API, значения не под нашим контролем и т.п.).
 
 ## Примеры
 
@@ -42,8 +64,11 @@ interface UserRow {
   nickname: string;
 }
 
-// ✅ union / выражение — только type
-type MatchOutcome = 'WIN' | 'LOSS';
+// ✅ закрытый набор — enum без строк
+enum MatchOutcome {
+  Win,
+  Loss,
+}
 
 // ✅ выборка полей — type (или interface extends Pick<…> — на вкус команды)
 type UserId = Pick<UserRow, 'id'>;

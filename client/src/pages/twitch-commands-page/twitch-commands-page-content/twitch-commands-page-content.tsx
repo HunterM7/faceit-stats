@@ -2,11 +2,22 @@ import { useCallback, useState } from 'react';
 import { classNames } from '@/utils/classNames';
 import { Section } from '@/components/section/section';
 import { Input } from '@/ui/input/input';
+import { Select, type SelectOption } from '@/ui/select/select';
 import { StorageLocal } from '@utils/app-local-storage';
-import { buildNightbotCode } from './utils/buildNightbotCode';
+import { TwitchChatbot } from '@utils/twitchChatbot';
 import { useToast } from '@components/toast-provider/use-toast';
 import { TwitchCommandsPageContentCommandRow } from './twitch-commands-page-content-command-row/twitch-commands-page-content-command-row';
+import { buildChatbotCode } from './utils/buildChatbotCode';
 import './twitch-commands-page-content.scss';
+
+const CHATBOT_OPTIONS: readonly SelectOption<TwitchChatbot>[] = [
+  { value: TwitchChatbot.Nightbot, label: 'Nightbot' },
+  { value: TwitchChatbot.StreamElements, label: 'StreamElements' },
+  { value: TwitchChatbot.Fossabot, label: 'Fossabot' },
+  { value: TwitchChatbot.StreamlabsChatbot, label: 'Streamlabs Chatbot' },
+  { value: TwitchChatbot.StreamlabsCloudBot, label: 'Streamlabs CloudBot' },
+  { value: TwitchChatbot.Moobot, label: 'Moobot' },
+];
 
 export interface TwitchCommandsPageContentProps {
   /** Дополнительный класс для стилизации компонента. */
@@ -18,11 +29,13 @@ export function TwitchCommandsPageContent(props: TwitchCommandsPageContentProps)
   const { showToast } = useToast();
 
   const nicknameStorage = StorageLocal().path('widgets.twitch.nickname');
+  const chatbotStorage = StorageLocal().path('widgets.twitch.chatbot');
   const [ nickname, setNickname ] = useState(() => nicknameStorage.get(''));
+  const [ chatbot, setChatbot ] = useState<TwitchChatbot>(() => chatbotStorage.get(TwitchChatbot.Nightbot));
 
   const canBuild = nickname.trim().length > 0;
-  const eloCode = buildNightbotCode('/api/twitch/elo', nickname);
-  const statsCode = buildNightbotCode('/api/twitch/stats', nickname);
+  const eloCode = buildChatbotCode('/api/twitch/elo', nickname, chatbot);
+  const statsCode = buildChatbotCode('/api/twitch/stats', nickname, chatbot);
 
   const handleNicknameChange = useCallback((value: string) => {
     setNickname(value);
@@ -32,6 +45,11 @@ export function TwitchCommandsPageContent(props: TwitchCommandsPageContentProps)
       return;
     }
     storage.set(value);
+  }, []);
+
+  const handleChatbotChange = useCallback((value: TwitchChatbot) => {
+    setChatbot(value);
+    StorageLocal().path('widgets.twitch.chatbot').set(value);
   }, []);
 
   const copyCode = useCallback(async (code: string) => {
@@ -58,16 +76,9 @@ export function TwitchCommandsPageContent(props: TwitchCommandsPageContentProps)
     <div className={classNames('twitch-commands-page-content', className)}>
       <header className='twitch-commands-page-content__hero'>
         <div className='twitch-commands-page-content__hero-copy'>
-          <h1 className='twitch-commands-page-content__hero-title'>Статистика для Twitch команд</h1>
+          <h1 className='twitch-commands-page-content__hero-title'>Статистика в чат стрима</h1>
           <p className='twitch-commands-page-content__hero-lead'>
-            Укажи FACEIT ник и скопируй код в ответ команды чатбота (Nightbot).
-            Бот запросит статистику с сервера и отправит её в чат.
-          </p>
-          <p className='twitch-commands-page-content__hero-lead'>
-            Для StreamElements вместо{' '}
-            <code className='twitch-commands-page-content__inline-code'>$(urlfetch URL)</code>
-            {' '}используй{' '}
-            <code className='twitch-commands-page-content__inline-code'>{'${customapi.URL}'}</code>.
+            Укажи FACEIT ник, выбери чатбота и скопируй код в команды !elo и !stats.
           </p>
         </div>
       </header>
@@ -88,12 +99,21 @@ export function TwitchCommandsPageContent(props: TwitchCommandsPageContentProps)
                 autoComplete='nickname'
               />
             </div>
+            <div className='twitch-commands-page-content__field'>
+              <p className='twitch-commands-page-content__input-label'>Чатбот</p>
+              <Select<TwitchChatbot>
+                className='twitch-commands-page-content__chatbot-select'
+                value={chatbot}
+                options={CHATBOT_OPTIONS}
+                onChange={handleChatbotChange}
+              />
+            </div>
           </div>
         </Section>
 
         <Section title='Команды для чатбота' className='twitch-commands-page-content__commands'>
           <p className='twitch-commands-page-content__hint'>
-            Создай команды !elo и !stats в чатботе и вставь скопированный код в поле ответа.
+            Скопируй код и вставь в ответ команд !elo и !stats.
           </p>
           <div className='twitch-commands-page-content__commands-list'>
             <TwitchCommandsPageContentCommandRow

@@ -3,12 +3,12 @@ import { classNames } from '@/utils/classNames';
 import { Key, useKeyDown } from '@/utils/use-key-down';
 import './select.scss';
 
-export type SelectOption<T extends string = string> = {
+export type SelectOption<T = string> = {
   value: T;
   label: string;
 };
 
-interface SelectProps<T extends string> {
+interface SelectProps<T> {
   /** Текущее значение. */
   value: T;
   /** Список вариантов. */
@@ -24,14 +24,14 @@ interface SelectProps<T extends string> {
 }
 
 /** Кастомный выпадающий список без внешних UI-библиотек. */
-export function Select<T extends string>(props: SelectProps<T>) {
+export function Select<T>(props: SelectProps<T>) {
   const { value, options, onChange, className, disabled, name } = props;
 
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
   const selectedIndex = Math.max(0, options.findIndex((option) => option.value === value));
-  const selectedLabel = options[selectedIndex]?.label ?? value;
+  const selectedLabel = options[selectedIndex]?.label ?? String(value);
 
   const [ open, setOpen ] = useState(false);
   const [ activeIndex, setActiveIndex ] = useState(selectedIndex);
@@ -174,7 +174,7 @@ export function Select<T extends string>(props: SelectProps<T>) {
         <span className='select__chevron'/>
       </button>
 
-      {name ? <input type='hidden' name={name} value={value}/> : null}
+      {name ? <input type='hidden' name={name} value={String(value)}/> : null}
 
       {open ? (
         <div className='select__content'>
@@ -184,7 +184,7 @@ export function Select<T extends string>(props: SelectProps<T>) {
 
             return (
               <button
-                key={option.value}
+                key={option.label}
                 type='button'
                 className={classNames(
                   'select__item',
