@@ -139,7 +139,7 @@ export function TwitchCommandsPageContent(props: TwitchCommandsPageContentProps)
           </div>
         </Section>
 
-        <Section title='!elo' className='twitch-commands-page-content__command-block'>
+        <Section title='Эло-рейтинг' className='twitch-commands-page-content__command-block'>
           <div className='twitch-commands-page-content__fields'>
             <div className='twitch-commands-page-content__field'>
               <p className='twitch-commands-page-content__input-label'>Текст ответа</p>
@@ -159,9 +159,8 @@ export function TwitchCommandsPageContent(props: TwitchCommandsPageContentProps)
           />
         </Section>
 
-        <Section title='!stats' className='twitch-commands-page-content__command-block'>
+        <Section title='Подробная статистика' className='twitch-commands-page-content__command-block'>
           <TwitchCommandsPageContentCommandRow
-            description='Готовая статистика с сервера'
             code={statsCode}
             canCopy={canBuild}
             onCopy={() => {
