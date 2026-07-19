@@ -7,7 +7,9 @@ import { StorageLocal } from '@utils/app-local-storage';
 import { TwitchChatbot } from '@utils/twitchChatbot';
 import { useToast } from '@components/toast-provider/use-toast';
 import { TwitchCommandsPageContentCommandRow } from './twitch-commands-page-content-command-row/twitch-commands-page-content-command-row';
-import { buildChatbotCode } from './utils/buildChatbotCode';
+import { TwitchCommandsPageContentTemplateEditor } from './twitch-commands-page-content-template-editor/twitch-commands-page-content-template-editor';
+import { buildEloChatbotCode, buildStatsChatbotCode } from './utils/buildChatbotCode';
+import { DEFAULT_ELO_TEXT } from './utils/twitchCommandTemplates';
 import './twitch-commands-page-content.scss';
 
 const CHATBOT_OPTIONS: readonly SelectOption<TwitchChatbot>[] = [
@@ -30,6 +32,8 @@ export function TwitchCommandsPageContent(props: TwitchCommandsPageContentProps)
 
   const nicknameStorage = StorageLocal().path('widgets.twitch.nickname');
   const chatbotStorage = StorageLocal().path('widgets.twitch.chatbot');
+  const eloTextStorage = StorageLocal().path('widgets.twitch.eloText');
+
   const [ nickname, setNickname ] = useState(() => nicknameStorage.get(''));
   const [ chatbot, setChatbot ] = useState<TwitchChatbot>(() => {
     const stored = chatbotStorage.get(TwitchChatbot.Nightbot);
@@ -37,13 +41,18 @@ export function TwitchCommandsPageContent(props: TwitchCommandsPageContentProps)
       ? stored
       : TwitchChatbot.Nightbot;
   });
+  const [ eloText, setEloText ] = useState(() => eloTextStorage.get(DEFAULT_ELO_TEXT));
 
   const canBuild = nickname.trim().length > 0;
-  const eloCode = buildChatbotCode('/api/twitch/elo', nickname, chatbot);
-  const statsCode = buildChatbotCode('/api/twitch/stats', nickname, chatbot);
+  const eloCode = buildEloChatbotCode({
+    nickname,
+    chatbot,
+    text: eloText.trim() || DEFAULT_ELO_TEXT,
+  });
+  const statsCode = buildStatsChatbotCode({ nickname, chatbot });
   const commandsHint = chatbot === TwitchChatbot.Moobot
     ? 'Включи «Show advanced options», в Response выбери «URL fetch – Full (plain) response» и вставь ссылку в URL to fetch.'
-    : 'Скопируй код и вставь в ответ команд !elo и !stats.';
+    : 'Скопируй код и вставь в ответ команды.';
 
   const handleNicknameChange = useCallback((value: string) => {
     setNickname(value);
@@ -58,6 +67,16 @@ export function TwitchCommandsPageContent(props: TwitchCommandsPageContentProps)
   const handleChatbotChange = useCallback((value: TwitchChatbot) => {
     setChatbot(value);
     StorageLocal().path('widgets.twitch.chatbot').set(value);
+  }, []);
+
+  const handleEloTextChange = useCallback((value: string) => {
+    setEloText(value);
+    const storage = StorageLocal().path('widgets.twitch.eloText');
+    if (!value.trim().length || value.trim() === DEFAULT_ELO_TEXT) {
+      storage.delete();
+      return;
+    }
+    storage.set(value);
   }, []);
 
   const copyCode = useCallback(async (code: string) => {
@@ -115,32 +134,40 @@ export function TwitchCommandsPageContent(props: TwitchCommandsPageContentProps)
                 options={CHATBOT_OPTIONS}
                 onChange={handleChatbotChange}
               />
+              <p className='twitch-commands-page-content__field-hint'>{commandsHint}</p>
             </div>
           </div>
         </Section>
 
-        <Section title='Команды для чатбота' className='twitch-commands-page-content__commands'>
-          <p className='twitch-commands-page-content__hint'>{commandsHint}</p>
-          <div className='twitch-commands-page-content__commands-list'>
-            <TwitchCommandsPageContentCommandRow
-              command='!elo'
-              description='Ответ: «Текущее эло: N»'
-              code={eloCode}
-              canCopy={canBuild}
-              onCopy={() => {
-                void copyCode(eloCode);
-              }}
-            />
-            <TwitchCommandsPageContentCommandRow
-              command='!stats'
-              description='Ответ: краткая статистика игрока (ELO, K/D, сегодня, 30 матчей)'
-              code={statsCode}
-              canCopy={canBuild}
-              onCopy={() => {
-                void copyCode(statsCode);
-              }}
-            />
+        <Section title='!elo' className='twitch-commands-page-content__command-block'>
+          <div className='twitch-commands-page-content__fields'>
+            <div className='twitch-commands-page-content__field'>
+              <p className='twitch-commands-page-content__input-label'>Текст ответа</p>
+              <TwitchCommandsPageContentTemplateEditor
+                className='twitch-commands-page-content__template-input'
+                value={eloText}
+                onChange={handleEloTextChange}
+              />
+            </div>
           </div>
+          <TwitchCommandsPageContentCommandRow
+            code={eloCode}
+            canCopy={canBuild}
+            onCopy={() => {
+              void copyCode(eloCode);
+            }}
+          />
+        </Section>
+
+        <Section title='!stats' className='twitch-commands-page-content__command-block'>
+          <TwitchCommandsPageContentCommandRow
+            description='Готовая статистика с сервера'
+            code={statsCode}
+            canCopy={canBuild}
+            onCopy={() => {
+              void copyCode(statsCode);
+            }}
+          />
         </Section>
       </div>
     </div>

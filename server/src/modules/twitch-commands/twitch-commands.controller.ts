@@ -7,22 +7,37 @@ export class TwitchCommandsController {
   constructor(private readonly twitchCommandsService: TwitchCommandsService) {}
 
   /**
-   * Plain-text ответ для чатбота: «Текущее эло: N».
-   * Подходит для Nightbot `$(urlfetch …)` / StreamElements `${customapi.…}`.
+   * Сырое `elo` / `level` для вставки чатботом в текст !elo.
    */
-  @Get('twitch/elo')
-  async getElo(@Query('nickname') nickname: string | undefined, @Res() res: Response): Promise<void> {
-    const text = await this.twitchCommandsService.getEloText(nickname);
-    res.type('text/plain; charset=utf-8').send(text);
+  @Get('twitch/field')
+  async getField(
+    @Query('nickname') nickname: string | undefined,
+    @Query('name') name: string | undefined,
+    @Res() res: Response,
+  ): Promise<void> {
+    const body = await this.twitchCommandsService.getFieldText(nickname, name);
+    res.type('text/plain; charset=utf-8').send(body);
   }
 
   /**
-   * Plain-text ответ для чатбота с краткой статистикой игрока.
-   * Подходит для Nightbot `$(urlfetch …)` / StreamElements `${customapi.…}`.
+   * Готовый текст !elo по шаблону — для Moobot.
+   */
+  @Get('twitch/elo')
+  async getElo(
+    @Query('nickname') nickname: string | undefined,
+    @Query('text') text: string | undefined,
+    @Res() res: Response,
+  ): Promise<void> {
+    const body = await this.twitchCommandsService.getEloMessageText(nickname, text);
+    res.type('text/plain; charset=utf-8').send(body);
+  }
+
+  /**
+   * Готовая строка !stats (фиксированный формат).
    */
   @Get('twitch/stats')
   async getStats(@Query('nickname') nickname: string | undefined, @Res() res: Response): Promise<void> {
-    const text = await this.twitchCommandsService.getStatsText(nickname);
-    res.type('text/plain; charset=utf-8').send(text);
+    const body = await this.twitchCommandsService.getStatsText(nickname);
+    res.type('text/plain; charset=utf-8').send(body);
   }
 }

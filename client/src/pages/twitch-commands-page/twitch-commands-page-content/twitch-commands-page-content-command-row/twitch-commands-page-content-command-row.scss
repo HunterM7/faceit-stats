@@ -3,20 +3,6 @@
   flex-direction: column;
   gap: 10px;
 
-  &__head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 8px 14px;
-  }
-
-  &__name {
-    margin: 0;
-    font-size: 20px;
-    font-weight: 700;
-    color: #f3f6fd;
-  }
-
   &__desc {
     margin: 0;
     font-size: 16px;

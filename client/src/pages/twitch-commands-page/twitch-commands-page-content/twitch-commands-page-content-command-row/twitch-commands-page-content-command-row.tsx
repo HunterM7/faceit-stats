@@ -2,10 +2,8 @@ import { Button, ButtonVariant } from '@/ui/button/button';
 import './twitch-commands-page-content-command-row.scss';
 
 export interface TwitchCommandsPageContentCommandRowProps {
-  /** Название команды в чате, например `!elo`. */
-  command: string;
   /** Краткое описание ответа бота. */
-  description: string;
+  description?: string | undefined;
   /** Готовый код для вставки в ответ команды чатбота. */
   code: string;
   /** Можно ли копировать (есть ник). */
@@ -15,14 +13,13 @@ export interface TwitchCommandsPageContentCommandRowProps {
 }
 
 export function TwitchCommandsPageContentCommandRow(props: TwitchCommandsPageContentCommandRowProps) {
-  const { command, description, code, canCopy, onCopy } = props;
+  const { description, code, canCopy, onCopy } = props;
 
   return (
     <div className='twitch-commands-page-content-command-row'>
-      <div className='twitch-commands-page-content-command-row__head'>
-        <p className='twitch-commands-page-content-command-row__name'>{command}</p>
+      {description ? (
         <p className='twitch-commands-page-content-command-row__desc'>{description}</p>
-      </div>
+      ) : null}
       <div className='twitch-commands-page-content-command-row__controls'>
         <input
           className='twitch-commands-page-content-command-row__code'

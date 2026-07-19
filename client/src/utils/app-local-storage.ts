@@ -26,6 +26,8 @@ type AppLocalStorageSchema = {
       nickname: string;
       /** Выбранный чатбот для генерации кода. */
       chatbot: TwitchChatbot;
+      /** Шаблон ответа команды !elo. */
+      eloText: string;
     };
   };
 };

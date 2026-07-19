@@ -79,17 +79,21 @@
     box-sizing: border-box;
   }
 
-  &__hint {
-    margin: 8px 0 0;
-    font-size: 16px;
-    color: rgba(212, 224, 247, 0.76);
+  &__template-input {
+    width: 100%;
   }
 
-  &__commands-list {
-    margin-top: 14px;
+  &__field-hint {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.4;
+    color: rgba(212, 224, 247, 0.62);
+  }
+
+  &__command-block {
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 14px;
   }
 
   @media (max-width: 900px) {
