@@ -34,14 +34,14 @@ export function WidgetStatisticsCommonPanel(props: Props) {
       return;
     }
     switch (rank.region.rating) {
-    case 1:
-      return ChallengerTier.Gold;
-    case 2:
-      return ChallengerTier.Silver;
-    case 3:
-      return ChallengerTier.Bronze;
-    default:
-      return ChallengerTier.Other;
+      case 1:
+        return ChallengerTier.Gold;
+      case 2:
+        return ChallengerTier.Silver;
+      case 3:
+        return ChallengerTier.Bronze;
+      default:
+        return ChallengerTier.Other;
     }
   }, [ rank.region?.rating ]);
 

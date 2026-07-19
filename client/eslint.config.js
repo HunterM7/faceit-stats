@@ -73,8 +73,8 @@ export default tseslint.config([
     rules: {
       // Максимальная длина строки в коде.
       'max-len': ['error', { code: 150, ignoreUrls: true, ignoreStrings: true }],
-      // Отступы в коде.
-      indent: ['error', 2],
+      // Отступы в коде. SwitchCase: 1 — `case` с отступом внутри `switch`.
+      indent: ['error', 2, { SwitchCase: 1 }],
       // Отступы в JSX-коде.
       'react/jsx-indent': ['error', 2, { checkAttributes: true, indentLogicalExpressions: true }],
       // Отступы в пропсах компонентов.
