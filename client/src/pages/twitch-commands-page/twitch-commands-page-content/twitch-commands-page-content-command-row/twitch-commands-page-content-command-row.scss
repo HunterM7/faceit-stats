@@ -1,0 +1,49 @@
+.twitch-commands-page-content-command-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  &__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px 14px;
+  }
+
+  &__name {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #f3f6fd;
+  }
+
+  &__desc {
+    margin: 0;
+    font-size: 16px;
+    color: rgba(212, 224, 247, 0.76);
+  }
+
+  &__controls {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+  }
+
+  &__code {
+    border-radius: 8px;
+    padding: 9px 10px;
+    background: rgba(0, 0, 0, 0.32);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #f1f3f7;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 15px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  @media (max-width: 900px) {
+    &__controls {
+      grid-template-columns: 1fr;
+    }
+  }
+}

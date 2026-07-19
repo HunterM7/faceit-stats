@@ -1,68 +1,16 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { classNames } from '@/utils/classNames';
 import { Section } from '@/components/section/section';
 import { Input } from '@/ui/input/input';
-import { Button, ButtonVariant } from '@/ui/button/button';
 import { StorageLocal } from '@utils/app-local-storage';
-import { buildApiUrl } from '@config/api';
+import { buildNightbotCode } from './utils/buildNightbotCode';
 import { useToast } from '@components/toast-provider/use-toast';
+import { TwitchCommandsPageContentCommandRow } from './twitch-commands-page-content-command-row/twitch-commands-page-content-command-row';
 import './twitch-commands-page-content.scss';
 
 export interface TwitchCommandsPageContentProps {
   /** Дополнительный класс для стилизации компонента. */
   className?: string | undefined;
-}
-
-interface TwitchCommandRowProps {
-  /** Название команды в чате, например `!elo`. */
-  command: string;
-  /** Краткое описание ответа бота. */
-  description: string;
-  /** Готовый код для вставки в ответ команды чатбота. */
-  code: string;
-  /** Можно ли копировать (есть ник). */
-  canCopy: boolean;
-  /** Копирует `code` в буфер. */
-  onCopy: () => void;
-}
-
-function TwitchCommandRow(props: TwitchCommandRowProps) {
-  const { command, description, code, canCopy, onCopy } = props;
-
-  return (
-    <div className='twitch-commands-page-content__command'>
-      <div className='twitch-commands-page-content__command-head'>
-        <p className='twitch-commands-page-content__command-name'>{command}</p>
-        <p className='twitch-commands-page-content__command-desc'>{description}</p>
-      </div>
-      <div className='twitch-commands-page-content__command-row'>
-        <input
-          className='twitch-commands-page-content__command-code'
-          type='text'
-          readOnly
-          value={code}
-          placeholder='Укажи FACEIT ник, чтобы сгенерировать код'
-        />
-        <Button variant={ButtonVariant.Primary} onClick={onCopy} disabled={!canCopy}>
-          Копировать
-        </Button>
-      </div>
-    </div>
-  );
-}
-
-/**
- * Собирает код Nightbot `$(urlfetch …)` для GET-эндпоинта Twitch-команд.
- * @param path Путь API, например `/api/twitch/elo`.
- * @param nickname Ник FACEIT.
- */
-function buildNightbotCode(path: string, nickname: string): string {
-  const trimmed = nickname.trim();
-  if (!trimmed) {
-    return '';
-  }
-  const url = buildApiUrl(`${path}?nickname=${encodeURIComponent(trimmed)}`);
-  return `$(urlfetch ${url})`;
 }
 
 export function TwitchCommandsPageContent(props: TwitchCommandsPageContentProps) {
@@ -76,16 +24,17 @@ export function TwitchCommandsPageContent(props: TwitchCommandsPageContentProps)
   const eloCode = buildNightbotCode('/api/twitch/elo', nickname);
   const statsCode = buildNightbotCode('/api/twitch/stats', nickname);
 
-  const handleNicknameChange = (value: string) => {
+  const handleNicknameChange = useCallback((value: string) => {
     setNickname(value);
+    const storage = StorageLocal().path('widgets.twitch.nickname');
     if (!value.trim().length) {
-      nicknameStorage.delete();
+      storage.delete();
       return;
     }
-    nicknameStorage.set(value);
-  };
+    storage.set(value);
+  }, []);
 
-  const copyCode = async (code: string) => {
+  const copyCode = useCallback(async (code: string) => {
     if (!code) {
       return;
     }
@@ -103,7 +52,7 @@ export function TwitchCommandsPageContent(props: TwitchCommandsPageContentProps)
         variant: 'error',
       });
     }
-  };
+  }, [ showToast ]);
 
   return (
     <div className={classNames('twitch-commands-page-content', className)}>
@@ -147,7 +96,7 @@ export function TwitchCommandsPageContent(props: TwitchCommandsPageContentProps)
             Создай команды !elo и !stats в чатботе и вставь скопированный код в поле ответа.
           </p>
           <div className='twitch-commands-page-content__commands-list'>
-            <TwitchCommandRow
+            <TwitchCommandsPageContentCommandRow
               command='!elo'
               description='Ответ: «Текущее эло: N»'
               code={eloCode}
@@ -156,7 +105,7 @@ export function TwitchCommandsPageContent(props: TwitchCommandsPageContentProps)
                 void copyCode(eloCode);
               }}
             />
-            <TwitchCommandRow
+            <TwitchCommandsPageContentCommandRow
               command='!stats'
               description='Ответ: краткая статистика игрока (ELO, K/D, сегодня, 30 матчей)'
               code={statsCode}

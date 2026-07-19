@@ -1,0 +1,60 @@
+---
+description: Один React-компонент — один модуль (отдельная папка/файл)
+alwaysApply: true
+---
+
+# Один компонент — один модуль
+
+Каждый React-компонент живёт в **своём** модуле. Не объявляй второй компонент в том же `.tsx`, где уже есть основной.
+
+## Правила
+
+- Один экспортируемый UI-компонент на файл (плюс его props/`interface`).
+- Если появляется отдельный компонент (даже «маленький» вроде строки списка) — выноси в соседнюю папку по паттерну проекта: `parent/parent-child/parent-child.tsx` (+ свой `.scss` и БЭМ-блок).
+- Не оставляй `function Foo()` / `const Foo = …` рядом с `export function Parent` в одном файле, если `Foo` — React-компонент с разметкой.
+- **Функции** не оставляй рядом с компонентом «просто так»:
+  - колбэки/обработчики внутри компонента — через **`useCallback`**;
+  - чистые функции — в **локальный** `utils/` **этого** компонента или страницы, модуль **по названию функции в camelCase** (например `buildNightbotCode` → `…/utils/buildNightbotCode.ts`). **Не** класть в общий `src/utils/`.
+
+## Примеры
+
+```tsx
+// ❌ два компонента в одном файле
+export function TwitchCommandsPageContent() { … }
+
+function TwitchCommandRow() { … }
+```
+
+```tsx
+// ❌ функция рядом с компонентом
+function buildNightbotCode() { … }
+export function TwitchCommandsPageContent() { … }
+```
+
+```tsx
+// ❌ общий utils
+import { buildNightbotCode } from '@utils/buildNightbotCode';
+```
+
+```tsx
+// ✅ компонент + useCallback
+export function TwitchCommandsPageContent() {
+  const copyCode = useCallback(async (code: string) => { … }, [ … ]);
+  …
+}
+```
+
+```tsx
+// ✅ локальный utils страницы/компонента
+// twitch-commands-page-content/utils/buildNightbotCode.ts
+export function buildNightbotCode(…) { … }
+
+// twitch-commands-page-content.tsx
+import { buildNightbotCode } from './utils/buildNightbotCode';
+```
+
+```tsx
+// ✅ дочерний компонент в своём модуле
+import { TwitchCommandsPageContentCommandRow } from './twitch-commands-page-content-command-row/…';
+export function TwitchCommandsPageContent() { … }
+```
