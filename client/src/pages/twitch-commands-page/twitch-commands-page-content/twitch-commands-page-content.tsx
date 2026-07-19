@@ -31,11 +31,19 @@ export function TwitchCommandsPageContent(props: TwitchCommandsPageContentProps)
   const nicknameStorage = StorageLocal().path('widgets.twitch.nickname');
   const chatbotStorage = StorageLocal().path('widgets.twitch.chatbot');
   const [ nickname, setNickname ] = useState(() => nicknameStorage.get(''));
-  const [ chatbot, setChatbot ] = useState<TwitchChatbot>(() => chatbotStorage.get(TwitchChatbot.Nightbot));
+  const [ chatbot, setChatbot ] = useState<TwitchChatbot>(() => {
+    const stored = chatbotStorage.get(TwitchChatbot.Nightbot);
+    return CHATBOT_OPTIONS.some((option) => option.value === stored)
+      ? stored
+      : TwitchChatbot.Nightbot;
+  });
 
   const canBuild = nickname.trim().length > 0;
   const eloCode = buildChatbotCode('/api/twitch/elo', nickname, chatbot);
   const statsCode = buildChatbotCode('/api/twitch/stats', nickname, chatbot);
+  const commandsHint = chatbot === TwitchChatbot.Moobot
+    ? 'Включи «Show advanced options», в Response выбери «URL fetch – Full (plain) response» и вставь ссылку в URL to fetch.'
+    : 'Скопируй код и вставь в ответ команд !elo и !stats.';
 
   const handleNicknameChange = useCallback((value: string) => {
     setNickname(value);
@@ -112,9 +120,7 @@ export function TwitchCommandsPageContent(props: TwitchCommandsPageContentProps)
         </Section>
 
         <Section title='Команды для чатбота' className='twitch-commands-page-content__commands'>
-          <p className='twitch-commands-page-content__hint'>
-            Скопируй код и вставь в ответ команд !elo и !stats.
-          </p>
+          <p className='twitch-commands-page-content__hint'>{commandsHint}</p>
           <div className='twitch-commands-page-content__commands-list'>
             <TwitchCommandsPageContentCommandRow
               command='!elo'
