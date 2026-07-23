@@ -36,6 +36,7 @@ npm install
 - `FACEIT_API_KEY`
 - `PORT` (опционально, по умолчанию `3333`)
 - `VITE_SERVER_URL` (адрес сервера для клиента; локально `http://localhost:3333`)
+- `VITE_SITE_URL` (публичный URL сайта для canonical / Open Graph; в проде `https://DOMAIN.com`, без `/` в конце)
 - `CLIENT_URL` (адрес клиента для CORS на сервере; локально `http://localhost:5173`, в проде `https://DOMAIN.com`)
 - `MONGODB_URI` (строка подключения MongoDB Atlas)
 - `MONGODB_DB_NAME` (опционально, имя БД для аналитики; по умолчанию `faceit_stats`)
@@ -43,9 +44,11 @@ npm install
 - `ADMIN_PASSWORD` (пароль для доступа к `/api/admin/*`)
 
 Важно про именование env:
-- `VITE_SERVER_URL` начинается с `VITE_` только потому, что это требование Vite для клиентских переменных.
+- `VITE_SERVER_URL` и `VITE_SITE_URL` начинаются с `VITE_` только потому, что это требование Vite для клиентских переменных.
 - Без префикса `VITE_` переменная не будет доступна в коде `client`.
 - `CLIENT_URL` и `FACEIT_API_KEY` используются на сервере, поэтому им префикс `VITE_` не нужен.
+
+SEO клиента (title/meta/JSON-LD, FAQ/HowTo, robots): подробности в [`client/src/seo/README.md`](client/src/seo/README.md).
 
 Для stateless-режима nickname всегда передается в URL:
 
@@ -150,7 +153,7 @@ Webhook на Vercel технически возможен, но для теку�
 - `faceit-web` -> `DOMAIN.com`
 - `faceit-api` -> `api.DOMAIN.com`
 3. Добавь env:
-- В `faceit-web`: `VITE_SERVER_URL=https://api.DOMAIN.com`
+- В `faceit-web`: `VITE_SERVER_URL=https://api.DOMAIN.com`, `VITE_SITE_URL=https://DOMAIN.com`
 - В `faceit-api`: `FACEIT_API_KEY=...`, `CLIENT_URL=https://DOMAIN.com`, `MONGODB_URI=...`, `MONGODB_DB_NAME=faceit_stats`, `ADMIN_LOGIN=...`, `ADMIN_PASSWORD=...`
 
 Почему это подходит:

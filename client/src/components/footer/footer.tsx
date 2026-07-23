@@ -11,7 +11,7 @@ export function Footer(props: Props) {
 
   return (
     <footer className={classNames('footer', className)}>
-      <p className='footer__text'>FACEIT Widgets for OBS</p>
+      <p className='footer__text'>FACEIT виджеты для OBS.</p>
     </footer>
   );
 }

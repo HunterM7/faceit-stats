@@ -35,9 +35,9 @@ export function OverlayWidgetPageContent(props: OverlayWidgetPageContentProps) {
     <div className={classNames('overlay-widget-page-content', className)}>
       <header className='overlay-widget-page-content__hero'>
         <div className='overlay-widget-page-content__hero-copy'>
-          <h1 className='overlay-widget-page-content__hero-title'>Виджет-оверлей</h1>
+          <h1 className='overlay-widget-page-content__hero-title'>Виджет итога матча FACEIT для OBS</h1>
           <p className='overlay-widget-page-content__hero-lead'>
-            Показывает изменение ELO и уровня после каждого завершённого матча — с анимацией победы или поражения.
+            Оверлей после матча: победа или поражение, изменение ELO и уровень — Browser Source для OBS и Streamlabs.
           </p>
           <p className='overlay-widget-page-content__hero-lead'>
             Данные обновляются автоматически, когда на FACEIT появляется новый результат.

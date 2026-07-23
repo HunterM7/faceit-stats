@@ -103,9 +103,9 @@ export function TwitchCommandsPageContent(props: TwitchCommandsPageContentProps)
     <div className={classNames('twitch-commands-page-content', className)}>
       <header className='twitch-commands-page-content__hero'>
         <div className='twitch-commands-page-content__hero-copy'>
-          <h1 className='twitch-commands-page-content__hero-title'>Статистика в чат стрима</h1>
+          <h1 className='twitch-commands-page-content__hero-title'>Команды FACEIT для Twitch-чата</h1>
           <p className='twitch-commands-page-content__hero-lead'>
-            Укажи FACEIT ник, выбери чатбота и скопируй код в команды !elo и !stats.
+            ELO и статистика FACEIT в чате: готовый код для Nightbot, StreamElements и других ботов.
           </p>
         </div>
       </header>
