@@ -2,6 +2,10 @@
   position: sticky;
   top: 10px;
   z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
   margin: 0 auto 22px;
   width: 100%;
   max-width: 1040px;
@@ -9,14 +13,6 @@
   border-radius: 12px;
   border: 1px solid transparent;
   transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, backdrop-filter 0.2s ease;
-
-  &__inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 14px;
-    flex-wrap: wrap;
-  }
 
   &--scrolled {
     border-color: rgba(170, 185, 230, 0.24);
@@ -36,9 +32,44 @@
     text-shadow: 0 0 14px rgba(160, 178, 255, 0.18);
   }
 
+  &__menu-toggle {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    padding: 7px 10px;
+    border: 1px solid rgba(170, 185, 230, 0.28);
+    border-radius: 8px;
+    background: rgba(10, 16, 31, 0.4);
+    color: #e8eefc;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+
+    &--open {
+      border-color: rgba(255, 162, 132, 0.45);
+      color: #fff;
+    }
+  }
+
+  &__menu-toggle-icon {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  &__menu-toggle-line {
+    display: block;
+    width: 14px;
+    height: 2px;
+    border-radius: 1px;
+    background: currentColor;
+  }
+
   &__nav {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 16px;
   }
 
@@ -49,6 +80,7 @@
     color: rgba(226, 233, 248, 0.92);
     font-weight: 600;
     font-size: 20px;
+    white-space: nowrap;
     transition: color 0.16s ease;
 
     &::after {
@@ -79,6 +111,49 @@
       &::after {
         transform: scaleX(1);
       }
+    }
+  }
+
+  @media (max-width: 900px) {
+    &__brand {
+      position: relative;
+      z-index: 2;
+    }
+
+    &__menu-toggle {
+      display: inline-flex;
+      position: relative;
+      z-index: 2;
+    }
+
+    &__nav {
+      display: none;
+      position: absolute;
+      top: calc(100% + 10px);
+      left: 0;
+      right: 0;
+      z-index: 1;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 2px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(170, 185, 230, 0.24);
+      background: rgba(10, 16, 31, 0.94);
+      backdrop-filter: blur(12px);
+      box-shadow:
+        0 16px 40px rgba(4, 8, 19, 0.55),
+        0 0 24px rgba(93, 126, 255, 0.12);
+
+      &--open {
+        display: flex;
+      }
+    }
+
+    &__nav-link {
+      width: 100%;
+      padding: 12px 0;
+      font-size: 18px;
     }
   }
 }
