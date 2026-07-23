@@ -1,5 +1,18 @@
-import { Suspense, lazy } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Suspense, lazy, useEffect } from 'react';
+import { Route, Routes, useLocation } from 'react-router-dom';
+
+const DEFAULT_DOCUMENT_TITLE = 'Faceit Widgets';
+
+const PAGE_DOCUMENT_TITLES: Record<string, string> = {
+  '/': DEFAULT_DOCUMENT_TITLE,
+  '/matchResult': 'Результат матча',
+  '/stats': 'Статистика',
+  '/admin': 'Админка',
+  '/admin/errors': 'Зарегистрированные ошибки',
+  '/widgets/stats': 'Виджет статистики',
+  '/widgets/match-result': 'Виджет-оверлей',
+  '/widgets/twitch-commands': 'Стрим команды',
+};
 
 const LandingPage = lazy(async () => {
   const m = await import('@pages/landing-page/landing-page');
@@ -42,6 +55,12 @@ const AdminErrorsPage = lazy(async () => {
 });
 
 export function AppRoutes() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    document.title = PAGE_DOCUMENT_TITLES[pathname] ?? DEFAULT_DOCUMENT_TITLE;
+  }, [ pathname ]);
+
   return (
     <Suspense fallback={null}>
       <Routes>
