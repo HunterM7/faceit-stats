@@ -2,6 +2,8 @@ import { removeLandingPageJsonLd, upsertLandingJsonLd, upsertSoftwareJsonLd } fr
 import { FALLBACK_PAGE_SEO, PAGE_SEO_BY_PATH, type PageSeo } from './pageSeo';
 import { SITE_NAME, getSiteOrigin } from './site';
 
+const OG_IMAGE_PATH = '/og-image.png';
+
 /**
  * Применяет SEO-метаданные страницы к `document.head`
  * (title, description, robots, canonical, Open Graph, Twitter).
@@ -10,6 +12,7 @@ export function applyPageSeo(pathname: string): void {
   const seo = PAGE_SEO_BY_PATH[pathname] ?? FALLBACK_PAGE_SEO;
   const origin = getSiteOrigin();
   const canonicalUrl = origin ? `${origin}${pathname === '/' ? '/' : pathname}` : '';
+  const ogImageUrl = origin ? `${origin}${OG_IMAGE_PATH}` : OG_IMAGE_PATH;
 
   document.title = seo.title;
 
@@ -22,6 +25,9 @@ export function applyPageSeo(pathname: string): void {
   setMetaByProperty('og:locale', 'ru_RU');
   setMetaByProperty('og:title', seo.title);
   setMetaByProperty('og:description', seo.description);
+  setMetaByProperty('og:image', ogImageUrl);
+  setMetaByProperty('og:image:width', '1200');
+  setMetaByProperty('og:image:height', '630');
   if (canonicalUrl) {
     setMetaByProperty('og:url', canonicalUrl);
   }
@@ -29,6 +35,7 @@ export function applyPageSeo(pathname: string): void {
   setMetaByName('twitter:card', 'summary_large_image');
   setMetaByName('twitter:title', seo.title);
   setMetaByName('twitter:description', seo.description);
+  setMetaByName('twitter:image', ogImageUrl);
 
   if (seo.landingJsonLd) {
     upsertLandingJsonLd();

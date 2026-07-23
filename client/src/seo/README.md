@@ -214,10 +214,17 @@ Sitemap пока **не** заведён: в sitemap нужны **абсолют
 
 ## Что ещё не сделано (осознанно)
 
-- OG-картинка 1200×630 (`og:image` / `twitter:image`)
-- `sitemap.xml` с абсолютными URL
 - Prerender / SSR лендинга и ключевых `/widgets/*`
 - `hreflang` (сайт пока один язык — RU)
 - Отдельный EN-лендинг
 
-Имеет смысл после стабильного домена и деплоя с `VITE_SITE_URL`.
+## Sitemap и OG-image
+
+- `client/public/sitemap.xml` — абсолютные URL `https://faceit-widgets.tonyx.ru/...` (только indexable-страницы).
+- `client/public/robots.txt` — строка `Sitemap: https://faceit-widgets.tonyx.ru/sitemap.xml`.
+- `client/public/og-image.png` — превью для шаринга; в `index.html` и через `applyPageSeo` (`og:image` / `twitter:image`).
+
+После деплоя добавь sitemap в:
+- Google Search Console → Индексирование → Файлы Sitemap
+- Яндекс.Вебмастер → Индексирование → Файлы Sitemap  
+URL: `https://faceit-widgets.tonyx.ru/sitemap.xml`

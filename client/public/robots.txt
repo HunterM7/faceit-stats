@@ -4,3 +4,5 @@ Disallow: /admin
 Disallow: /admin/errors
 Disallow: /stats
 Disallow: /matchResult
+
+Sitemap: https://faceit-widgets.tonyx.ru/sitemap.xml
