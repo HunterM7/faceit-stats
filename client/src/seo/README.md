@@ -202,29 +202,43 @@ Disallow: /stats
 Disallow: /matchResult
 ```
 
-Sitemap пока **не** заведён: в sitemap нужны **абсолютные** URL. Когда домен стабилен — добавить `sitemap.xml` (лучше генерация на билде с `VITE_SITE_URL`) и строку `Sitemap: https://DOMAIN.com/sitemap.xml`.
+Sitemap: `client/public/sitemap.xml` + строка в `robots.txt`  
+(`https://faceit-widgets.tonyx.ru/sitemap.xml`).
 
 ## Проверка
 
 1. Открой `/`, `/widgets/stats` и т.д.
-2. DevTools → Elements → `<head>`: title, description, robots, canonical, og:*, JSON-LD.
+2. DevTools → Elements → `<head>`: title, description, robots, canonical, og:*, favicon links, JSON-LD.
 3. На `/stats` / `/admin` — `noindex, nofollow`, без FAQ/HowTo schema.
 4. [Google Rich Results Test](https://search.google.com/test/rich-results) / [Schema Markup Validator](https://validator.schema.org/) по URL прода.
 5. View-Source главной: в сыром HTML видны дефолты из `index.html`.
+6. Favicon: открой `/favicon.ico` и `/favicon-32.png` на проде.
+
+## Сниппет в выдаче (иконка, title, разделы)
+
+### Favicon
+Яндекс/Google часто **не показывают SVG**. В `client/public/` лежат:
+- `favicon.ico` (16+32)
+- `favicon-32.png`, `favicon-192.png`
+- `apple-touch-icon.png`
+- `favicon.svg` (для современных браузеров)
+
+Подключены в `client/index.html`. После деплоя: переобход главной в Вебмастере; иконка в выдаче может обновиться с задержкой (дни).
+
+### Title / description
+Тексты короче и «человечнее» (бренд + смысл), без длинной простыни ключей. Источник правды:
+- главная: `site.ts` → `DEFAULT_PAGE_TITLE` / `DEFAULT_PAGE_DESCRIPTION` (+ копия в `index.html`)
+- остальные: `pageSeo.ts`
+
+### Быстрые ссылки («разделы»)
+Не гарантируются. На главной в JSON-LD: `WebSite` + `ItemList`/`SiteNavigationElement` (`landingJsonLd.ts`). Решает поисковик по кликам и структуре меню.
+
+### OG / sitemap
+- `og-image.png` — шаринг
+- sitemap уже в Вебмастере/GSC
 
 ## Что ещё не сделано (осознанно)
 
 - Prerender / SSR лендинга и ключевых `/widgets/*`
 - `hreflang` (сайт пока один язык — RU)
 - Отдельный EN-лендинг
-
-## Sitemap и OG-image
-
-- `client/public/sitemap.xml` — абсолютные URL `https://faceit-widgets.tonyx.ru/...` (только indexable-страницы).
-- `client/public/robots.txt` — строка `Sitemap: https://faceit-widgets.tonyx.ru/sitemap.xml`.
-- `client/public/og-image.png` — превью для шаринга; в `index.html` и через `applyPageSeo` (`og:image` / `twitter:image`).
-
-После деплоя добавь sitemap в:
-- Google Search Console → Индексирование → Файлы Sitemap
-- Яндекс.Вебмастер → Индексирование → Файлы Sitemap  
-URL: `https://faceit-widgets.tonyx.ru/sitemap.xml`

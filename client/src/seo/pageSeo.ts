@@ -7,7 +7,7 @@ export interface PageSeo {
   description: string;
   /** Значение `meta robots`. */
   robots: string;
-  /** Подключать JSON-LD лендинга (FAQ / HowTo / приложение). */
+  /** Подключать JSON-LD лендинга (FAQ / HowTo / приложение / навигация). */
   landingJsonLd?: boolean | undefined;
 }
 
@@ -22,21 +22,21 @@ export const PAGE_SEO_BY_PATH: Record<string, PageSeo> = {
     landingJsonLd: true,
   },
   '/widgets/stats': {
-    title: 'Виджет статистики FACEIT для OBS — ELO, K/D, last 30',
+    title: 'Виджет статистики FACEIT — для OBS и стрима',
     description:
-      'Собери виджет статистики FACEIT для стрима: ELO, уровень, wins/losses за сегодня и аналитика последних 30 матчей. Скопируй ссылку и добавь Browser Source в OBS.',
+      'Покажи на стриме ELO, уровень и статистику FACEIT. Скопируй ссылку и добавь Browser Source в OBS — без регистрации.',
     robots: INDEXABLE,
   },
   '/widgets/match-result': {
-    title: 'Виджет итога матча FACEIT для OBS — ELO и уровень',
+    title: 'Итог матча FACEIT — оверлей для OBS',
     description:
-      'Оверлей результата матча FACEIT для OBS: победа или поражение, изменение ELO и уровень. Автообновление после игры — вставь ссылку как Browser Source.',
+      'Оверлей после матча: победа или поражение, изменение ELO и уровень. Вставь ссылку в OBS как Browser Source.',
     robots: INDEXABLE,
   },
   '/widgets/twitch-commands': {
-    title: 'Команды FACEIT для Twitch-чата — ELO и статистика',
+    title: 'Команды FACEIT для Twitch — ELO в чате',
     description:
-      'Готовые команды для Nightbot и StreamElements: ELO, уровень и подробная статистика FACEIT в чате Twitch. Скопируй код и вставь в чат-бота.',
+      'Готовый код для Nightbot и StreamElements: ELO и статистика FACEIT в чате Twitch. Скопируй и вставь в бота.',
     robots: INDEXABLE,
   },
   '/stats': {

@@ -11,10 +11,10 @@ export function LandingPageHero(props: Props) {
   return (
     <section className={classNames('landing-page-hero', className)}>
       <p className='landing-page-hero__badge'>ДЛЯ OBS / BROWSER SOURCE</p>
-      <h1 className='landing-page-hero__title'>FACEIT виджеты для OBS и стрима</h1>
+      <h1 className='landing-page-hero__title'>Виджеты с FACEIT-статистикой для OBS</h1>
       <p className='landing-page-hero__subtitle'>
-        Бесплатные Browser Source виджеты: ELO, уровень, статистика CS2 и итог матча.
-        Настрой на сайте, скопируй ссылку и добавь в OBS или Streamlabs — без регистрации.
+        Статистика, ELO и итог матча на стриме. Настрой виджет, скопируй ссылку и добавь в OBS —
+        без регистрации.
       </p>
     </section>
   );

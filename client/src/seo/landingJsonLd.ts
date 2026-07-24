@@ -5,6 +5,19 @@ import { DEFAULT_PAGE_DESCRIPTION, SITE_NAME, getSiteOrigin } from './site';
 const SOFTWARE_JSON_LD_ID = 'seo-jsonld-software';
 const FAQ_JSON_LD_ID = 'seo-jsonld-faq';
 const HOWTO_JSON_LD_ID = 'seo-jsonld-howto';
+const WEBSITE_JSON_LD_ID = 'seo-jsonld-website';
+const NAV_JSON_LD_ID = 'seo-jsonld-navigation';
+
+interface SiteNavItem {
+  name: string;
+  path: string;
+}
+
+const SITE_NAV_ITEMS: SiteNavItem[] = [
+  { name: 'Виджет статистики', path: '/widgets/stats' },
+  { name: 'Показ результата матча', path: '/widgets/match-result' },
+  { name: 'Twitch команды', path: '/widgets/twitch-commands' },
+];
 
 export function buildSoftwareApplicationJsonLd(siteOrigin: string) {
   return {
@@ -20,6 +33,35 @@ export function buildSoftwareApplicationJsonLd(siteOrigin: string) {
     },
     description: DEFAULT_PAGE_DESCRIPTION,
     url: siteOrigin || undefined,
+  };
+}
+
+export function buildWebSiteJsonLd(siteOrigin: string) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: SITE_NAME,
+    alternateName: 'FACEIT виджеты для OBS',
+    url: siteOrigin || undefined,
+    description: DEFAULT_PAGE_DESCRIPTION,
+    inLanguage: 'ru-RU',
+  };
+}
+
+export function buildSiteNavigationJsonLd(siteOrigin: string) {
+  if (!siteOrigin) {
+    return null;
+  }
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    itemListElement: SITE_NAV_ITEMS.map((item, index) => ({
+      '@type': 'SiteNavigationElement',
+      position: index + 1,
+      name: item.name,
+      url: `${siteOrigin}${item.path}`,
+    })),
   };
 }
 
@@ -58,21 +100,30 @@ export function buildHowToJsonLd(siteOrigin: string) {
 export function upsertLandingJsonLd(): void {
   const origin = getSiteOrigin();
   setJsonLdScript(SOFTWARE_JSON_LD_ID, buildSoftwareApplicationJsonLd(origin));
+  setJsonLdScript(WEBSITE_JSON_LD_ID, buildWebSiteJsonLd(origin));
+  const navigation = buildSiteNavigationJsonLd(origin);
+  if (navigation) {
+    setJsonLdScript(NAV_JSON_LD_ID, navigation);
+  } else {
+    removeElementById(NAV_JSON_LD_ID);
+  }
   setJsonLdScript(FAQ_JSON_LD_ID, buildFaqPageJsonLd());
   setJsonLdScript(HOWTO_JSON_LD_ID, buildHowToJsonLd(origin));
 }
 
-/** Оставляет SoftwareApplication, убирает FAQ/HowTo лендинга. */
+/** Оставляет SoftwareApplication / WebSite, убирает FAQ / HowTo / навигацию лендинга. */
 export function removeLandingPageJsonLd(): void {
   removeElementById(FAQ_JSON_LD_ID);
   removeElementById(HOWTO_JSON_LD_ID);
+  removeElementById(NAV_JSON_LD_ID);
 }
 
-/** Обновляет только карточку приложения (для внутренних indexable-страниц). */
+/** Обновляет карточку приложения и сайт (для indexable-страниц). */
 export function upsertSoftwareJsonLd(): void {
-  setJsonLdScript(SOFTWARE_JSON_LD_ID, buildSoftwareApplicationJsonLd(getSiteOrigin()));
+  const origin = getSiteOrigin();
+  setJsonLdScript(SOFTWARE_JSON_LD_ID, buildSoftwareApplicationJsonLd(origin));
+  setJsonLdScript(WEBSITE_JSON_LD_ID, buildWebSiteJsonLd(origin));
 }
-
 
 function setJsonLdScript(id: string, data: object): void {
   let el = document.getElementById(id) as HTMLScriptElement | null;

@@ -287,9 +287,9 @@ export function StatsWidgetPageContent(props: StatsWidgetPageContentProps) {
     <div className={classNames('stats-widget-page-content', className)}>
       <header className='stats-widget-page-content__hero'>
         <div className='stats-widget-page-content__hero-copy'>
-          <h1 className='stats-widget-page-content__hero-title'>Виджет статистики FACEIT для OBS</h1>
+          <h1 className='stats-widget-page-content__hero-title'>Виджет статистики</h1>
           <p className='stats-widget-page-content__hero-lead'>
-            Browser Source с ELO, уровнем и статистикой FACEIT — за сегодня и за последние 30 матчей.
+            ELO, уровень и статистика FACEIT на стриме — за сегодня и за последние 30 матчей.
           </p>
           <p className='stats-widget-page-content__hero-lead'>
             Данные обновляются автоматически в реальном времени.
