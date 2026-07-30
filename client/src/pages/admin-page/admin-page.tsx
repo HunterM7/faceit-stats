@@ -199,7 +199,7 @@ export function AdminPage() {
     <main className='admin-page'>
       <header className='admin-page__header'>
         <Link to='/' className='admin-page__header-home-link'>На главную</Link>
-        <nav className='admin-page__sections' aria-label='Разделы админки'>
+        <nav className='admin-page__sections'>
           {ADMIN_SCOPE_OPTIONS.map((option) => (
             <Link
               key={option.id}
@@ -221,8 +221,13 @@ export function AdminPage() {
             <p className='admin-page__subtitle'>
               {scopeDescription}
             </p>
+            {data.storage === 'disabled' ? (
+              <p className='admin-page__storage-warning'>
+                Аналитика отключена: {data.disableReason || 'MongoDB недоступен'}
+              </p>
+            ) : null}
           </div>
-          <div className='admin-page__periods' role='group' aria-label='Выбор периода'>
+          <div className='admin-page__periods'>
             {ADMIN_PERIOD_OPTIONS.map((option) => (
               <Button
                 key={option.id}

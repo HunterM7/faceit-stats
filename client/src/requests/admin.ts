@@ -44,6 +44,8 @@ export type AdminOverviewPayload = {
     request?: AdminRequestMeta;
   }>;
   storage: 'mongo' | 'disabled';
+  /** Почему storage=disabled; есть только при отключённой аналитике. */
+  disableReason?: string | undefined;
 };
 
 export type AdminErrorsPayload = {
@@ -64,6 +66,8 @@ export type AdminErrorsPayload = {
     request?: AdminRequestMeta;
   }>;
   storage: 'mongo' | 'disabled';
+  /** Почему storage=disabled; есть только при отключённой аналитике. */
+  disableReason?: string | undefined;
 };
 
 function extractErrorMessage(raw: unknown, fallback: string): string {

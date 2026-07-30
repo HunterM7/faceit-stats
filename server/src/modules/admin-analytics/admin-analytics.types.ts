@@ -52,6 +52,8 @@ export type AdminOverviewResponse = {
   chart: AdminChartItem[];
   latestEvents: AdminEvent[];
   storage: 'mongo' | 'disabled';
+  /** Почему storage=disabled; есть только при отключённой аналитике. */
+  disableReason?: string;
 };
 
 export type AdminErrorsResponse = {
@@ -60,4 +62,6 @@ export type AdminErrorsResponse = {
   totalErrors: number;
   latestErrors: AdminEvent[];
   storage: 'mongo' | 'disabled';
+  /** Почему storage=disabled; есть только при отключённой аналитике. */
+  disableReason?: string;
 };

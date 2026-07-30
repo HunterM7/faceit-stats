@@ -160,6 +160,18 @@
     color: rgba(230, 233, 239, 0.86);
   }
 
+  &__storage-warning {
+    margin: 12px 0 0;
+    max-width: 700px;
+    padding: 10px 12px;
+    border: 1px solid rgba(255, 170, 90, 0.45);
+    border-radius: 10px;
+    background: rgba(90, 50, 10, 0.35);
+    color: #ffd7a8;
+    font-size: 15px;
+    line-height: 1.45;
+  }
+
   &__status {
     margin: 8px 0 0;
     color: rgba(183, 230, 190, 0.9);

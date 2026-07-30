@@ -34,11 +34,13 @@ export class AdminAnalyticsService {
   private mongoClient: MongoClient | null = null;
   private collection: Collection<AdminEventDocument> | null = null;
   private isRuntimeDisabled = false;
+  private disableReason: string | null = null;
 
   constructor(private readonly statsService: StatsService) {
     this.mongoUri = (process.env.MONGODB_URI || '').trim();
     this.mongoDbName = (process.env.MONGODB_DB_NAME || 'faceit_stats').trim();
     if (!this.mongoUri) {
+      this.disableReason = 'MONGODB_URI не задан в runtime';
       this.logger.warn('MongoDB не настроен. Аналитика отключена (ожидается MONGODB_URI).');
     }
   }
@@ -71,42 +73,19 @@ export class AdminAnalyticsService {
         request: payload.request,
       });
     } catch (error) {
-      this.isRuntimeDisabled = true;
-      this.logger.error(`Mongo аналитика отключена после ошибки записи: ${(error as Error).message}`);
+      this.disableAnalytics(`ошибка записи: ${(error as Error).message}`);
     }
   }
 
   async getOverview(period: AdminPeriod, scope: AdminScope): Promise<AdminOverviewResponse> {
     if (this.isRuntimeDisabled) {
-      return {
-        period,
-        scope,
-        totalEvents: 0,
-        productionEvents: 0,
-        previewEvents: 0,
-        uniqueUsers: 0,
-        topNicknames: [],
-        chart: [],
-        latestEvents: [],
-        storage: 'disabled',
-      };
+      return this.buildDisabledOverview(period, scope);
     }
 
     try {
       const collection = await this.getCollection();
       if (!collection) {
-        return {
-          period,
-          scope,
-          totalEvents: 0,
-          productionEvents: 0,
-          previewEvents: 0,
-          uniqueUsers: 0,
-          topNicknames: [],
-          chart: [],
-          latestEvents: [],
-          storage: 'disabled',
-        };
+        return this.buildDisabledOverview(period, scope);
       }
 
       const now = new Date();
@@ -132,44 +111,20 @@ export class AdminAnalyticsService {
         storage: 'mongo',
       };
     } catch (error) {
-      this.isRuntimeDisabled = true;
-      this.logger.error(`Mongo аналитика отключена после ошибки чтения: ${(error as Error).message}`);
-      return {
-        period,
-        scope,
-        totalEvents: 0,
-        productionEvents: 0,
-        previewEvents: 0,
-        uniqueUsers: 0,
-        topNicknames: [],
-        chart: [],
-        latestEvents: [],
-        storage: 'disabled',
-      };
+      this.disableAnalytics(`ошибка чтения: ${(error as Error).message}`);
+      return this.buildDisabledOverview(period, scope);
     }
   }
 
   async getErrors(period: AdminPeriod, scope: AdminScope): Promise<AdminErrorsResponse> {
     if (this.isRuntimeDisabled) {
-      return {
-        period,
-        scope,
-        totalErrors: 0,
-        latestErrors: [],
-        storage: 'disabled',
-      };
+      return this.buildDisabledErrors(period, scope);
     }
 
     try {
       const collection = await this.getCollection();
       if (!collection) {
-        return {
-          period,
-          scope,
-          totalErrors: 0,
-          latestErrors: [],
-          storage: 'disabled',
-        };
+        return this.buildDisabledErrors(period, scope);
       }
 
       const periodStartDate = this.getPeriodStartDate(period, new Date());
@@ -187,16 +142,44 @@ export class AdminAnalyticsService {
         storage: 'mongo',
       };
     } catch (error) {
-      this.isRuntimeDisabled = true;
-      this.logger.error(`Mongo аналитика отключена после ошибки чтения ошибок: ${(error as Error).message}`);
-      return {
-        period,
-        scope,
-        totalErrors: 0,
-        latestErrors: [],
-        storage: 'disabled',
-      };
+      this.disableAnalytics(`ошибка чтения ошибок: ${(error as Error).message}`);
+      return this.buildDisabledErrors(period, scope);
     }
+  }
+
+  private buildDisabledOverview(period: AdminPeriod, scope: AdminScope): AdminOverviewResponse {
+    return {
+      period,
+      scope,
+      totalEvents: 0,
+      productionEvents: 0,
+      previewEvents: 0,
+      uniqueUsers: 0,
+      topNicknames: [],
+      chart: [],
+      latestEvents: [],
+      storage: 'disabled',
+      disableReason: this.disableReason ?? 'MONGODB_URI не задан или Mongo недоступен',
+    };
+  }
+
+  private buildDisabledErrors(period: AdminPeriod, scope: AdminScope): AdminErrorsResponse {
+    return {
+      period,
+      scope,
+      totalErrors: 0,
+      latestErrors: [],
+      storage: 'disabled',
+      disableReason: this.disableReason ?? 'MONGODB_URI не задан или Mongo недоступен',
+    };
+  }
+
+  private disableAnalytics(reason: string): void {
+    this.isRuntimeDisabled = true;
+    this.disableReason = reason;
+    const message = `Mongo аналитика отключена: ${reason}`;
+    this.logger.error(message);
+    console.error(message);
   }
 
   private async getRequestVolume(
@@ -496,8 +479,7 @@ export class AdminAnalyticsService {
       await this.collection.createIndex({ preview: 1, createdAt: -1 });
       return this.collection;
     } catch (error) {
-      this.isRuntimeDisabled = true;
-      this.logger.error(`Mongo аналитика отключена после ошибки подключения: ${(error as Error).message}`);
+      this.disableAnalytics(`ошибка подключения: ${(error as Error).message}`);
       return null;
     }
   }
