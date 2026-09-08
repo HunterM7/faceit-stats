@@ -32,6 +32,7 @@ export default defineConfig(({ command }) => ({
     },
   },
   server: {
+    host: 'localhost',
     port: 5173,
     strictPort: true,
   },
