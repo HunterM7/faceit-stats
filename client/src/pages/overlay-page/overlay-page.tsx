@@ -14,7 +14,9 @@ function overlayResultFromApi(result: string | undefined): 'WIN' | 'LOSS' {
 }
 
 const analyticsSource = 'overlay_widget';
-const pollMs = 5000;
+const pollMs = 1500;
+/** FACEIT часто отдаёт старый ELO сразу после матча — ждём смену, не списывая ID. */
+const eloLagRetryMs = 40000;
 
 function captureErrorMessage(error: unknown, fallback: string): string {
   return error instanceof Error ? error.message : fallback;
@@ -82,6 +84,8 @@ export function OverlayPage() {
     let playerId: string | null = null;
     let pollTimer: number | null = null;
     let cancelled = false;
+    let eloWaitStartedAt = 0;
+    let eloWaitMatchId: string | null = null;
 
     const resetLoadErrorRaf = window.requestAnimationFrame(() => {
       if (!cancelled) {
@@ -108,78 +112,56 @@ export function OverlayPage() {
           lastMatchId = matchData.matchId;
           return;
         }
-        if (matchData.matchId === lastMatchId) {
+        if (!matchData.matchId || matchData.matchId === lastMatchId) {
           return;
         }
 
-        let playerPayload = await player(nickname, analyticsSource);
+        const playerPayload = await player(nickname, analyticsSource);
         if (cancelled) {
           return;
         }
 
-        let nextElo = typeof playerPayload.currentElo === 'number' ? playerPayload.currentElo : null;
-        let nextLevel =
+        const nextElo = typeof playerPayload.currentElo === 'number' ? playerPayload.currentElo : null;
+        const nextLevel =
           typeof playerPayload.currentSkillLevel === 'number' ? playerPayload.currentSkillLevel : null;
         const previousElo = lastKnownElo;
-        let computedDelta: number | null = null;
-        if (typeof nextElo === 'number' && typeof previousElo === 'number') {
-          computedDelta = nextElo - previousElo;
-        }
-
-        if (
-          computedDelta === 0
-          && typeof nextElo === 'number'
-          && typeof previousElo === 'number'
-          && nextElo === previousElo
-        ) {
-          await new Promise((resolve) => {
-            window.setTimeout(resolve, 700);
-          });
-          if (cancelled) {
-            return;
-          }
-          playerPayload = await player(nickname, analyticsSource);
-          if (cancelled) {
-            return;
-          }
-          nextElo = typeof playerPayload.currentElo === 'number' ? playerPayload.currentElo : null;
-          nextLevel =
-            typeof playerPayload.currentSkillLevel === 'number' ? playerPayload.currentSkillLevel : null;
-          if (typeof nextElo === 'number' && typeof previousElo === 'number') {
-            computedDelta = nextElo - previousElo;
-          }
-        }
-
-        const snapshotElo = lastKnownElo;
         const snapshotLevel = lastKnownLevel;
+
+        if (typeof nextElo !== 'number' || typeof previousElo !== 'number') {
+          return;
+        }
+
+        if (nextElo === previousElo) {
+          if (eloWaitMatchId !== matchData.matchId) {
+            eloWaitMatchId = matchData.matchId;
+            eloWaitStartedAt = Date.now();
+          }
+          if (Date.now() - eloWaitStartedAt < eloLagRetryMs) {
+            return;
+          }
+        }
+
+        eloWaitMatchId = null;
+        eloWaitStartedAt = 0;
         lastMatchId = matchData.matchId;
         lastKnownElo = nextElo;
         if (typeof nextLevel === 'number') {
           lastKnownLevel = nextLevel;
         }
 
-        const nextLevelForOverlay = typeof nextLevel === 'number' ? nextLevel : snapshotLevel;
-        const nextEloForOverlay = typeof nextElo === 'number' ? nextElo : snapshotElo;
-
-        if (typeof nextEloForOverlay !== 'number' || typeof snapshotElo !== 'number') {
-          return;
-        }
-
         publishMatch(
           {
-            elo: snapshotElo,
+            elo: previousElo,
             skillLevel: snapshotLevel,
           },
           {
-            elo: nextEloForOverlay,
-            skillLevel: nextLevelForOverlay,
+            elo: nextElo,
+            skillLevel: typeof nextLevel === 'number' ? nextLevel : snapshotLevel,
             result: overlayResultFromApi(matchData.result),
           },
         );
-      } catch (error) {
-        if (!cancelled) {
-          setOverlayLoadError(captureErrorMessage(error, 'Не удалось обновить данные игрока.'));
-        }
+      } catch {
+        // Держим последний успешный оверлей при временных ошибках поллинга.
       }
     };
 
