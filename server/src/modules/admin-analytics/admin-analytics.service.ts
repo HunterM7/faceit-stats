@@ -33,7 +33,6 @@ export class AdminAnalyticsService {
   private readonly mongoDbName: string;
   private mongoClient: MongoClient | null = null;
   private collection: Collection<AdminEventDocument> | null = null;
-  private isRuntimeDisabled = false;
   private disableReason: string | null = null;
 
   constructor(private readonly statsService: StatsService) {
@@ -46,7 +45,7 @@ export class AdminAnalyticsService {
   }
 
   async trackRequest(payload: TrackRequestPayload): Promise<void> {
-    if (this.isRuntimeDisabled) {
+    if (!this.mongoUri) {
       return;
     }
 
@@ -73,12 +72,13 @@ export class AdminAnalyticsService {
         request: payload.request,
       });
     } catch (error) {
-      this.disableAnalytics(`ошибка записи: ${(error as Error).message}`);
+      this.logger.error(`ошибка записи: ${(error as Error).message}`);
+      await this.resetMongo();
     }
   }
 
   async getOverview(period: AdminPeriod, scope: AdminScope): Promise<AdminOverviewResponse> {
-    if (this.isRuntimeDisabled) {
+    if (!this.mongoUri) {
       return this.buildDisabledOverview(period, scope);
     }
 
@@ -111,13 +111,14 @@ export class AdminAnalyticsService {
         storage: 'mongo',
       };
     } catch (error) {
-      this.disableAnalytics(`ошибка чтения: ${(error as Error).message}`);
+      this.disableReason = `ошибка чтения: ${(error as Error).message}`;
+      await this.resetMongo();
       return this.buildDisabledOverview(period, scope);
     }
   }
 
   async getErrors(period: AdminPeriod, scope: AdminScope): Promise<AdminErrorsResponse> {
-    if (this.isRuntimeDisabled) {
+    if (!this.mongoUri) {
       return this.buildDisabledErrors(period, scope);
     }
 
@@ -142,7 +143,8 @@ export class AdminAnalyticsService {
         storage: 'mongo',
       };
     } catch (error) {
-      this.disableAnalytics(`ошибка чтения ошибок: ${(error as Error).message}`);
+      this.disableReason = `ошибка чтения ошибок: ${(error as Error).message}`;
+      await this.resetMongo();
       return this.buildDisabledErrors(period, scope);
     }
   }
@@ -174,12 +176,17 @@ export class AdminAnalyticsService {
     };
   }
 
-  private disableAnalytics(reason: string): void {
-    this.isRuntimeDisabled = true;
-    this.disableReason = reason;
-    const message = `Mongo аналитика отключена: ${reason}`;
-    this.logger.error(message);
-    console.error(message);
+  private async resetMongo(): Promise<void> {
+    this.collection = null;
+    const client = this.mongoClient;
+    this.mongoClient = null;
+    if (client) {
+      try {
+        await client.close();
+      } catch {
+        // ignore
+      }
+    }
   }
 
   private async getRequestVolume(
@@ -460,7 +467,7 @@ export class AdminAnalyticsService {
   }
 
   private async getCollection(): Promise<Collection<AdminEventDocument> | null> {
-    if (!this.mongoUri || this.isRuntimeDisabled) {
+    if (!this.mongoUri) {
       return null;
     }
 
@@ -469,7 +476,9 @@ export class AdminAnalyticsService {
     }
 
     try {
-      this.mongoClient = new MongoClient(this.mongoUri);
+      this.mongoClient = new MongoClient(this.mongoUri, {
+        serverSelectionTimeoutMS: 8000,
+      });
       await this.mongoClient.connect();
       const db = this.mongoClient.db(this.mongoDbName);
       this.collection = db.collection<AdminEventDocument>('admin_events');
@@ -479,7 +488,9 @@ export class AdminAnalyticsService {
       await this.collection.createIndex({ preview: 1, createdAt: -1 });
       return this.collection;
     } catch (error) {
-      this.disableAnalytics(`ошибка подключения: ${(error as Error).message}`);
+      this.disableReason = `ошибка подключения: ${(error as Error).message}`;
+      this.logger.error(this.disableReason);
+      await this.resetMongo();
       return null;
     }
   }
