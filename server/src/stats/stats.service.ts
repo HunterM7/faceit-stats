@@ -71,7 +71,7 @@ export class StatsService {
       rankingCountryPromise,
     ]);
     const items = history?.items || [];
-    const latest = items[0] || null;
+    const latest = this.pickLatestFinishedMatch(items);
     const gameStats = player.games?.[this.config.gameId];
     const internalItems = (internalStats?.items || [])
       .map((item) => this.parseInternalMatch(item))
@@ -99,7 +99,7 @@ export class StatsService {
       common: {
         elo: gameStats?.faceit_elo ?? 0,
         skillLevel: gameStats?.skill_level ?? 0,
-        kd: Number(gameStatsRaw.lifetime?.['Average K/D Ratio']),
+        kd: this.toFiniteNumber(gameStatsRaw.lifetime?.['Average K/D Ratio']) ?? 0,
         rank,
       },
       daily: {
@@ -122,15 +122,15 @@ export class StatsService {
       },
       latestMatchId: latest?.match_id || null,
       latestMatchStatus: latest?.status || null,
-      latestMatchResult: this.resolveResultForPlayer(latest, playerId),
+      latestMatchResult: latest ? this.resolveResultForPlayer(latest, playerId) : 'LOSS',
       updatedAt: new Date().toISOString(),
       ...(this.config.devMode && { raw: { player, gameStats: gameStatsRaw, history, internalStats } }),
     };
   }
 
   async getLastMatchByPlayerId(playerId: string): Promise<LastMatchResponse> {
-    const history = await this.faceit.getPlayerHistory(playerId, 1);
-    const latest = history.items?.[0];
+    const history = await this.faceit.getPlayerHistory(playerId, 5);
+    const latest = this.pickLatestFinishedMatch(history.items);
 
     if (!latest) {
       throw new Error('LAST_MATCH_EMPTY');
@@ -262,8 +262,29 @@ export class StatsService {
     return Math.round((value + Number.EPSILON) * 100) / 100;
   }
 
+  private pickLatestFinishedMatch(items: MatchHistoryItem[] | undefined): MatchHistoryItem | null {
+    if (!items?.length) {
+      return null;
+    }
+    return items.find((item) => this.isFinishedHistoryMatch(item)) ?? null;
+  }
+
+  private isFinishedHistoryMatch(item: MatchHistoryItem): boolean {
+    return Boolean(
+      item.match_id
+      && item.results?.winner
+      && item.teams
+      && typeof item.finished_at === 'number'
+      && Number.isFinite(item.finished_at)
+      && item.finished_at > 0,
+    );
+  }
+
   private resolveResultForPlayer(match: MatchHistoryItem, playerId: string): MatchResult {
-    const winnerFactionId = match.results.winner;
+    const winnerFactionId = match.results?.winner;
+    if (!winnerFactionId || !match.teams) {
+      return 'LOSS';
+    }
 
     const found = Object.entries(match.teams).find(
       ([ , team ]) => Array.isArray(team.players) && team.players.some((p) => p.player_id === playerId),

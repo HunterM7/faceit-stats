@@ -60,8 +60,16 @@ export function StatsPage() {
       return;
     }
 
+    let cancelled = false;
+    playerIdRef.current = null;
+    latestMatchIdRef.current = null;
+    isPollingRef.current = false;
+
     requestStats(nickname, analyticsSource, ratingParamForRequest(rating))
       .then((stats) => {
+        if (cancelled) {
+          return;
+        }
         playerIdRef.current = stats.playerId ?? null;
         latestMatchIdRef.current = stats.latestMatchId ?? null;
         setState(mapStatsToState(stats));
@@ -69,7 +77,7 @@ export function StatsPage() {
       .catch(() => { /* Игнорируем возможные ошибки. */});
 
     const pollMatchUpdates = async () => {
-      if (isPollingRef.current) {
+      if (cancelled || isPollingRef.current) {
         return;
       }
       isPollingRef.current = true;
@@ -77,6 +85,9 @@ export function StatsPage() {
       try {
         if (!playerIdRef.current) {
           const snapshot = await player(nickname, analyticsSource);
+          if (cancelled) {
+            return;
+          }
           playerIdRef.current = snapshot.playerId ?? null;
         }
 
@@ -86,23 +97,23 @@ export function StatsPage() {
         }
 
         const matchData = await lastMatch(playerId, analyticsSource);
-        const currentMatchId = matchData.matchId;
-
-        if (!latestMatchIdRef.current) {
-          latestMatchIdRef.current = currentMatchId;
+        if (cancelled) {
           return;
         }
+        const currentMatchId = matchData.matchId;
 
         if (!currentMatchId || currentMatchId === latestMatchIdRef.current) {
           return;
         }
 
-        latestMatchIdRef.current = currentMatchId;
         const nextStats = await requestStats(
           nickname,
           analyticsSource,
           ratingParamForRequest(rating),
         );
+        if (cancelled) {
+          return;
+        }
 
         playerIdRef.current = nextStats.playerId ?? playerIdRef.current;
         latestMatchIdRef.current = nextStats.latestMatchId ?? currentMatchId;
@@ -116,6 +127,8 @@ export function StatsPage() {
 
     const timer = setInterval(pollMatchUpdates, STATS_WIDGET_POLL_MS);
     return () => {
+      cancelled = true;
+      isPollingRef.current = false;
       clearInterval(timer);
     };
   }, [ nickname, rating ]);
