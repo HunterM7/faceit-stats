@@ -46,6 +46,7 @@ jobs:
           host: 212.118.45.215
           username: root
           key: ${{ secrets.VPS_SSH_KEY }}
+          command_timeout: 30m
           script: |
             cd /opt/faceit-stats/server
             HASH=$(md5sum package.json | awk '{print $1}')
