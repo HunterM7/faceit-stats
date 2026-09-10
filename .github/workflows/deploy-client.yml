@@ -3,6 +3,10 @@ name: Deploy client
 on:
   push:
     branches: [main]
+    paths:
+      - "client/**"
+      - "package.json"
+      - ".github/workflows/deploy-client.yml"
 
 jobs:
   deploy:
