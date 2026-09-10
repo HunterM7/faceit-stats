@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - "server/**"
+      - "package.json"
       - ".github/workflows/deploy-server.yml"
 
 jobs:
@@ -47,5 +48,10 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             cd /opt/faceit-stats/server
-            npm install --omit=dev --no-workspaces
+            HASH=$(md5sum package.json | awk '{print $1}')
+            STAMP=$(cat .deps-stamp 2>/dev/null || true)
+            if [ "$HASH" != "$STAMP" ]; then
+              npm install --omit=dev --no-workspaces
+              echo "$HASH" > .deps-stamp
+            fi
             pm2 restart faceit-api
