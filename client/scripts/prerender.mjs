@@ -35,12 +35,12 @@ function applyHead(html, page, pathname) {
   next = setMetaContent(next, 'property', 'og:description', description);
   next = setMetaContent(next, 'name', 'twitter:title', title);
   next = setMetaContent(next, 'name', 'twitter:description', description);
+  if (page.canonical) {
+    next = setMetaContent(next, 'property', 'og:url', page.canonical);
+    next = setLinkHref(next, 'canonical', page.canonical);
+  }
 
   const extra = [];
-  if (page.canonical) {
-    extra.push(`    <meta property="og:url" content="${page.canonical}" />`);
-    extra.push(`    <link rel="canonical" href="${page.canonical}" />`);
-  }
   for (const href of collectCssHrefs(manifest, getPrerenderEntry(pathname))) {
     if (!next.includes(`href="${href}"`)) {
       extra.push(`    <link rel="stylesheet" crossorigin href="${href}">`);
@@ -80,6 +80,14 @@ function setMetaContent(html, attr, key, content) {
     throw new Error(`Не найден meta ${attr}="${key}"`);
   }
   return html.replace(re, `$1${content}$3`);
+}
+
+function setLinkHref(html, rel, href) {
+  const re = new RegExp(`(<link\\s+rel="${rel}"[^>]*href=")([^"]*)(")`, 'i');
+  if (!re.test(html)) {
+    throw new Error(`Не найден link rel="${rel}"`);
+  }
+  return html.replace(re, `$1${href}$3`);
 }
 
 function escapeAttr(value) {

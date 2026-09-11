@@ -14,9 +14,9 @@ interface SiteNavItem {
 }
 
 const SITE_NAV_ITEMS: SiteNavItem[] = [
-  { name: 'Виджет статистики', path: '/widgets/stats' },
-  { name: 'Показ результата матча', path: '/widgets/match-result' },
-  { name: 'Twitch команды', path: '/widgets/twitch-commands' },
+  { name: 'Виджет статистики Faceit', path: '/widgets/stats' },
+  { name: 'Виджет с результатами матча Faceit', path: '/widgets/match-result' },
+  { name: 'Команды Faceit для Twitch', path: '/widgets/twitch-commands' },
 ];
 
 export function buildSoftwareApplicationJsonLd(siteOrigin: string) {
@@ -24,6 +24,7 @@ export function buildSoftwareApplicationJsonLd(siteOrigin: string) {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
     name: SITE_NAME,
+    alternateName: [ 'Виджет Faceit для OBS', 'Фейсит виджет', 'Виджет с результатами матча Faceit' ],
     applicationCategory: 'MultimediaApplication',
     operatingSystem: 'Web',
     offers: {
@@ -31,6 +32,13 @@ export function buildSoftwareApplicationJsonLd(siteOrigin: string) {
       price: '0',
       priceCurrency: 'USD',
     },
+    featureList: [
+      'Виджет Faceit для OBS',
+      'Фейсит виджет для стрима',
+      'Статистика ELO Faceit',
+      'Виджет с результатами матча после игры',
+      'Команды Faceit для Twitch',
+    ],
     description: DEFAULT_PAGE_DESCRIPTION,
     url: siteOrigin || undefined,
   };
@@ -41,7 +49,7 @@ export function buildWebSiteJsonLd(siteOrigin: string) {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: SITE_NAME,
-    alternateName: 'FACEIT виджеты для OBS',
+    alternateName: [ 'Виджет Faceit для OBS', 'Фейсит виджет', 'Виджет с результатами матча Faceit' ],
     url: siteOrigin || undefined,
     description: DEFAULT_PAGE_DESCRIPTION,
     inLanguage: 'ru-RU',

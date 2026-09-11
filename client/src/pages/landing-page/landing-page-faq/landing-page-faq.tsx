@@ -19,7 +19,7 @@ export function LandingPageFaq(props: Props) {
 
   return (
     <section className={classNames('landing-page-faq', className)}>
-      <h2 className='landing-page-faq__title'>Частые вопросы</h2>
+      <h2 className='landing-page-faq__title'>Частые вопросы про виджет Faceit</h2>
       <div className='landing-page-faq__list'>
         {LANDING_FAQ_ITEMS.map((item) => (
           <LandingPageFaqItem

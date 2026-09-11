@@ -1,0 +1,27 @@
+.landing-page-topics {
+  width: min(980px, 100%);
+  margin: 0 auto 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  &__item {
+    padding: 16px 18px;
+    border-radius: 12px;
+    border: 1px solid rgba(170, 185, 230, 0.18);
+    background: rgba(10, 16, 31, 0.35);
+  }
+
+  &__title {
+    margin: 0 0 8px;
+    font-size: clamp(18px, 2.4vw, 22px);
+    line-height: 1.25;
+  }
+
+  &__text {
+    margin: 0;
+    color: rgba(230, 233, 239, 0.86);
+    font-size: 15px;
+    line-height: 1.45;
+  }
+}

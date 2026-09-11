@@ -71,7 +71,7 @@ export function Header(props: Props) {
           className={({ isActive }) => classNames('header__nav-link', isActive && 'header__nav-link--active')}
           onClick={closeMenu}
         >
-          Виджет-оверлей
+          Виджет итогов матча
         </NavLink>
         <NavLink
           to='/widgets/twitch-commands'

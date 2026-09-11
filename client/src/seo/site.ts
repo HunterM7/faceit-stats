@@ -2,11 +2,11 @@
 export const SITE_NAME = 'FACEIT Widgets';
 
 /** Title главной по умолчанию (также в `index.html` для первого paint и ботов). */
-export const DEFAULT_PAGE_TITLE = 'FACEIT Widgets — виджеты статистики для OBS';
+export const DEFAULT_PAGE_TITLE = `Виджет Faceit для OBS — статистика и результаты матча | ${SITE_NAME}`;
 
 /** Description главной по умолчанию (сниппет в выдаче). */
 export const DEFAULT_PAGE_DESCRIPTION =
-  'Бесплатные виджеты FACEIT для стрима: статистика, ELO и итог матча. Добавь в OBS как Browser Source — без регистрации.';
+  'FACEIT Widgets — бесплатные виджеты Faceit для OBS: статистика, ELO и результаты матча после окончания игры. Добавь в OBS — без регистрации.';
 
 /**
  * Базовый URL сайта для canonical / Open Graph.

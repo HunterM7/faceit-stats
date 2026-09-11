@@ -18,14 +18,14 @@ export function LandingPageShowcase(props: Props) {
       <div className='landing-page-showcase__inner'>
         <article className='landing-page-showcase__widget-block' style={widgetBackgroundStyle}>
           <div className='landing-page-showcase__widget-head'>
-            <p className='landing-page-showcase__widget-headline'>Твоя статистика</p>
+            <h2 className='landing-page-showcase__widget-headline'>Виджет статистики Faceit</h2>
           </div>
           <Link to='/widgets/stats' className='landing-page-showcase__widget-cta'>Создать виджет</Link>
         </article>
 
         <article className='landing-page-showcase__widget-block' style={widgetBackgroundStyle}>
           <div className='landing-page-showcase__widget-head'>
-            <p className='landing-page-showcase__widget-headline'>Итог матча</p>
+            <h2 className='landing-page-showcase__widget-headline'>Виджет с результатами матча Faceit</h2>
           </div>
           <Link to='/widgets/match-result' className='landing-page-showcase__widget-cta'>Создать виджет</Link>
         </article>

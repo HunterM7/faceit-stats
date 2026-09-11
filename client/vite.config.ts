@@ -50,7 +50,7 @@ export default defineConfig(({ command, isSsrBuild }) => ({
     ? { outDir: 'dist-ssr', emptyOutDir: true }
     : { manifest: true },
   server: {
-    host: 'localhost',
+    host: '127.0.0.1',
     port: 5173,
     strictPort: true,
   },

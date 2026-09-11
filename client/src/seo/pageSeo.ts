@@ -22,21 +22,21 @@ export const PAGE_SEO_BY_PATH: Record<string, PageSeo> = {
     landingJsonLd: true,
   },
   '/widgets/stats': {
-    title: 'Виджет статистики FACEIT — для OBS и стрима',
+    title: `Виджет статистики Faceit для OBS | ${SITE_NAME}`,
     description:
-      'Покажи на стриме ELO, уровень и статистику FACEIT. Скопируй ссылку и добавь Browser Source в OBS — без регистрации.',
+      'FACEIT Widgets — фейсит виджет статистики для OBS: ELO, уровень Faceit и последние матчи CS2 на стриме. Скопируй ссылку и добавь в OBS — без регистрации.',
     robots: INDEXABLE,
   },
   '/widgets/match-result': {
-    title: 'Итог матча FACEIT — оверлей для OBS',
+    title: `Виджет с результатами матча Faceit для OBS | ${SITE_NAME}`,
     description:
-      'Оверлей после матча: победа или поражение, изменение ELO и уровень. Вставь ссылку в OBS как Browser Source.',
+      'FACEIT Widgets — виджет с результатами матча Faceit после окончания игры: победа или поражение, изменение ELO и уровень. Вставь ссылку в OBS.',
     robots: INDEXABLE,
   },
   '/widgets/twitch-commands': {
-    title: 'Команды FACEIT для Twitch — ELO в чате',
+    title: `Команды Faceit для Twitch | ${SITE_NAME}`,
     description:
-      'Готовый код для Nightbot и StreamElements: ELO и статистика FACEIT в чате Twitch. Скопируй и вставь в бота.',
+      'FACEIT Widgets — команды фейсит виджета для Twitch: ELO и статистика Faceit в чате. Готовый код для Nightbot и StreamElements.',
     robots: INDEXABLE,
   },
   '/stats': {

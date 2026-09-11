@@ -287,12 +287,12 @@ export function StatsWidgetPageContent(props: StatsWidgetPageContentProps) {
     <div className={classNames('stats-widget-page-content', className)}>
       <header className='stats-widget-page-content__hero'>
         <div className='stats-widget-page-content__hero-copy'>
-          <h1 className='stats-widget-page-content__hero-title'>Виджет статистики</h1>
+          <h1 className='stats-widget-page-content__hero-title'>Виджет статистики Faceit для OBS</h1>
           <p className='stats-widget-page-content__hero-lead'>
-            ELO, уровень и статистика FACEIT на стриме — за сегодня и за последние 30 матчей.
+            Фейсит виджет FACEIT Widgets: ELO, уровень и статистика CS2 на стриме — за сегодня и за последние 30 матчей.
           </p>
           <p className='stats-widget-page-content__hero-lead'>
-            Данные обновляются автоматически в реальном времени.
+            Данные обновляются автоматически. Скопируй ссылку и добавь в OBS.
           </p>
         </div>
       </header>

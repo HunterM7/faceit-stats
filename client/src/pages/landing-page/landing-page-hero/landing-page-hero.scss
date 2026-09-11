@@ -14,14 +14,21 @@
   }
 
   &__title {
-    margin: 0 0 12px;
+    margin: 0 0 8px;
     font-size: clamp(30px, 5vw, 52px);
     line-height: 1.05;
   }
 
+  &__brand {
+    margin: 0 0 12px;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    color: rgba(230, 233, 239, 0.72);
+  }
+
   &__subtitle {
     margin: 0;
-    max-width: 760px;
     color: rgba(230, 233, 239, 0.86);
     font-size: 18px;
     line-height: 1.3;
