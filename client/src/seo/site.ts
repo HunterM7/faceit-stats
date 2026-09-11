@@ -22,3 +22,45 @@ export function getSiteOrigin(): string {
   }
   return '';
 }
+
+const CANONICAL_TRAILING_SLASH_PATHS = new Set([
+  '/widgets/stats',
+  '/widgets/match-result',
+  '/widgets/twitch-commands',
+]);
+
+/**
+ * Pathname для карты SEO: без завершающего `/`, кроме корня.
+ * Nginx отдаёт `/widgets/stats/` — ключи в `PAGE_SEO_BY_PATH` без слэша.
+ */
+export function normalizeSeoPathname(pathname: string): string {
+  if (pathname.length > 1 && pathname.endsWith('/')) {
+    return pathname.slice(0, -1);
+  }
+  return pathname;
+}
+
+/**
+ * Путь канонического URL: тот, что отвечает 200 (для виджетов — со слэшем, как после 301 nginx).
+ */
+export function getCanonicalPath(pathname: string): string {
+  const normalized = normalizeSeoPathname(pathname);
+  if (normalized === '/') {
+    return '/';
+  }
+  if (CANONICAL_TRAILING_SLASH_PATHS.has(normalized)) {
+    return `${normalized}/`;
+  }
+  return normalized;
+}
+
+/**
+ * Абсолютный canonical / og:url или пустая строка, если origin неизвестен.
+ */
+export function getCanonicalUrl(pathname: string): string {
+  const origin = getSiteOrigin();
+  if (!origin) {
+    return '';
+  }
+  return `${origin}${getCanonicalPath(pathname)}`;
+}

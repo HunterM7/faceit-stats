@@ -1,6 +1,6 @@
 import { LANDING_FAQ_ITEMS } from './landingFaq';
 import { LANDING_HOWTO_DESCRIPTION, LANDING_HOWTO_NAME, LANDING_HOWTO_STEPS } from './landingHowTo';
-import { DEFAULT_PAGE_DESCRIPTION, SITE_NAME, getSiteOrigin } from './site';
+import { DEFAULT_PAGE_DESCRIPTION, SITE_NAME, getCanonicalPath, getSiteOrigin } from './site';
 
 const SOFTWARE_JSON_LD_ID = 'seo-jsonld-software';
 const FAQ_JSON_LD_ID = 'seo-jsonld-faq';
@@ -68,7 +68,7 @@ export function buildSiteNavigationJsonLd(siteOrigin: string) {
       '@type': 'SiteNavigationElement',
       position: index + 1,
       name: item.name,
-      url: `${siteOrigin}${item.path}`,
+      url: `${siteOrigin}${getCanonicalPath(item.path)}`,
     })),
   };
 }

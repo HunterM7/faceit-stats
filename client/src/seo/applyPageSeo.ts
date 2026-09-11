@@ -1,6 +1,6 @@
 import { removeLandingPageJsonLd, upsertLandingJsonLd, upsertSoftwareJsonLd } from './landingJsonLd';
 import { FALLBACK_PAGE_SEO, PAGE_SEO_BY_PATH, type PageSeo } from './pageSeo';
-import { SITE_NAME, getSiteOrigin } from './site';
+import { SITE_NAME, getCanonicalUrl, getSiteOrigin, normalizeSeoPathname } from './site';
 
 const OG_IMAGE_PATH = '/og-image.png';
 
@@ -9,9 +9,9 @@ const OG_IMAGE_PATH = '/og-image.png';
  * (title, description, robots, canonical, Open Graph, Twitter).
  */
 export function applyPageSeo(pathname: string): void {
-  const seo = PAGE_SEO_BY_PATH[pathname] ?? FALLBACK_PAGE_SEO;
+  const seo = PAGE_SEO_BY_PATH[normalizeSeoPathname(pathname)] ?? FALLBACK_PAGE_SEO;
   const origin = getSiteOrigin();
-  const canonicalUrl = origin ? `${origin}${pathname === '/' ? '/' : pathname}` : '';
+  const canonicalUrl = getCanonicalUrl(pathname);
   const ogImageUrl = origin ? `${origin}${OG_IMAGE_PATH}` : OG_IMAGE_PATH;
 
   document.title = seo.title;
@@ -48,7 +48,7 @@ export function applyPageSeo(pathname: string): void {
 }
 
 export function getPageSeo(pathname: string): PageSeo {
-  return PAGE_SEO_BY_PATH[pathname] ?? FALLBACK_PAGE_SEO;
+  return PAGE_SEO_BY_PATH[normalizeSeoPathname(pathname)] ?? FALLBACK_PAGE_SEO;
 }
 
 function setMetaByName(name: string, content: string): void {

@@ -5,7 +5,7 @@ import { OverlayWidgetPage } from '@pages/overlay-widget-page/overlay-widget-pag
 import { StatsWidgetPage } from '@pages/stats-widget-page/stats-widget-page';
 import { TwitchCommandsPage } from '@pages/twitch-commands-page/twitch-commands-page';
 import { PAGE_SEO_BY_PATH } from '@/seo/pageSeo';
-import { getSiteOrigin } from '@/seo/site';
+import { getCanonicalUrl } from '@/seo/site';
 
 const PRERENDER_PAGES = {
   '/': { Page: LandingPage, entry: 'src/pages/landing-page/landing-page.tsx' },
@@ -31,7 +31,6 @@ export function render(pathname: keyof typeof PRERENDER_PAGES) {
   if (!seo) {
     throw new Error(`Нет SEO для ${pathname}`);
   }
-  const origin = getSiteOrigin();
   return {
     html: renderToString(
       <StaticRouter location={pathname}>
@@ -40,6 +39,6 @@ export function render(pathname: keyof typeof PRERENDER_PAGES) {
     ),
     title: seo.title,
     description: seo.description,
-    canonical: origin ? `${origin}${pathname === '/' ? '/' : pathname}` : '',
+    canonical: getCanonicalUrl(pathname),
   };
 }
