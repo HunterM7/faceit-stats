@@ -4,6 +4,7 @@ node_modules/
 # build outputs
 dist/
 client/dist/
+client/dist-ssr/
 server/dist/
 
 # env and local state

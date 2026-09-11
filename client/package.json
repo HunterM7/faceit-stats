@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && npm run prerender",
+    "prerender": "vite build --ssr src/entry-server.tsx && node scripts/prerender.mjs",
     "lint": "eslint . && npm run lint:styles",
     "lint:styles": "stylelint \"src/**/*.scss\"",
     "preview": "vite preview"

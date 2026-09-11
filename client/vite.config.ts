@@ -1,13 +1,28 @@
-import { defineConfig } from 'vite';
+import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import viteChecker from 'vite-plugin-checker';
 import path from 'path';
 
+function ssrCssNoop(): Plugin {
+  return {
+    name: 'ssr-css-noop',
+    apply: 'build',
+    enforce: 'pre',
+    transform(_code, id) {
+      if (!/\.(css|scss)(?:$|\?)/.test(id)) {
+        return;
+      }
+      return { code: 'export default {}', map: null };
+    },
+  };
+}
+
 // https://vite.dev/config/
-export default defineConfig(({ command }) => ({
+export default defineConfig(({ command, isSsrBuild }) => ({
   cacheDir: path.resolve(__dirname, '../.cache/vite-client'),
   plugins: [
     react(),
+    ...(isSsrBuild ? [ ssrCssNoop() ] : []),
     ...(command === 'serve' ? [
       viteChecker({
         typescript: {
@@ -31,6 +46,9 @@ export default defineConfig(({ command }) => ({
       '@images': path.resolve(__dirname, 'src/images'),
     },
   },
+  build: isSsrBuild
+    ? { outDir: 'dist-ssr', emptyOutDir: true }
+    : { manifest: true },
   server: {
     host: 'localhost',
     port: 5173,
