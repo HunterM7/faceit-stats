@@ -64,6 +64,19 @@
       0 0 0.32em rgba(0, 0, 0, 0.5);
   }
 
+  &__elo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2em;
+  }
+
+  &__elo-icon {
+    width: 1em;
+    height: 0.5em;
+    margin-top: 0.12em;
+  }
+
   &__result-label {
     &--win {
       color: #5bff5b;
@@ -115,11 +128,17 @@
 
     &--show {
       opacity: 1;
+      transform: translateY(0);
     }
 
     &--hidden {
       opacity: 0;
       transform: translateY(0.09em);
+    }
+
+    &--dismiss {
+      opacity: 0;
+      transform: translateY(-0.09em);
     }
 
     &--positive {
@@ -163,6 +182,10 @@
 
       &--hidden {
         transform: translateY(6px);
+      }
+
+      &--dismiss {
+        transform: translateY(-6px);
       }
     }
   }

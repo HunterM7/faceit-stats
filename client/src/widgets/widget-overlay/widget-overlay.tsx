@@ -1,4 +1,5 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { EloIcon } from '@components/elo-icon/elo-icon';
 import { WidgetOverlayLevelIcon } from './widget-overlay-level-icon/widget-overlay-level-icon';
 import { WidgetOverlayParticles } from './widget-overlay-particles/widget-overlay-particles';
 import './widget-overlay.scss';
@@ -35,6 +36,8 @@ interface Ref {
 
 type OverlayDisplayMode = 'stats' | 'result-label';
 
+enum OverlayDeltaMotion { Hidden, Show, Dismiss }
+
 type EloOverlayTick =
   | { kind: 'static'; elo: number | null; delta: number | null; skillLevel: number | null }
   | {
@@ -59,7 +62,7 @@ export const WidgetOverlay = forwardRef<Ref>((_props, ref) => {
   const [ skillLevel, setSkillLevel ] = useState<number | null>(null);
   const [ eloDisplay, setEloDisplay ] = useState<number | null>(null);
   const [ deltaDisplay, setDeltaDisplay ] = useState<number | null>(null);
-  const [ isDeltaVisible, setIsDeltaVisible ] = useState(false);
+  const [ deltaMotion, setDeltaMotion ] = useState(OverlayDeltaMotion.Hidden);
   const [ burstSeed, setBurstSeed ] = useState(0);
 
   const eloAnimationFrameRef = useRef<number | null>(null);
@@ -90,7 +93,7 @@ export const WidgetOverlay = forwardRef<Ref>((_props, ref) => {
     if (tick.kind === 'static') {
       setEloDisplay(tick.elo);
       setDeltaDisplay(tick.delta);
-      setIsDeltaVisible(typeof tick.delta === 'number');
+      setDeltaMotion(typeof tick.delta === 'number' ? OverlayDeltaMotion.Show : OverlayDeltaMotion.Hidden);
       setSkillLevel(tick.skillLevel);
       return;
     }
@@ -101,25 +104,34 @@ export const WidgetOverlay = forwardRef<Ref>((_props, ref) => {
 
     setEloDisplay(fromElo);
     setDeltaDisplay(delta);
-    setIsDeltaVisible(false);
+    setDeltaMotion(OverlayDeltaMotion.Hidden);
     setSkillLevel(fromLevel);
 
+    let deltaDismissed = false;
     const step = (startTime: number, now: number) => {
       const progress = Math.min(1, (now - startTime) / durationMs);
       const eased = 1 - ((1 - progress) ** 3);
+      const nextDelta = Math.round(delta * (1 - eased));
       setEloDisplay(Math.round(fromElo + (diff * eased)));
-      setDeltaDisplay(Math.round(delta * (1 - eased)));
+      setDeltaDisplay(nextDelta);
+
+      if (!deltaDismissed && nextDelta === 0) {
+        deltaDismissed = true;
+        setDeltaMotion(OverlayDeltaMotion.Dismiss);
+      }
 
       if (progress < 1) {
         eloAnimationFrameRef.current = window.requestAnimationFrame((frameNow) => step(startTime, frameNow));
       } else {
-        setDeltaDisplay(0);
         eloAnimationFrameRef.current = null;
+        if (!deltaDismissed) {
+          setDeltaMotion(OverlayDeltaMotion.Dismiss);
+        }
       }
     };
 
     eloAnimationDelayTimeoutRef.current = window.setTimeout(() => {
-      setIsDeltaVisible(true);
+      setDeltaMotion(OverlayDeltaMotion.Show);
       eloAnimationStartTimeoutRef.current = window.setTimeout(() => {
         eloAnimationStartTimeoutRef.current = null;
         setSkillLevel(toLevel ?? fromLevel);
@@ -202,12 +214,23 @@ export const WidgetOverlay = forwardRef<Ref>((_props, ref) => {
               </div>
             ) : (
               <>
-                <div className='widget-overlay__elo'>{eloDisplay ?? '--'} ELO</div>
+                <div className='widget-overlay__elo'>
+                  <EloIcon className='widget-overlay__elo-icon'/>
+                  {eloDisplay ?? '--'}
+                </div>
                 <div className='widget-overlay__level'>
                   <WidgetOverlayLevelIcon skillLevel={skillLevel} result={result}/>
                 </div>
-                <div className={`${result === 'LOSS' ? 'widget-overlay__delta widget-overlay__delta--negative' : 'widget-overlay__delta widget-overlay__delta--positive'} ${isDeltaVisible ? 'widget-overlay__delta--show' : 'widget-overlay__delta--hidden'}`}>
-                  {eloDeltaText} ELO
+                <div
+                  className={classNames(
+                    'widget-overlay__delta',
+                    result === 'LOSS' ? 'widget-overlay__delta--negative' : 'widget-overlay__delta--positive',
+                    deltaMotion === OverlayDeltaMotion.Show && 'widget-overlay__delta--show',
+                    deltaMotion === OverlayDeltaMotion.Hidden && 'widget-overlay__delta--hidden',
+                    deltaMotion === OverlayDeltaMotion.Dismiss && 'widget-overlay__delta--dismiss',
+                  )}
+                >
+                  {eloDeltaText}
                 </div>
               </>
             )}
