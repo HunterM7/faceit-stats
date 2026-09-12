@@ -71,7 +71,9 @@ export async function player(nickname: string, source?: WidgetSource): Promise<P
     cache: 'no-store',
   });
   if (!response.ok) {
-    throw new Error(await parseErrorMessage(response));
+    const error = new Error(await parseErrorMessage(response)) as Error & { status: number };
+    error.status = response.status;
+    throw error;
   }
   return (await response.json()) as PlayerPayload;
 }

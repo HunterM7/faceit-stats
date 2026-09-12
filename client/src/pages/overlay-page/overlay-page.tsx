@@ -18,8 +18,11 @@ const pollMs = 1500;
 /** FACEIT часто отдаёт старый ELO сразу после матча — ждём смену, не списывая ID. */
 const eloLagRetryMs = 40000;
 
-function captureErrorMessage(error: unknown, fallback: string): string {
-  return error instanceof Error ? error.message : fallback;
+function isPlayerNotFoundError(error: unknown): boolean {
+  return typeof error === 'object'
+    && error !== null
+    && 'status' in error
+    && (error as { status: unknown }).status === 404;
 }
 
 export function OverlayPage() {
@@ -83,6 +86,7 @@ export function OverlayPage() {
     let lastKnownLevel: number | null = null;
     let playerId: string | null = null;
     let pollTimer: number | null = null;
+    let retryTimer: number | null = null;
     let cancelled = false;
     let eloWaitStartedAt = 0;
     let eloWaitMatchId: string | null = null;
@@ -165,34 +169,51 @@ export function OverlayPage() {
       }
     };
 
-    const bootstrap = async () => {
-      try {
-        const playerPayload = await player(nickname, analyticsSource);
-        if (cancelled) {
-          return;
-        }
-        playerId = typeof playerPayload.playerId === 'string' ? playerPayload.playerId : null;
-        if (!playerId) {
-          setOverlayLoadError('Игрок не найден. Проверьте никнейм FACEIT.');
-          return;
-        }
-        lastKnownElo = typeof playerPayload.currentElo === 'number' ? playerPayload.currentElo : null;
-        lastKnownLevel = typeof playerPayload.currentSkillLevel === 'number' ? playerPayload.currentSkillLevel : null;
-
-        const matchData = await lastMatch(playerId, analyticsSource);
-        if (cancelled) {
-          return;
-        }
-        if (matchData.matchId) {
-          lastMatchId = matchData.matchId;
-        }
-
-        pollTimer = window.setInterval(() => void pollLastMatch(), pollMs);
-      } catch (error) {
-        if (!cancelled) {
-          setOverlayLoadError(captureErrorMessage(error, 'Не удалось загрузить игрока.'));
-        }
+    const startPolling = () => {
+      if (cancelled || pollTimer !== null) {
+        return;
       }
+      pollTimer = window.setInterval(() => void pollLastMatch(), pollMs);
+    };
+
+    const bootstrap = () => {
+      player(nickname, analyticsSource)
+        .then((playerPayload) => {
+          if (cancelled) {
+            return;
+          }
+          playerId = typeof playerPayload.playerId === 'string' ? playerPayload.playerId : null;
+          if (!playerId) {
+            setOverlayLoadError('Игрок не найден. Проверьте никнейм FACEIT.');
+            return;
+          }
+          lastKnownElo = typeof playerPayload.currentElo === 'number' ? playerPayload.currentElo : null;
+          lastKnownLevel = typeof playerPayload.currentSkillLevel === 'number' ? playerPayload.currentSkillLevel : null;
+          return lastMatch(playerId, analyticsSource);
+        })
+        .then((matchData) => {
+          if (cancelled || !playerId) {
+            return;
+          }
+          if (matchData?.matchId) {
+            lastMatchId = matchData.matchId;
+          }
+          startPolling();
+        })
+        .catch((error: unknown) => {
+          if (cancelled) {
+            return;
+          }
+          if (playerId) {
+            startPolling();
+            return;
+          }
+          if (isPlayerNotFoundError(error) && error instanceof Error) {
+            setOverlayLoadError(error.message);
+            return;
+          }
+          retryTimer = window.setTimeout(() => void bootstrap(), pollMs);
+        });
     };
 
     void bootstrap();
@@ -202,6 +223,9 @@ export function OverlayPage() {
       window.cancelAnimationFrame(resetLoadErrorRaf);
       if (pollTimer) {
         window.clearInterval(pollTimer);
+      }
+      if (retryTimer) {
+        window.clearTimeout(retryTimer);
       }
       window.requestAnimationFrame(() => {
         setOverlayMatch(null);

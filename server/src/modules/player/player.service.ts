@@ -1,4 +1,5 @@
 import { BadGatewayException, BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { isAxiosError } from 'axios';
 import { StatsService } from '../../stats/stats.service';
 
 @Injectable()
@@ -14,8 +15,7 @@ export class PlayerService {
     try {
       return await this.statsService.getPlayerSnapshotByNickname(normalizedNickname);
     } catch (error: unknown) {
-      const errorMessage = (error as Error).message || '';
-      if (/404|not found|player/i.test(errorMessage)) {
+      if (isAxiosError(error) && error.response?.status === 404) {
         throw new NotFoundException('Игрок не найден. Проверьте никнейм FACEIT.');
       }
       throw new BadGatewayException('Не удалось получить данные игрока. Попробуйте позже.');
