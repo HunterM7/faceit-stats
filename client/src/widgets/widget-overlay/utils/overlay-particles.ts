@@ -12,8 +12,8 @@ export interface OverlayParticle {
   pulseScale: number;
 }
 
-const GRID_COLUMNS: number = 24;
-const GRID_ROWS: number = 14;
+const GRID_COLUMNS: number = 18;
+const GRID_ROWS: number = 10;
 const GRID_SPREAD_X_CQW: number = 48;
 const GRID_SPREAD_Y_CQH: number = 46;
 

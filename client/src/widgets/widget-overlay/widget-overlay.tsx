@@ -206,7 +206,7 @@ export const WidgetOverlay = forwardRef<Ref, Props>((props, ref) => {
   return (
     <div className='widget-overlay'>
       <div className={`widget-overlay__stage ${visible ? 'widget-overlay__stage--show' : 'widget-overlay__stage--hidden'}`}>
-        {particles && <WidgetOverlayParticles burstKey={burstSeed} result={result}/>}
+        {particles && <WidgetOverlayParticles burstKey={burstSeed}/>}
         <div
           key={burstSeed}
           className={classNames('widget-overlay__notice', result == 'LOSS' ? 'widget-overlay__notice--loss' : 'widget-overlay__notice--win')}

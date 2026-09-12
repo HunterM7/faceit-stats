@@ -2,22 +2,16 @@
   position: absolute;
   inset: 0;
   overflow: hidden;
-  filter: drop-shadow(0 0 1.5cqh rgba(255, 255, 255, 0.42));
-
-  &--win {
-    color: #ff6f3e;
-  }
-
-  &--loss {
-    color: #ff4f6b;
-  }
+  opacity: 0.45;
+  color: #9e9e9e;
+  filter: drop-shadow(0 0 1.2cqh rgba(197, 201, 209, 0.4));
 
   &__particle {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 3cqh;
-    height: 3cqh;
+    width: 2.2cqh;
+    height: 2.2cqh;
     opacity: 0;
     transform: translate(calc(-50% + var(--particle-x)), calc(-50% + var(--particle-y)))
       scale(0.72);
@@ -44,11 +38,11 @@
 
 @supports not (width: 1cqh) {
   .widget-overlay-particles {
-    filter: drop-shadow(0 0 14px rgba(255, 255, 255, 0.42));
+    filter: drop-shadow(0 0 12px rgba(197, 201, 209, 0.4));
 
     &__particle {
-      width: 30px;
-      height: 30px;
+      width: 22px;
+      height: 22px;
     }
   }
 }

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { classNames } from '@/utils/classNames';
 import { widgetOverlaySkillLevelColor } from './widget-overlay-level-icon-colors';
 import {
@@ -76,7 +76,10 @@ export function WidgetOverlayLevelIcon(props: WidgetOverlayLevelIconProps) {
   const accentColor = widgetOverlaySkillLevelColor(skillLevel);
 
   return (
-    <div className={classNames('widget-overlay-level-icon', className)}>
+    <div
+      className={classNames('widget-overlay-level-icon', className)}
+      style={{ '--widget-overlay-level-icon-glow': accentColor } as CSSProperties}
+    >
       <svg className='widget-overlay-level-icon__chart' viewBox='0 0 24 24'>
         <circle className='widget-overlay-level-icon__bg' cx={cx} cy={cy} r='12'/>
         <circle

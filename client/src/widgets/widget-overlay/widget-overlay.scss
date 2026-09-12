@@ -70,6 +70,7 @@
     justify-content: center;
     gap: 0.2em;
     margin-top: 0.22em;
+    filter: drop-shadow(0 0 0.22em rgba(255, 255, 255, 0.5));
   }
 
   &__elo-icon {
@@ -87,10 +88,10 @@
     }
 
     &--loss {
-      color: #ff5466;
+      color: #ff3b3b;
       text-shadow:
         0 0.04em 0.16em rgba(0, 0, 0, 0.9),
-        0 0 0.3em rgba(255, 84, 102, 0.28);
+        0 0 0.3em rgba(255, 59, 59, 0.28);
     }
   }
 
@@ -130,16 +131,18 @@
 
     &--positive {
       color: #5bff5b;
+      filter: drop-shadow(0 0 0.22em rgba(91, 255, 91, 0.55));
       text-shadow:
         0 0.06em 0.2em rgba(0, 0, 0, 0.96),
         0 0 0.3em rgba(74, 255, 74, 0.32);
     }
 
     &--negative {
-      color: #ff5466;
+      color: #ff3b3b;
+      filter: drop-shadow(0 0 0.22em rgba(255, 59, 59, 0.55));
       text-shadow:
         0 0.06em 0.2em rgba(0, 0, 0, 0.96),
-        0 0 0.3em rgba(255, 84, 102, 0.28);
+        0 0 0.3em rgba(255, 59, 59, 0.28);
     }
   }
 }
