@@ -176,10 +176,8 @@ export function OverlayPage() {
           setOverlayLoadError('Игрок не найден. Проверьте никнейм FACEIT.');
           return;
         }
-        lastKnownElo =
-          typeof playerPayload.currentElo === 'number' ? playerPayload.currentElo : null;
-        const initialLevel = typeof playerPayload.currentSkillLevel === 'number' ? playerPayload.currentSkillLevel : null;
-        lastKnownLevel = initialLevel;
+        lastKnownElo = typeof playerPayload.currentElo === 'number' ? playerPayload.currentElo : null;
+        lastKnownLevel = typeof playerPayload.currentSkillLevel === 'number' ? playerPayload.currentSkillLevel : null;
 
         const matchData = await lastMatch(playerId, analyticsSource);
         if (cancelled) {
@@ -187,13 +185,6 @@ export function OverlayPage() {
         }
         if (matchData.matchId) {
           lastMatchId = matchData.matchId;
-        }
-        if (matchData.matchId && typeof lastKnownElo === 'number') {
-          publishMatch(null, {
-            elo: lastKnownElo,
-            skillLevel: initialLevel,
-            result: overlayResultFromApi(matchData.result),
-          });
         }
 
         pollTimer = window.setInterval(() => void pollLastMatch(), pollMs);
