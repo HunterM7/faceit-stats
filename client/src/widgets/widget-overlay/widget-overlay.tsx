@@ -221,12 +221,12 @@ export const WidgetOverlay = forwardRef<Ref, Props>((props, ref) => {
               </div>
             ) : (
               <>
+                <div className='widget-overlay__level'>
+                  <WidgetOverlayLevelIcon skillLevel={skillLevel} result={result}/>
+                </div>
                 <div className='widget-overlay__elo'>
                   <EloIcon className='widget-overlay__elo-icon'/>
                   {eloDisplay ?? '--'}
-                </div>
-                <div className='widget-overlay__level'>
-                  <WidgetOverlayLevelIcon skillLevel={skillLevel} result={result}/>
                 </div>
                 <div
                   className={classNames(

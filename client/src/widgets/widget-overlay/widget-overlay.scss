@@ -39,7 +39,9 @@
   }
 
   &__anchor {
-    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     font-size: calc(7cqh * var(--overlay-scale));
     opacity: 0;
     transform: scale(calc(var(--overlay-scale) * 1.02));
@@ -49,8 +51,6 @@
 
   &__elo,
   &__result-label {
-    position: relative;
-    z-index: 1;
     margin: 0;
     font-size: 1em;
     line-height: 1;
@@ -69,6 +69,7 @@
     align-items: center;
     justify-content: center;
     gap: 0.2em;
+    margin-top: 0.22em;
   }
 
   &__elo-icon {
@@ -94,25 +95,11 @@
   }
 
   &__level {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: calc(100% + 0.22em);
-    z-index: 1;
-    width: 150px;
-    margin: 0 auto;
-    transform: scale(calc(11.55cqh * var(--overlay-scale) / 150px));
-    transform-origin: center bottom;
+    zoom: calc(11.55cqh * var(--overlay-scale) / 150px);
   }
 
   &__delta {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: calc(100% + 0.14em);
-    z-index: 1;
-    width: fit-content;
-    margin: 0 auto;
+    margin-top: 0.14em;
     font-size: 0.86em;
     line-height: 1;
     font-weight: 900;
@@ -170,12 +157,10 @@
     }
 
     &__level {
-      bottom: calc(100% + 14px);
-      transform: scale(calc(12.2vh * var(--overlay-scale) / 150px));
+      zoom: calc(12.2vh * var(--overlay-scale) / 150px);
     }
 
     &__delta {
-      top: calc(100% + 6px);
       letter-spacing: 0.8px;
       -webkit-text-stroke: 2px rgba(8, 10, 16, 0.95);
       text-shadow: 0 4px 14px rgba(0, 0, 0, 0.96), 0 0 26px rgba(0, 0, 0, 0.62);
