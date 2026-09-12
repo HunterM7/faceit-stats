@@ -30,7 +30,9 @@ export function OverlayPage() {
   const [ searchParams, setSearchParams ] = useSearchParams();
   const rawNickname = searchParams.get('nickname');
   const rawTest = searchParams.get('test');
+  const rawParticles = searchParams.get('particles');
   const isTestMode = rawTest === 'true';
+  const showParticles = rawParticles !== 'false';
   const nickname = rawNickname?.trim() ?? '';
   const missingNicknameMessage = !isTestMode && !nickname
     ? 'Похоже, что ты не указал свой FACEIT-ник. Добавь его в адресной строке после nickname='
@@ -49,10 +51,14 @@ export function OverlayPage() {
     if (rawTest !== null) {
       nextParams.set('test', rawTest === 'true' ? 'true' : 'false');
     }
+    if (rawParticles !== null) {
+      nextParams.set('particles', rawParticles === 'false' ? 'false' : 'true');
+    }
 
     const hasNicknameWithoutEquals = /(?:\?|&)nickname(?:&|$)/.test(location.search);
     const hasTestWithoutEquals = /(?:\?|&)test(?:&|$)/.test(location.search);
-    if (hasNicknameWithoutEquals || hasTestWithoutEquals || nextParams.toString() !== searchParams.toString()) {
+    const hasParticlesWithoutEquals = /(?:\?|&)particles(?:&|$)/.test(location.search);
+    if (hasNicknameWithoutEquals || hasTestWithoutEquals || hasParticlesWithoutEquals || nextParams.toString() !== searchParams.toString()) {
       setSearchParams(nextParams, { replace: true });
       return;
     }
@@ -237,6 +243,7 @@ export function OverlayPage() {
     location.search,
     nickname,
     rawNickname,
+    rawParticles,
     rawTest,
     searchParams,
     setSearchParams,
@@ -281,7 +288,7 @@ export function OverlayPage() {
           <div className='overlay-page__error-message'>{blockingMessage}</div>
         </div>
       ) : (
-        <WidgetOverlay ref={widgetOverlayRef}/>
+        <WidgetOverlay ref={widgetOverlayRef} particles={showParticles}/>
       )}
     </div>
   );

@@ -29,6 +29,11 @@ interface ShowMatchResultParams {
   result: 'WIN' | 'LOSS';
 }
 
+interface Props {
+  /** Фоновые частицы при показе результата. По умолчанию включены. */
+  particles?: boolean | undefined;
+}
+
 interface Ref {
   /** Запускает анимацию результатов последнего матча (победа/поражение). */
   showMatchResult(params: ShowMatchResultParams): void;
@@ -50,7 +55,9 @@ type EloOverlayTick =
   };
 
 /** Виджет-оверлей с показом результатов последнего матча. */
-export const WidgetOverlay = forwardRef<Ref>((_props, ref) => {
+export const WidgetOverlay = forwardRef<Ref, Props>((props, ref) => {
+  const { particles = true } = props;
+
   const previewMs = WIDGET_OVERLAY_PREVIEW_MS;
   const deltaLeadInMs = WIDGET_OVERLAY_DELTA_LEAD_IN_MS;
   const counterDurationMs = WIDGET_OVERLAY_COUNTER_DURATION_MS;
@@ -199,7 +206,7 @@ export const WidgetOverlay = forwardRef<Ref>((_props, ref) => {
   return (
     <div className='widget-overlay'>
       <div className={`widget-overlay__stage ${visible ? 'widget-overlay__stage--show' : 'widget-overlay__stage--hidden'}`}>
-        <WidgetOverlayParticles burstKey={burstSeed} result={result}/>
+        {particles && <WidgetOverlayParticles burstKey={burstSeed} result={result}/>}
         <div
           key={burstSeed}
           className={classNames('widget-overlay__notice', result == 'LOSS' ? 'widget-overlay__notice--loss' : 'widget-overlay__notice--win')}

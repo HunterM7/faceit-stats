@@ -21,6 +21,7 @@ export function OverlayWidgetPageContent(props: OverlayWidgetPageContentProps) {
 
   const [ nickname, setNickname ] = useState(() => nicknameStorage.get(''));
   const [ testMode, setTestMode ] = useState<BoolSetting>('false');
+  const [ particles, setParticles ] = useState(true);
 
   const handleNicknameChange = (value: string) => {
     setNickname(value);
@@ -47,7 +48,7 @@ export function OverlayWidgetPageContent(props: OverlayWidgetPageContentProps) {
 
       <div className='overlay-widget-page-content__metrics'>
         <Section title='Предпросмотр' className='overlay-widget-page-content__preview-section overlay-widget-page-content__metrics-preview'>
-          <OverlayWidgetPageContentPreview nickname={nickname}/>
+          <OverlayWidgetPageContentPreview nickname={nickname} particles={particles}/>
         </Section>
 
         <Section title='Параметры виджета' className='overlay-widget-page-content__metrics-params'>
@@ -65,6 +66,19 @@ export function OverlayWidgetPageContent(props: OverlayWidgetPageContentProps) {
                 onChange={handleNicknameChange}
                 placeholder='например: s1mple'
                 autoComplete='nickname'
+              />
+            </div>
+            <div className='overlay-widget-page-content__field'>
+              <p className='overlay-widget-page-content__input-label overlay-widget-page-content__input-label--in-field'>
+                Частицы
+              </p>
+              <Select
+                value={particles}
+                options={[
+                  { value: true, label: 'Включены' },
+                  { value: false, label: 'Выключены' },
+                ]}
+                onChange={setParticles}
               />
             </div>
             <div className='overlay-widget-page-content__field'>
@@ -90,6 +104,7 @@ export function OverlayWidgetPageContent(props: OverlayWidgetPageContentProps) {
           className='overlay-widget-page-content__metrics-link'
           nickname={nickname}
           testMode={testMode}
+          particles={particles}
         />
       </div>
 

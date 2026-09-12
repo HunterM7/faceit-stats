@@ -2,12 +2,16 @@ import { type ComponentRef, useEffect, useRef } from 'react';
 import { WidgetOverlay } from '@widgets/widget-overlay/widget-overlay';
 import { useOverlayTestMatchCycle } from '@widgets/widget-overlay/use-overlay-test-match-cycle';
 
-type OverlayWidgetPageContentPreviewProps = {
+interface OverlayWidgetPageContentPreviewProps {
+  /** Ник FACEIT — без него превью не показывается. */
   nickname: string;
-};
+  /** Показывать фоновые частицы в превью. */
+  particles: boolean;
+}
 
 export function OverlayWidgetPageContentPreview(props: OverlayWidgetPageContentPreviewProps) {
-  const { nickname } = props;
+  const { nickname, particles } = props;
+
   const hasNickname = nickname.trim().length > 0;
   const previewCycle = useOverlayTestMatchCycle(hasNickname);
   const widgetOverlayRef = useRef<ComponentRef<typeof WidgetOverlay>>(null);
@@ -49,7 +53,7 @@ export function OverlayWidgetPageContentPreview(props: OverlayWidgetPageContentP
     <div className='overlay-widget-page-content__preview'>
       <div className='overlay-widget-page-content__preview-stage'>
         <div className='overlay-widget-page-content__preview-card'>
-          <WidgetOverlay ref={widgetOverlayRef}/>
+          <WidgetOverlay ref={widgetOverlayRef} particles={particles}/>
         </div>
       </div>
     </div>

@@ -11,14 +11,16 @@ export type OverlayWidgetPageLinkSectionProps = {
   nickname: string;
   /** Тестовый режим в ссылке на виджет. */
   testMode: BoolSetting;
+  /** Частицы на фоне при показе результата. */
+  particles: boolean;
   /** Дополнительный класс для стилизации компонента. */
   className?: string | undefined;
 };
 
 export function OverlayWidgetPageLinkSection(props: OverlayWidgetPageLinkSectionProps) {
-  const { nickname, testMode, className } = props;
+  const { nickname, testMode, particles, className } = props;
 
-  const { widgetUrl, canBuild, copy } = useOverlayWidgetPageLink({ nickname, testMode });
+  const { widgetUrl, canBuild, copy } = useOverlayWidgetPageLink({ nickname, testMode, particles });
 
   return (
     <Section title='Ссылка на виджет' className={classNames('overlay-widget-page-link-section', className)}>
